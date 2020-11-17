@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F91D3A112562D0BD0018238B /* FocusableTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = F91D3A102562D0BC0018238B /* FocusableTextField.swift */; };
+		F91D3A122562D0BD0018238B /* FocusableTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = F91D3A102562D0BC0018238B /* FocusableTextField.swift */; };
+		F91D3A132562D0BD0018238B /* FocusableTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = F91D3A102562D0BC0018238B /* FocusableTextField.swift */; };
 		F97309FB25600D05007109F7 /* TresorMockup4App.swift in Sources */ = {isa = PBXBuildFile; fileRef = F97309FA25600D05007109F7 /* TresorMockup4App.swift */; };
 		F97309FD25600D05007109F7 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F97309FC25600D05007109F7 /* ContentView.swift */; };
 		F97309FF25600D05007109F7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F97309FE25600D05007109F7 /* Assets.xcassets */; };
@@ -15,9 +18,6 @@
 		F9730A0725600D05007109F7 /* TresorMockup4.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = F9730A0525600D05007109F7 /* TresorMockup4.xcdatamodeld */; };
 		F9730A1225600D05007109F7 /* TresorMockup4Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9730A1125600D05007109F7 /* TresorMockup4Tests.swift */; };
 		F9730A1D25600D06007109F7 /* TresorMockup4UITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9730A1C25600D06007109F7 /* TresorMockup4UITests.swift */; };
-		F9730A4225600E18007109F7 /* AuthenticationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9730A3B25600E17007109F7 /* AuthenticationManager.swift */; };
-		F9730A4325600E18007109F7 /* AuthenticationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9730A3B25600E17007109F7 /* AuthenticationManager.swift */; };
-		F9730A4425600E18007109F7 /* AuthenticationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9730A3B25600E17007109F7 /* AuthenticationManager.swift */; };
 		F9730A4525600E18007109F7 /* SecureStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9730A3C25600E17007109F7 /* SecureStore.swift */; };
 		F9730A4625600E18007109F7 /* SecureStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9730A3C25600E17007109F7 /* SecureStore.swift */; };
 		F9730A4725600E18007109F7 /* SecureStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9730A3C25600E17007109F7 /* SecureStore.swift */; };
@@ -37,6 +37,9 @@
 		F9730A5525600E18007109F7 /* Cryptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9730A4125600E18007109F7 /* Cryptor.swift */; };
 		F9730A5625600E18007109F7 /* Cryptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9730A4125600E18007109F7 /* Cryptor.swift */; };
 		F9730A6425600E75007109F7 /* J1Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9730A6325600E75007109F7 /* J1Logger.swift */; };
+		F9730A7725614FF8007109F7 /* AuthenticationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9730A7625614FF8007109F7 /* AuthenticationManager.swift */; };
+		F9730A7825614FF8007109F7 /* AuthenticationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9730A7625614FF8007109F7 /* AuthenticationManager.swift */; };
+		F9730A7925614FF8007109F7 /* AuthenticationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9730A7625614FF8007109F7 /* AuthenticationManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -57,6 +60,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		F91D3A102562D0BC0018238B /* FocusableTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FocusableTextField.swift; sourceTree = "<group>"; };
 		F97309F725600D05007109F7 /* TresorMockup4.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TresorMockup4.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F97309FA25600D05007109F7 /* TresorMockup4App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TresorMockup4App.swift; sourceTree = "<group>"; };
 		F97309FC25600D05007109F7 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -71,7 +75,6 @@
 		F9730A1825600D06007109F7 /* TresorMockup4UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TresorMockup4UITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		F9730A1C25600D06007109F7 /* TresorMockup4UITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TresorMockup4UITests.swift; sourceTree = "<group>"; };
 		F9730A1E25600D06007109F7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		F9730A3B25600E17007109F7 /* AuthenticationManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthenticationManager.swift; sourceTree = "<group>"; };
 		F9730A3C25600E17007109F7 /* SecureStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SecureStore.swift; sourceTree = "<group>"; };
 		F9730A3D25600E17007109F7 /* LocalPassword.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocalPassword.swift; sourceTree = "<group>"; };
 		F9730A3E25600E17007109F7 /* CryptorExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CryptorExtensions.swift; sourceTree = "<group>"; };
@@ -79,6 +82,7 @@
 		F9730A4025600E17007109F7 /* RandomData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RandomData.swift; sourceTree = "<group>"; };
 		F9730A4125600E18007109F7 /* Cryptor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Cryptor.swift; sourceTree = "<group>"; };
 		F9730A6325600E75007109F7 /* J1Logger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = J1Logger.swift; sourceTree = "<group>"; };
+		F9730A7625614FF8007109F7 /* AuthenticationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -171,13 +175,14 @@
 		F9730A3A25600DFB007109F7 /* Cryptor */ = {
 			isa = PBXGroup;
 			children = (
-				F9730A3B25600E17007109F7 /* AuthenticationManager.swift */,
+				F9730A7625614FF8007109F7 /* AuthenticationManager.swift */,
 				F9730A4125600E18007109F7 /* Cryptor.swift */,
 				F9730A3F25600E17007109F7 /* CryptorCore.swift */,
 				F9730A3E25600E17007109F7 /* CryptorExtensions.swift */,
 				F9730A3D25600E17007109F7 /* LocalPassword.swift */,
 				F9730A4025600E17007109F7 /* RandomData.swift */,
 				F9730A3C25600E17007109F7 /* SecureStore.swift */,
+				F91D3A102562D0BC0018238B /* FocusableTextField.swift */,
 			);
 			path = Cryptor;
 			sourceTree = "<group>";
@@ -318,10 +323,11 @@
 				F9730A6425600E75007109F7 /* J1Logger.swift in Sources */,
 				F9730A5125600E18007109F7 /* RandomData.swift in Sources */,
 				F9730A5425600E18007109F7 /* Cryptor.swift in Sources */,
-				F9730A4225600E18007109F7 /* AuthenticationManager.swift in Sources */,
 				F9730A4B25600E18007109F7 /* CryptorExtensions.swift in Sources */,
 				F9730A4E25600E18007109F7 /* CryptorCore.swift in Sources */,
+				F9730A7725614FF8007109F7 /* AuthenticationManager.swift in Sources */,
 				F97309FB25600D05007109F7 /* TresorMockup4App.swift in Sources */,
+				F91D3A112562D0BD0018238B /* FocusableTextField.swift in Sources */,
 				F9730A4825600E18007109F7 /* LocalPassword.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -331,10 +337,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				F9730A4F25600E18007109F7 /* CryptorCore.swift in Sources */,
+				F9730A7825614FF8007109F7 /* AuthenticationManager.swift in Sources */,
 				F9730A4925600E18007109F7 /* LocalPassword.swift in Sources */,
 				F9730A1225600D05007109F7 /* TresorMockup4Tests.swift in Sources */,
 				F9730A5525600E18007109F7 /* Cryptor.swift in Sources */,
-				F9730A4325600E18007109F7 /* AuthenticationManager.swift in Sources */,
+				F91D3A122562D0BD0018238B /* FocusableTextField.swift in Sources */,
 				F9730A4625600E18007109F7 /* SecureStore.swift in Sources */,
 				F9730A4C25600E18007109F7 /* CryptorExtensions.swift in Sources */,
 				F9730A5225600E18007109F7 /* RandomData.swift in Sources */,
@@ -346,10 +353,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				F9730A5025600E18007109F7 /* CryptorCore.swift in Sources */,
+				F9730A7925614FF8007109F7 /* AuthenticationManager.swift in Sources */,
 				F9730A4A25600E18007109F7 /* LocalPassword.swift in Sources */,
 				F9730A1D25600D06007109F7 /* TresorMockup4UITests.swift in Sources */,
 				F9730A5625600E18007109F7 /* Cryptor.swift in Sources */,
-				F9730A4425600E18007109F7 /* AuthenticationManager.swift in Sources */,
+				F91D3A132562D0BD0018238B /* FocusableTextField.swift in Sources */,
 				F9730A4725600E18007109F7 /* SecureStore.swift in Sources */,
 				F9730A4D25600E18007109F7 /* CryptorExtensions.swift in Sources */,
 				F9730A5325600E18007109F7 /* RandomData.swift in Sources */,

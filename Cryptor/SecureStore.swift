@@ -64,8 +64,8 @@ internal class SecureStore {
         result = nil
         
         #if DEBUG
-//        SwiftyBeaver.debug("label=\(label) query=[\(self.queryString)]" +
-//            " SecItemCopyMatching=\(self.errorString(status))")
+        J1Logger.shared.debug("label=\(label) query=[\(self.queryString)]" +
+            " SecItemCopyMatching=\(self.errorString(status))")
         #endif
 
         switch status {
@@ -95,8 +95,8 @@ internal class SecureStore {
             SecItemCopyMatching(self.query as CFDictionary, UnsafeMutablePointer($0))
         }
         #if DEBUG
-//        SwiftyBeaver.debug("label=\(label) query=[\(self.queryString)]" +
-//            " SecItemCopyMatching=\(self.errorString(status))")
+        J1Logger.shared.debug("label=\(label) query=[\(self.queryString)]" +
+            " SecItemCopyMatching=\(self.errorString(status))")
         #endif
 
         guard status != errSecItemNotFound else {
@@ -132,8 +132,8 @@ internal class SecureStore {
         self.mutex.unlock()
 
         #if DEBUG
-//        SwiftyBeaver.debug("label=\(label) query=[\(self.queryString)]" +
-//            " SecItemAdd=\(self.errorString(status))")
+        J1Logger.shared.debug("label=\(label) query=[\(self.queryString)]" +
+            " SecItemAdd=\(self.errorString(status))")
         #endif
 
         guard status == noErr else {
@@ -151,8 +151,8 @@ internal class SecureStore {
         self.mutex.unlock()
 
         #if DEBUG
-//        SwiftyBeaver.debug("label=\(label) query=[\(self.queryString)]" +
-//            " SecItemUpdate=\(self.errorString(status))")
+        J1Logger.shared.debug("label=\(label) query=[\(self.queryString)]" +
+            " SecItemUpdate=\(self.errorString(status))")
         #endif
 
         guard status == noErr else {
@@ -170,8 +170,8 @@ internal class SecureStore {
         self.mutex.unlock()
 
         #if DEBUG
-//        SwiftyBeaver.debug("label=\(label) query=[\(self.queryString)]" +
-//            " SecItemDelete=\(self.errorString(status))")
+        J1Logger.shared.debug("label=\(label) query=[\(self.queryString)]" +
+            " SecItemDelete=\(self.errorString(status))")
         #endif
 
         guard status == noErr || status == errSecItemNotFound else {

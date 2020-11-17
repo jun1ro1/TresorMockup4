@@ -11,30 +11,25 @@ import SwiftUI
 struct TresorMockup4App: App {
     let persistenceController = PersistenceController.shared
     @State private var authentication: Bool = false
+    @ObservedObject var handler = AuthenticationHandler {
+        print($0 ? "OK" : "NG")
+    }
     @State private var showView: Bool = false
-
+    
     var body: some Scene {
         WindowGroup {
-            VStack {
             ContentView()
                 .environment(\.managedObjectContext, self.persistenceController.container.viewContext)
                 .onAppear {
-                    self.showView = AuthenticationManger.shared.authentication { success in
-                        self.authentication = success
-                        self.showView = false
-                    }
+                    self.handler.authenticate()
                 }
-                .sheet(isPresented: self.$showView) {
-                    AuthenticationManger.shared.authenticationView
+                .sheet(isPresented: self.$handler.shouldShow) {
+                    self.handler.view
                 }
-                self.authentication ? Text("OK") : Text("NG")
-                Button("Authenticate") {
-                    self.showView = AuthenticationManger.shared.authentication { success in
-                        self.authentication = success
-                        self.showView = false
-                    }
-                }
+            Button("Authenticate") {
+                self.handler.authenticate()
             }
         }
     }
 }
+

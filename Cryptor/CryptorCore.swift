@@ -219,10 +219,8 @@ internal class Validator {
         self.hashedMark = mark.hash()
 
         #if DEBUG
-            print("thread=\(Thread.current)", String(reflecting: type(of: self)),
-                  "\(#function) mark   =", mark as NSData)
-            print("thread=\(Thread.current)", String(reflecting: type(of: self)),
-                  "\(#function) hshMark=", self.hashedMark! as NSData)
+        J1Logger.shared.debug("mark=\(mark as NSData)")
+        J1Logger.shared.debug("hashedMark=\(self.hashedMark! as NSData)")
         #endif
 
         self.encryptedMark = try? mark.encrypt(using: key)
@@ -231,8 +229,7 @@ internal class Validator {
         }
 
         #if DEBUG
-            print("thread=\(Thread.current)", String(reflecting: type(of: self)),
-                  "\(#function) encryptedMark=", self.encryptedMark! as NSData)
+        J1Logger.shared.debug("encryptedMark=\(self.encryptedMark! as NSData)")
         #endif
     }
 
@@ -262,10 +259,8 @@ internal class Validator {
             defer { hashedDecryptedMark.reset() }
 
             #if DEBUG
-                print("thread=\(Thread.current)", String(reflecting: type(of: self)),
-                      "\(#function) hashedMark          =", hashedMark! as NSData)
-                print("thread=\(Thread.current)", String(reflecting: type(of: self)),
-                      "\(#function) hashedDecryptedMark =", hashedDecryptedMark as NSData)
+            J1Logger.shared.debug("hashedMark=\(hashedMark! as NSData)")
+            J1Logger.shared.debug("hashedDecryptedMark=\(hashedDecryptedMark as NSData)")
             #endif
 
             return hashedMark == hashedDecryptedMark
@@ -367,8 +362,7 @@ internal class CryptorCore {
         let kek = HKDF<SHA256>.deriveKey(inputKeyMaterial: prk, salt: salt, outputByteCount: 32)                
         self.mutex.unlock()
         #if DEBUG
-            print("thread=\(Thread.current)", String(reflecting: type(of: self)),
-                  "\(#function) KEK   =", kek.data as NSData)
+        J1Logger.shared.debug("KEK=\(kek.data as NSData)")
         #endif
         return kek
     }
@@ -442,14 +436,10 @@ internal class CryptorCore {
             try Validator.write(validator)
 
             #if DEBUG
-                print("thread=\(Thread.current)", String(reflecting: type(of: self)),
-                      "\(#function) salt  =", salt as NSData)
-                print("thread=\(Thread.current)", String(reflecting: type(of: self)),
-                      "\(#function) kek   =", kek.data as NSData)
-                print("thread=\(Thread.current)", String(reflecting: type(of: self)),
-                      "\(#function) cek   =", cek.data as NSData)
-                print("thread=\(Thread.current)", String(reflecting: type(of: self)),
-                      "\(#function) cekEnc=", cekEnc.data as NSData)
+            J1Logger.shared.debug("salt=\(salt as NSData)")
+            J1Logger.shared.debug("kek=\(kek.data as NSData)")
+            J1Logger.shared.debug("cek=\(cek.data as NSData)")
+            J1Logger.shared.debug("cekEnc=\(cekEnc.data as NSData)")
             #endif
         }
     }
@@ -493,15 +483,13 @@ internal class CryptorCore {
         }
 
         #if DEBUG
-            print("thread=\(Thread.current)", String(reflecting: type(of: self)),
-                  "\(#function) cek   =", cek.data as NSData)
+        J1Logger.shared.debug("cek   =\(cek.data)")
         #endif
 
         // check CEK
         guard validator.validate(key: cek) == true else {
             #if DEBUG
-                print("thread=\(Thread.current)", String(reflecting: type(of: self)),
-                      "\(#function) validate= false")
+            J1Logger.shared.debug("validate=false")
             #endif
             throw CryptorError.wrongPassword
         }
@@ -589,8 +577,7 @@ internal class CryptorCore {
         // check CEK
         guard validator.validate(key: cek) == true else {
             #if DEBUG
-                print("thread=\(Thread.current)", String(reflecting: type(of: self)),
-                      "\(#function) validate= false")
+            J1Logger.shared.debug("validate=false")
             #endif
             throw CryptorError.wrongPassword
         }
@@ -608,12 +595,9 @@ internal class CryptorCore {
         try CryptorSeed.update(seed)
 
         #if DEBUG
-            print("thread=\(Thread.current)", String(reflecting: type(of: self)),
-                  "\(#function) newkek    =", newkek.data as NSData)
-            print("thread=\(Thread.current)", String(reflecting: type(of: self)),
-                  "\(#function) cek       =", cek.data as NSData)
-            print("thread=\(Thread.current)", String(reflecting: type(of: self)),
-                  "\(#function) newkekEnc =", newcekEnc.data as NSData)
+        J1Logger.shared.debug("newkek   =\(newkek.data)")
+        J1Logger.shared.debug("cek      =\(cek.data)")
+        J1Logger.shared.debug("newkekEnc=\(newcekEnc.data)")
         #endif
     }
 
@@ -626,8 +610,7 @@ internal class CryptorCore {
         self.mutex.unlock()
 
         #if DEBUG
-            print("thread=\(Thread.current)", String(reflecting: type(of: self)),
-                  "\(#function) session.itk = ", (session?.itk.data as NSData?) ?? "nil")
+        J1Logger.shared.debug("session.itk=\(String(describing: session?.itk.data))")
         #endif
         guard var itk = session?.itk else {
             throw CryptorError.notOpened
@@ -664,8 +647,7 @@ internal class CryptorCore {
         self.mutex.unlock()
 
         #if DEBUG
-            print("thread=\(Thread.current)", String(reflecting: type(of: self)),
-                  "\(#function) session.itk = ", (session?.itk.data as NSData?) ?? "nil")
+        J1Logger.shared.debug("session.itk=\(String(describing: session?.itk.data))")
         #endif
         guard var itk = session?.itk else {
             throw CryptorError.notOpened
@@ -702,8 +684,7 @@ internal class CryptorCore {
         self.mutex.unlock()
 
         #if DEBUG
-            print("thread=\(Thread.current)", String(reflecting: type(of: self)),
-                  "\(#function) session.itk = ", (session?.itk.data as NSData?) ?? "nil")
+        J1Logger.shared.debug("session.itk=\(String(describing: session?.itk.data))")
         #endif
         guard var itk = session?.itk else {
             throw CryptorError.notOpened
@@ -741,8 +722,7 @@ internal class CryptorCore {
         self.mutex.unlock()
 
         #if DEBUG
-            print("thread=\(Thread.current)", String(reflecting: type(of: self)),
-                  "\(#function) session.itk = ", (session?.itk.data as NSData?) ?? "nil")
+        J1Logger.shared.debug("session.itk=\(String(describing: session?.itk.data))")
         #endif
         guard var itk = session?.itk else {
             throw CryptorError.notOpened
