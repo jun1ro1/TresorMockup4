@@ -64,6 +64,6 @@ internal class LocalPssword {
     }
 
     static func delete() throws {
-        try SecureStore.shared.delete(label: LocalPssword.label)
+        try SecureStore.shared.delete(label: LocalPssword.label, iCloud: false)
     }
 } // Validator

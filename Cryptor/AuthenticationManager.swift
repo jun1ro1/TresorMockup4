@@ -70,27 +70,29 @@ class AuthenticationHandler: ObservableObject {
         var authError: NSError? = nil
         
          guard Cryptor.isPrepared else {
+            J1Logger.shared.debug("Cryptor is not prepared")
             self.view =
-                AnyView(RegisterPasswordView(authenticatedBlock: self.authenticatedBlock))
+                AnyView(RegisterPasswordView(handler: self,
+                                             authenticatedBlock: self.authenticatedBlock))
             self.shouldShow = true
             return
         }
         
-        // already authenticated in 30 seconds
+        // It has been already authenticated in 30 seconds
         let authenticated = AuthenticationManger.shared.authenticated
         if authenticated {
-            J1Logger.shared.debug("authenticated=\(authenticated)")
+            J1Logger.shared.debug("already authenticated")
             self.authenticatedBlock?(true)
             return
         }
         assert(authenticated == false, "self.authenticated is not false")
         
         do {
-            let exists = try LocalPssword.doesExist()
-            guard exists else {
+            guard try LocalPssword.doesExist() else {
+                J1Logger.shared.debug("local password does not exist")
                 self.view =
-                    AnyView(EnterPasswordView(handler: self,
-                                              authenticatedBlock: authenticatedBlock))
+                    AnyView(RegisterPasswordView(handler: self,
+                                                 authenticatedBlock: self.authenticatedBlock))
                 self.shouldShow = true
                 return
             }
@@ -182,6 +184,7 @@ class AuthenticationHandler: ObservableObject {
     // MARK: - RegisterPasswordView
     // https://stackoverflow.com/questions/58069516/how-can-i-have-two-alerts-on-one-view-in-swiftui
     struct RegisterPasswordView: View {
+        var handler: AuthenticationHandler? = nil
         @State var authenticatedBlock: ((Bool) -> Void)?
         
         private enum ActiveAlert { case null, empty, unmatch }
@@ -193,7 +196,7 @@ class AuthenticationHandler: ObservableObject {
         
         var body: some View {
             VStack {
-                Text("Register Your Password")
+                Text("Register a password for this App to protect your data.")
                     .font(.title2)
                     .padding()
                 Toggle("Show Password", isOn: self.$showPassword)
@@ -246,10 +249,8 @@ class AuthenticationHandler: ObservableObject {
             }
             catch let error {
                 J1Logger.shared.error("Cryptor.prepare error = \(error)")
-                guard self.authenticatedBlock != nil else {
-                    return
-                }
-                self.authenticatedBlock!(false)
+                handler?.shouldShow = false
+                self.authenticatedBlock?(false)
                 return
             }
             
@@ -259,17 +260,13 @@ class AuthenticationHandler: ObservableObject {
             }
             catch let error {
                 J1Logger.shared.error("SecureStore write pass Error \(error)")
-                guard self.authenticatedBlock != nil else {
-                    return
-                }
-                self.authenticatedBlock!(false)
+                handler?.shouldShow = false
+                self.authenticatedBlock?(false)
                 return
             }
             
-            guard self.authenticatedBlock != nil else {
-                return
-            }
-            self.authenticatedBlock!(true)
+            handler?.shouldShow = false
+            self.authenticatedBlock?(true)
         }
     }
 

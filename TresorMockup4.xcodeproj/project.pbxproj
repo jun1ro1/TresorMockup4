@@ -61,6 +61,7 @@
 
 /* Begin PBXFileReference section */
 		F91D3A102562D0BC0018238B /* FocusableTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FocusableTextField.swift; sourceTree = "<group>"; };
+		F94207AF256579CE008F4883 /* log.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = log.rtf; sourceTree = "<group>"; };
 		F97309F725600D05007109F7 /* TresorMockup4.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TresorMockup4.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F97309FA25600D05007109F7 /* TresorMockup4App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TresorMockup4App.swift; sourceTree = "<group>"; };
 		F97309FC25600D05007109F7 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -183,6 +184,7 @@
 				F9730A4025600E17007109F7 /* RandomData.swift */,
 				F9730A3C25600E17007109F7 /* SecureStore.swift */,
 				F91D3A102562D0BC0018238B /* FocusableTextField.swift */,
+				F94207AF256579CE008F4883 /* log.rtf */,
 			);
 			path = Cryptor;
 			sourceTree = "<group>";

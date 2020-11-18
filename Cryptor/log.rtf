@@ -1,0 +1,30 @@
+{\rtf1\ansi\ansicpg932\cocoartf2513
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fnil\fcharset0 Menlo-Bold;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;\red255\green255\blue255;\red251\green2\blue7;
+}
+{\*\expandedcolortbl;;\csgenericrgb\c0\c0\c0;\csgenericrgb\c100000\c100000\c100000;\cssrgb\c100000\c14913\c0;
+}
+\paperw12240\paperh15840\margl1440\margr1440\vieww9000\viewh8400\viewkind0
+\deftab593
+\pard\tx593\pardeftab593\pardirnatural\partightenfactor0
+
+\f0\b\fs24 \cf2 \cb3 2020-11-19 00:46:28.230974+0900 TresorMockup4[1450:58444] [DEBUG] main TresorMockup4/SecureStore.doseExist(label:iCloud:):67 - label=CryptorSeed query=[m_Limit:m_LimitOne, r_Data:1, acct:CryptorSeed, sync:1, svce:com.gmail.jun1ro1.TresorMockup4, class:genp, r_Attributes:1] SecItemCopyMatching=-25300:The specified item could not be found in the keychain.\
+2020-11-19 00:46:28.231149+0900 TresorMockup4[1450:58444] [DEBUG] main TresorMockup4/AuthenticationManager.authenticate():73 - Cryptor is not prepared\
+2020-11-19 00:46:51.549514+0900 TresorMockup4[1450:58444] invalid mode 'kCFRunLoopCommonModes' provided to CFRunLoopRunSpecific - break on _CFRunLoopError_RunCalledWithInvalidMode to debug. This message will only appear once per execution.\
+2020-11-19 00:47:38.310705+0900 TresorMockup4[1450:58444] [DEBUG] main TresorMockup4/SecureStore.doseExist(label:iCloud:):67 - label=CryptorSeed query=[sync:1, r_Data:1, class:genp, r_Attributes:1, acct:CryptorSeed, m_Limit:m_LimitOne, svce:com.gmail.jun1ro1.TresorMockup4] SecItemCopyMatching=-25300:The specified item could not be found in the keychain.\
+2020-11-19 00:47:38.313634+0900 TresorMockup4[1450:58444] [DEBUG] main TresorMockup4/CryptorCore.getKEK(password:seed:):365 - KEK=\{length = 32, bytes = 0x69546fce 36df6250 dfa9e9bd c98fe193 ... a1b03816 5e59641e \}\
+2020-11-19 00:47:38.314493+0900 TresorMockup4[1450:58444] [DEBUG] main TresorMockup4/CryptorCore.init(key:):222 - mark=\{length = 16, bytes = 0x095b95c9798c3bb215e91cb83df33eba\}\
+2020-11-19 00:47:38.314714+0900 TresorMockup4[1450:58444] [DEBUG] main TresorMockup4/CryptorCore.init(key:):223 - hashedMark=\{length = 32, bytes = 0xcc343e26 e10287cf f5870f02 cd5a3e88 ... 8c858b78 afbc778d \}\
+2020-11-19 00:47:38.317082+0900 TresorMockup4[1450:58444] [DEBUG] main TresorMockup4/CryptorCore.init(key:):232 - encryptedMark=\{length = 44, bytes = 0x04d1c2c2 42411ac7 d75ccf9f 941052a9 ... caa00129 4ebdc2f9 \}\
+2020-11-19 00:47:38.320557+0900 TresorMockup4[1450:58444] [DEBUG] main TresorMockup4/SecureStore.write(label:_:iCloud:):135 - label=CryptorSeed query=[acct:CryptorSeed, class:genp, svce:com.gmail.jun1ro1.TresorMockup4, v_Data:\{length = 107, bytes = 0x323a3247 4744667a 51556e6f 494a374d ... 4d62324b 72394a72 \}, sync:1] SecItemAdd=0:No error.\
+2020-11-19 00:47:38.323137+0900 TresorMockup4[1450:58444] [DEBUG] main TresorMockup4/SecureStore.write(label:_:iCloud:):135 - label=Validator query=[acct:Validator, class:genp, svce:com.gmail.jun1ro1.TresorMockup4, v_Data:\{length = 105, bytes = 0x7a44512b 4a754543 68382f31 68773843 ... 4b553639 77766b3d \}, sync:1] SecItemAdd=0:No error.\
+2020-11-19 00:47:38.325203+0900 TresorMockup4[1450:58444] [DEBUG] main TresorMockup4/CryptorCore.prepare(password:):439 - salt=\{length = 16, bytes = 0xd861837f34149e8209eccb275d22bd78\}\
+2020-11-19 00:47:38.325384+0900 TresorMockup4[1450:58444] [DEBUG] main TresorMockup4/CryptorCore.prepare(password:):440 - kek=\{length = 32, bytes = 0x69546fce 36df6250 dfa9e9bd c98fe193 ... a1b03816 5e59641e \}\
+2020-11-19 00:47:38.325491+0900 TresorMockup4[1450:58444] [DEBUG] main TresorMockup4/CryptorCore.prepare(password:):441 - cek=\{length = 32, bytes = 0x0137e76c fc812155 8370632b 52cad92c ... e2f5b116 b3b715f2 \}\
+2020-11-19 00:47:38.325624+0900 TresorMockup4[1450:58444] [DEBUG] main TresorMockup4/CryptorCore.prepare(password:):442 - cekEnc=\{length = 60, bytes = 0x68270377 a5372b6e 14155409 b1f79cda ... 961231bd 8aafd26b \}\
+\
+2020-11-19 00:47:38.328060+0900 TresorMockup4[1450:58444] [DEBUG] main TresorMockup4/SecureStore.write(label:_:iCloud:):135 - label=Password query=[class:genp, sync:0, acct:Password, v_Data:\{length = 8, bytes = 0x70617373776f7264\}, svce:com.gmail.jun1ro1.TresorMockup4] SecItemAdd=-25299:The specified item already exists in the keychain.\
+\
+\cf4 2020-11-19 00:47:38.330063+0900 TresorMockup4[1450:58444] [ERROR] main TresorMockup4/AuthenticationManager.checkPassword():261 - SecureStore write pass Error SecItemError(error: -25299)\
+\cf2 NG\
+}
