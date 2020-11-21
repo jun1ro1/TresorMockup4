@@ -13,9 +13,12 @@ struct PersistenceController {
     static var preview: PersistenceController = {
         let result = PersistenceController(inMemory: true)
         let viewContext = result.container.viewContext
-        for _ in 0..<10 {
-            let newItem = Item(context: viewContext)
-            newItem.timestamp = Date()
+        for n in 0..<10 {
+            let newItem = Site(context: viewContext)
+            let title = "Title" + String(n)
+            newItem.title     = title
+            newItem.titleSort = title
+            newItem.url       = "https://www.url\(String(n)).com/"
         }
         do {
             try viewContext.save()
