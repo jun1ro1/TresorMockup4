@@ -15,7 +15,7 @@ import CoreData
 
 struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
-    @State private var refresh: UUID = UUID()
+    @State private var updateCount: Int = 0
     @State private var searchText = ""
         
 //    @FetchRequest(
@@ -41,7 +41,7 @@ struct ContentView: View {
                 HStack {
                 SearchBar(text: self.$searchText)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    Text(String(self.refresh.uuidString))
+                    Text(String(self.updateCount))
                         .frame(width: 0.0, height: 0.0, alignment: .trailing)
                         .hidden()
                 }
@@ -70,8 +70,15 @@ struct ContentView: View {
                 }
             }
         }
+        .onAppear {
+            self.update()
+        }
     }
     
+    
+    private func update() {
+        self.updateCount = (self.updateCount + 1) % 8
+    }
     private func addItem() {
         withAnimation {
             let newItem = Site(context: viewContext)
@@ -80,6 +87,7 @@ struct ContentView: View {
             
             do {
                 try viewContext.save()
+                self.update()
             } catch {
                 // Replace this implementation with code to handle the error appropriately.
                 // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
@@ -98,7 +106,7 @@ struct ContentView: View {
 
             do {
                 try viewContext.save()
-                self.refresh = UUID()
+                self.update()
             } catch {
                 // Replace this implementation with code to handle the error appropriately.
                 // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
