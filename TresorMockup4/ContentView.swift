@@ -8,13 +8,14 @@
 
 // https://note.com/dngri/n/n26e807c880db
 // https://www.raywenderlich.com/9335365-core-data-with-swiftui-tutorial-getting-started
+// https://stackoverflow.com/questions/56533511/how-update-a-swiftui-list-without-animation
 
 import SwiftUI
 import CoreData
 
 struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
-//    @State private var refresh = false
+    @State private var refresh: UUID = UUID()
     @State private var searchText = ""
         
 //    @FetchRequest(
@@ -37,8 +38,13 @@ struct ContentView: View {
     var body: some View {
         NavigationView {
             List {
+                HStack {
                 SearchBar(text: self.$searchText)
                     .frame(maxWidth: .infinity, alignment: .leading)
+                    Text(String(self.refresh.uuidString))
+                        .frame(width: 0.0, height: 0.0, alignment: .trailing)
+                        .hidden()
+                }
                 ForEach(self.searchedItems, id: \.self) { item in
                     VStack(alignment: .leading) {
                         Text(item.title ?? "")
@@ -92,9 +98,7 @@ struct ContentView: View {
 
             do {
                 try viewContext.save()
-                _ = self.searchedItems
-//                self.refresh = true
-//                self.refresh = false
+                self.refresh = UUID()
             } catch {
                 // Replace this implementation with code to handle the error appropriately.
                 // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
