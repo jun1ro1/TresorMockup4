@@ -4,47 +4,65 @@
 //
 //  Created by OKU Junichirou on 2020/11/14.
 //
+// https://www.appcoda.com/swiftui-search-bar/
+// https://www.hackingwithswift.com/books/ios-swiftui/dynamically-filtering-fetchrequest-with-swiftui
+
+// https://note.com/dngri/n/n26e807c880db
+// https://www.raywenderlich.com/9335365-core-data-with-swiftui-tutorial-getting-started
 
 import SwiftUI
 import CoreData
 
 struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
-
+    
+    @State private var searchText = ""
+//    @State private var predicate: NSPredicate? = nil
+    
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Site.titleSort, ascending: true)],
-        animation: .default)
-    private var items: FetchedResults<Site>
-
+        animation: .default) var items: FetchedResults<Site>
+    
     var body: some View {
-        List {
-            ForEach(items) { item in
-                VStack(alignment: .leading) {
-                    Text(item.title ?? "")
-                    Text(item.url ?? "")
-                        .frame(maxWidth: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/, alignment: .trailing)
-                        .font(.subheadline)
-                        .foregroundColor(.gray)
+        NavigationView {
+            List {
+                SearchBar(text: self.$searchText)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                ForEach(self.items, id: \.self) { item in
+//                FilteredList(filterKey: "title", searchText: self.searchText) { item in
+//                    let item = item as! Site
+                    VStack(alignment: .leading) {
+                        Text(item.title ?? "")
+                        Text(item.url ?? "")
+                            .italic()
+                            .frame(maxWidth: .infinity, alignment: .trailing)
+                            .font(.subheadline)
+                            .foregroundColor(.gray)
+                    }
                 }
+                .onDelete(perform: deleteItems)
             }
-            .onDelete(perform: deleteItems)
-        }
-        .toolbar {
-            #if os(iOS)
-            EditButton()
-            #endif
-
-            Button(action: addItem) {
-                Label("Add Item", systemImage: "plus")
+            .navigationBarTitle("Sites")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: addItem, label: {
+                        Image(systemName: "plus")
+                    })
+                }
+                ToolbarItem(placement: .navigationBarLeading) {
+                    EditButton()
+                }
             }
         }
     }
-
+    
     private func addItem() {
         withAnimation {
             let newItem = Site(context: viewContext)
-            newItem.titleSort = "title"
-
+            newItem.title     = "newly added"
+            newItem.titleSort = newItem.title
+            
             do {
                 try viewContext.save()
             } catch {
@@ -55,7 +73,7 @@ struct ContentView: View {
             }
         }
     }
-
+    
     private func deleteItems(offsets: IndexSet) {
         withAnimation {
             offsets.map { items[$0] }.forEach(viewContext.delete)
@@ -71,6 +89,7 @@ struct ContentView: View {
         }
     }
 }
+
 
 private let itemFormatter: DateFormatter = {
     let formatter = DateFormatter()
