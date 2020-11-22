@@ -53,7 +53,6 @@ struct PersistenceController {
             "morphophyly",
             "tauromachic",
             "introconvertibility",
-
         ]
         
         let urls = [
@@ -126,7 +125,7 @@ struct PersistenceController {
     
     init(inMemory: Bool = false) {
         container = NSPersistentCloudKitContainer(name: "TresorMockup4")
-        if inMemory {
+        if true { // inMemory {
             container.persistentStoreDescriptions.first!.url = URL(fileURLWithPath: "/dev/null")
         }
         container.loadPersistentStores(completionHandler: { (storeDescription, error) in

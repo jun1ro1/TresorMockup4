@@ -5,7 +5,6 @@
 //  Created by OKU Junichirou on 2020/11/14.
 //
 // https://www.appcoda.com/swiftui-search-bar/
-// https://www.hackingwithswift.com/books/ios-swiftui/dynamically-filtering-fetchrequest-with-swiftui
 
 // https://note.com/dngri/n/n26e807c880db
 // https://www.raywenderlich.com/9335365-core-data-with-swiftui-tutorial-getting-started
@@ -15,13 +14,13 @@ import CoreData
 
 struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
-
+//    @State private var refresh = false
     @State private var searchText = ""
         
-    @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \Site.titleSort, ascending: true)],
-        animation: .default) var items: FetchedResults<Site>
-    
+//    @FetchRequest(
+//        sortDescriptors: [NSSortDescriptor(keyPath: \Site.titleSort, ascending: true)],
+//        animation: .default) var items: FetchedResults<Site>
+
     var searchedItems: [Site] {
         let sortDescriptors: [NSSortDescriptor] = [NSSortDescriptor(keyPath: \Site.titleSort, ascending: true)]
         let predicate: NSPredicate? =
@@ -86,10 +85,16 @@ struct ContentView: View {
     
     private func deleteItems(offsets: IndexSet) {
         withAnimation {
-            offsets.map { items[$0] }.forEach(viewContext.delete)
+//            let deleted = offsets.map { self.searchedItems[$0] }
+            offsets.map { self.searchedItems[$0] }.forEach {
+                viewContext.delete($0)
+            }
 
             do {
                 try viewContext.save()
+                _ = self.searchedItems
+//                self.refresh = true
+//                self.refresh = false
             } catch {
                 // Replace this implementation with code to handle the error appropriately.
                 // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.

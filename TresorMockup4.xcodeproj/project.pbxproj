@@ -26,7 +26,6 @@
 		F9ECF1DA2568B7AA00936DAF /* Site+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9ECF1D92568B7AA00936DAF /* Site+Extensions.swift */; };
 		F9ECF1E52568CBF700936DAF /* TresorMockup4.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = F9730A0525600D05007109F7 /* TresorMockup4.xcdatamodeld */; };
 		F9ECF1F625695C7600936DAF /* SearchBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9ECF1F525695C7600936DAF /* SearchBar.swift */; };
-		F9ECF1FB256A0EB600936DAF /* FilteredList.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9ECF1FA256A0EB500936DAF /* FilteredList.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -74,7 +73,6 @@
 		F9ECF1D92568B7AA00936DAF /* Site+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Site+Extensions.swift"; path = "TresorMockup4/Site+Extensions.swift"; sourceTree = "<group>"; };
 		F9ECF1DE2568C01400936DAF /* memo.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = memo.rtf; sourceTree = "<group>"; };
 		F9ECF1F525695C7600936DAF /* SearchBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchBar.swift; sourceTree = "<group>"; };
-		F9ECF1FA256A0EB500936DAF /* FilteredList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilteredList.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -179,7 +177,6 @@
 				F9730A0825600D05007109F7 /* Info.plist */,
 				F9730A0025600D05007109F7 /* Preview Content */,
 				F9ECF1F525695C7600936DAF /* SearchBar.swift */,
-				F9ECF1FA256A0EB500936DAF /* FilteredList.swift */,
 			);
 			path = TresorMockup4;
 			sourceTree = "<group>";
@@ -321,7 +318,6 @@
 				F9730A6425600E75007109F7 /* J1Logger.swift in Sources */,
 				F9730A5125600E18007109F7 /* RandomData.swift in Sources */,
 				F9730A5425600E18007109F7 /* Cryptor.swift in Sources */,
-				F9ECF1FB256A0EB600936DAF /* FilteredList.swift in Sources */,
 				F9730A4B25600E18007109F7 /* CryptorExtensions.swift in Sources */,
 				F9730A4E25600E18007109F7 /* CryptorCore.swift in Sources */,
 				F9730A7725614FF8007109F7 /* AuthenticationManager.swift in Sources */,
