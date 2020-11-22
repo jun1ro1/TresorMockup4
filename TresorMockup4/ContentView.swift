@@ -15,22 +15,32 @@ import CoreData
 
 struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
-    
+
     @State private var searchText = ""
-//    @State private var predicate: NSPredicate? = nil
-    
+        
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Site.titleSort, ascending: true)],
         animation: .default) var items: FetchedResults<Site>
     
+    var searchedItems: [Site] {
+        let sortDescriptors: [NSSortDescriptor] = [NSSortDescriptor(keyPath: \Site.titleSort, ascending: true)]
+        let predicate: NSPredicate? =
+            (self.$searchText.wrappedValue == "") ?
+            nil : NSPredicate(format: "title CONTAINS[cd] %@",  self.$searchText.wrappedValue)
+        
+        let request = NSFetchRequest<Site>(entityName: Site.entity().name!)
+        request.sortDescriptors = sortDescriptors
+        request.predicate       = predicate
+        let result = try? self.viewContext.fetch(request)
+        return result ?? []
+    }
+
     var body: some View {
         NavigationView {
             List {
                 SearchBar(text: self.$searchText)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                ForEach(self.items, id: \.self) { item in
-//                FilteredList(filterKey: "title", searchText: self.searchText) { item in
-//                    let item = item as! Site
+                ForEach(self.searchedItems, id: \.self) { item in
                     VStack(alignment: .leading) {
                         Text(item.title ?? "")
                         Text(item.url ?? "")
