@@ -18,7 +18,7 @@ class AuthenticationManger {
     
     static var shared: AuthenticationManger = {
         if _manager == nil {
-            #if true // DEBUG_DELETE_KEYCHAIN
+            #if false // DEBUG_DELETE_KEYCHAIN
             try? CryptorSeed.delete()
             try? Validator.delete()
             try? LocalPssword.delete()

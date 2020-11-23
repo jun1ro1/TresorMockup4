@@ -22,7 +22,7 @@ struct ContentView: View {
     //        sortDescriptors: [NSSortDescriptor(keyPath: \Site.titleSort, ascending: true)],
     //        animation: .default) var items: FetchedResults<Site>
     
-    var searchedItems: [Site] {
+    var items: [Site] {
         let sortDescriptors: [NSSortDescriptor] = [NSSortDescriptor(keyPath: \Site.titleSort, ascending: true)]
         let predicate: NSPredicate? =
             (self.$searchText.wrappedValue == "") ?
@@ -44,20 +44,21 @@ struct ContentView: View {
                     .frame(width: 0.0, height: 0.0, alignment: .trailing)
                     .hidden()
             }
-            ForEach(self.searchedItems, id: \.self) { item in
-                VStack(alignment: .leading) {
-                    Text(item.title ?? "")
-                    Text(item.url ?? "")
-                        .italic()
-                        .frame(maxWidth: .infinity, alignment: .trailing)
-                        .font(.subheadline)
-                        .foregroundColor(.gray)
+            ForEach(self.items, id: \.self) { item in
+                NavigationLink(destination: DetailView(item: item)) {
+                    VStack(alignment: .leading) {
+                        Text(item.title ?? "")
+                        Text(item.url ?? "")
+                            .italic()
+                            .frame(maxWidth: .infinity, alignment: .trailing)
+                            .font(.caption)
+                            .foregroundColor(.gray)
+                    }
                 }
             }
             .onDelete(perform: deleteItems)
         }
         .navigationTitle("Sites")
-        //            .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: addItem, label: {
@@ -100,7 +101,7 @@ struct ContentView: View {
     private func deleteItems(offsets: IndexSet) {
         withAnimation {
             //            let deleted = offsets.map { self.searchedItems[$0] }
-            offsets.map { self.searchedItems[$0] }.forEach {
+            offsets.map { self.items[$0] }.forEach {
                 viewContext.delete($0)
             }
             

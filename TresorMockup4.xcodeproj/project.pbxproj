@@ -23,6 +23,8 @@
 		F9730A5425600E18007109F7 /* Cryptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9730A4125600E18007109F7 /* Cryptor.swift */; };
 		F9730A6425600E75007109F7 /* J1Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9730A6325600E75007109F7 /* J1Logger.swift */; };
 		F9730A7725614FF8007109F7 /* AuthenticationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9730A7625614FF8007109F7 /* AuthenticationManager.swift */; };
+		F9851EC2256BEC0500784485 /* TestData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9851EC1256BEC0500784485 /* TestData.swift */; };
+		F9851ECA256BEEA800784485 /* DetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9851EC9256BEEA800784485 /* DetailView.swift */; };
 		F9ECF1DA2568B7AA00936DAF /* Site+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9ECF1D92568B7AA00936DAF /* Site+Extensions.swift */; };
 		F9ECF1E52568CBF700936DAF /* TresorMockup4.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = F9730A0525600D05007109F7 /* TresorMockup4.xcdatamodeld */; };
 		F9ECF1F625695C7600936DAF /* SearchBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9ECF1F525695C7600936DAF /* SearchBar.swift */; };
@@ -70,6 +72,8 @@
 		F9730A4125600E18007109F7 /* Cryptor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Cryptor.swift; sourceTree = "<group>"; };
 		F9730A6325600E75007109F7 /* J1Logger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = J1Logger.swift; sourceTree = "<group>"; };
 		F9730A7625614FF8007109F7 /* AuthenticationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationManager.swift; sourceTree = "<group>"; };
+		F9851EC1256BEC0500784485 /* TestData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestData.swift; sourceTree = "<group>"; };
+		F9851EC9256BEEA800784485 /* DetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailView.swift; sourceTree = "<group>"; };
 		F9ECF1D92568B7AA00936DAF /* Site+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Site+Extensions.swift"; path = "TresorMockup4/Site+Extensions.swift"; sourceTree = "<group>"; };
 		F9ECF1DE2568C01400936DAF /* memo.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = memo.rtf; sourceTree = "<group>"; };
 		F9ECF1F525695C7600936DAF /* SearchBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchBar.swift; sourceTree = "<group>"; };
@@ -168,15 +172,17 @@
 		F9ECF0F02568303800936DAF /* TresorMockup4 */ = {
 			isa = PBXGroup;
 			children = (
-				F9730A0525600D05007109F7 /* TresorMockup4.xcdatamodeld */,
 				F9730A6325600E75007109F7 /* J1Logger.swift */,
 				F97309FA25600D05007109F7 /* TresorMockup4App.swift */,
 				F97309FC25600D05007109F7 /* ContentView.swift */,
-				F97309FE25600D05007109F7 /* Assets.xcassets */,
+				F9851EC9256BEEA800784485 /* DetailView.swift */,
 				F9730A0325600D05007109F7 /* Persistence.swift */,
-				F9730A0825600D05007109F7 /* Info.plist */,
-				F9730A0025600D05007109F7 /* Preview Content */,
 				F9ECF1F525695C7600936DAF /* SearchBar.swift */,
+				F9851EC1256BEC0500784485 /* TestData.swift */,
+				F9730A0825600D05007109F7 /* Info.plist */,
+				F9730A0525600D05007109F7 /* TresorMockup4.xcdatamodeld */,
+				F97309FE25600D05007109F7 /* Assets.xcassets */,
+				F9730A0025600D05007109F7 /* Preview Content */,
 			);
 			path = TresorMockup4;
 			sourceTree = "<group>";
@@ -312,9 +318,11 @@
 			files = (
 				F9730A0425600D05007109F7 /* Persistence.swift in Sources */,
 				F9730A4525600E18007109F7 /* SecureStore.swift in Sources */,
+				F9851ECA256BEEA800784485 /* DetailView.swift in Sources */,
 				F9ECF1F625695C7600936DAF /* SearchBar.swift in Sources */,
 				F9ECF1E52568CBF700936DAF /* TresorMockup4.xcdatamodeld in Sources */,
 				F97309FD25600D05007109F7 /* ContentView.swift in Sources */,
+				F9851EC2256BEC0500784485 /* TestData.swift in Sources */,
 				F9730A6425600E75007109F7 /* J1Logger.swift in Sources */,
 				F9730A5125600E18007109F7 /* RandomData.swift in Sources */,
 				F9730A5425600E18007109F7 /* Cryptor.swift in Sources */,
