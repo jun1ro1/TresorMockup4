@@ -125,7 +125,12 @@ struct PersistenceController {
     
     init(inMemory: Bool = false) {
         container = NSPersistentCloudKitContainer(name: "TresorMockup4")
-        if true { // inMemory {
+        var debugging = false
+        #if DEBUG
+        debugging = true
+        #endif
+        
+        if inMemory || debugging {
             container.persistentStoreDescriptions.first!.url = URL(fileURLWithPath: "/dev/null")
         }
         container.loadPersistentStores(completionHandler: { (storeDescription, error) in

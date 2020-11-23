@@ -16,7 +16,7 @@ class AuthenticationManger {
     
     static var shared: AuthenticationManger = {
         if _manager == nil {
-            #if true // DEBUG_DELETE_KEYCHAIN
+            #if false // DEBUG_DELETE_KEYCHAIN
             try? CryptorSeed.delete()
             try? Validator.delete()
             try? LocalPssword.delete()
@@ -30,7 +30,7 @@ class AuthenticationManger {
     
     private var mutex = NSLock()
     private var _authenticated = false
-    fileprivate var authenticated: Bool {
+    var authenticated: Bool {
         get {
             self.mutex.lock()
             let val = self._authenticated
@@ -53,13 +53,14 @@ class AuthenticationManger {
     
     init() {}
 }
-    // https://stackoverflow.com/questions/24158062/how-to-use-touch-id-sensor-in-ios-8/40612228
-    
+// https://stackoverflow.com/questions/24158062/how-to-use-touch-id-sensor-in-ios-8/40612228
+
 class AuthenticationHandler: ObservableObject {
     @Published var view: AnyView = AnyView(EmptyView())
     @Published var shouldShow: Bool = false
-    private    var authenticatedBlock: ((Bool) -> Void)? = nil
-
+    @Published var authenticated: Bool = false
+    private    var authenticatedBlock: ((Bool) -> Void) = {_ in}
+    
     init() {}
     
     init(_ authenticatedBlock: @escaping (Bool) -> Void) {
@@ -69,7 +70,7 @@ class AuthenticationHandler: ObservableObject {
     internal func authenticate() {
         var authError: NSError? = nil
         
-         guard Cryptor.isPrepared else {
+        guard Cryptor.isPrepared else {
             J1Logger.shared.debug("Cryptor is not prepared")
             self.view =
                 AnyView(RegisterPasswordView(handler: self,
@@ -82,7 +83,8 @@ class AuthenticationHandler: ObservableObject {
         let authenticated = AuthenticationManger.shared.authenticated
         if authenticated {
             J1Logger.shared.debug("already authenticated")
-            self.authenticatedBlock?(true)
+            self.authenticated = true
+            self.authenticatedBlock(true)
             return
         }
         assert(authenticated == false, "self.authenticated is not false")
@@ -99,7 +101,8 @@ class AuthenticationHandler: ObservableObject {
         }
         catch let error {
             J1Logger.shared.debug("LocalPssword.doesExist=\(error)")
-            self.authenticatedBlock?(false)
+            self.authenticated = false
+            self.authenticatedBlock(false)
             return
         }
         
@@ -109,37 +112,39 @@ class AuthenticationHandler: ObservableObject {
                                      error: &authError) {
             context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics,
                                    localizedReason: reason) { (success, error) in
-                checkPassword: do {
-                    guard success else {
-                        J1Logger.shared.error("Authenticaion Error \(error!)")
-                        break checkPassword
+                DispatchQueue.main.async {
+                    checkPassword: do {
+                        guard success else {                        J1Logger.shared.error("Authenticaion Error \(error!)")
+                            break checkPassword
+                        }
+                        J1Logger.shared.debug("evaluatePolicy=success")
+                        
+                        var localPass: LocalPssword? = nil
+                        do {
+                            localPass = try LocalPssword.read()
+                        }
+                        catch let error {
+                            J1Logger.shared.error("SecureStore read password Error \(error)")
+                            break checkPassword
+                        }
+                        guard localPass != nil else {
+                            J1Logger.shared.error("SecureStore read password failed")
+                            break checkPassword
+                        }
+                        do {
+                            try Cryptor.prepare(password: localPass!.password!)
+                        }
+                        catch let error {
+                            J1Logger.shared.error("Cryptor.prepare error = \(error)")
+                            break checkPassword
+                        }
+                        AuthenticationManger.shared.authenticated = true
                     }
-                    J1Logger.shared.debug("evaluatePolicy=success")
-                    
-                    var localPass: LocalPssword? = nil
-                    do {
-                        localPass = try LocalPssword.read()
-                    }
-                    catch let error {
-                        J1Logger.shared.error("SecureStore read password Error \(error)")
-                        break checkPassword
-                    }
-                    guard localPass != nil else {
-                        J1Logger.shared.error("SecureStore read password failed")
-                        break checkPassword
-                    }
-                    do {
-                        try Cryptor.prepare(password: localPass!.password!)
-                    }
-                    catch let error {
-                        J1Logger.shared.error("Cryptor.prepare error = \(error)")
-                        break checkPassword
-                    }
-                    AuthenticationManger.shared.authenticated = true
+                    let val = AuthenticationManger.shared.authenticated
+                    J1Logger.shared.debug("authenticated=\(val)")
+                    self.authenticated = val
+                    self.authenticatedBlock(val)
                 }
-                let val = AuthenticationManger.shared.authenticated
-                J1Logger.shared.debug("authenticated=\(val)")
-                self.authenticatedBlock?(val)
             }
         }
         else {
@@ -180,7 +185,7 @@ class AuthenticationHandler: ObservableObject {
             }
         }
     }
-
+    
     // MARK: - RegisterPasswordView
     // https://stackoverflow.com/questions/58069516/how-can-i-have-two-alerts-on-one-view-in-swiftui
     struct RegisterPasswordView: View {
@@ -250,6 +255,7 @@ class AuthenticationHandler: ObservableObject {
             catch let error {
                 J1Logger.shared.error("Cryptor.prepare error = \(error)")
                 handler?.shouldShow = false
+                self.handler?.authenticated = false
                 self.authenticatedBlock?(false)
                 return
             }
@@ -261,15 +267,17 @@ class AuthenticationHandler: ObservableObject {
             catch let error {
                 J1Logger.shared.error("SecureStore write pass Error \(error)")
                 handler?.shouldShow = false
+                self.handler?.authenticated = false
                 self.authenticatedBlock?(false)
                 return
             }
             
             handler?.shouldShow = false
+            self.handler?.authenticated = true
             self.authenticatedBlock?(true)
         }
     }
-
+    
     // https://developer.apple.com/forums/thread/650112
     struct EnterPasswordView: View {
         var handler: AuthenticationHandler? = nil
@@ -327,11 +335,13 @@ class AuthenticationHandler: ObservableObject {
             catch let error {
                 J1Logger.shared.error("Cryptor.prepare error = \(error)")
                 handler?.shouldShow = false
+                self.handler?.authenticated = false
                 self.authenticatedBlock?(false)
                 return
             }
             
             handler?.shouldShow = false
+            self.handler?.authenticated = true
             self.authenticatedBlock?(true)
         }
     }

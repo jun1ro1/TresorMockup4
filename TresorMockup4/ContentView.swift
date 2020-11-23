@@ -17,11 +17,11 @@ struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @State private var updateCount: Int = 0
     @State private var searchText = ""
-        
-//    @FetchRequest(
-//        sortDescriptors: [NSSortDescriptor(keyPath: \Site.titleSort, ascending: true)],
-//        animation: .default) var items: FetchedResults<Site>
-
+    
+    //    @FetchRequest(
+    //        sortDescriptors: [NSSortDescriptor(keyPath: \Site.titleSort, ascending: true)],
+    //        animation: .default) var items: FetchedResults<Site>
+    
     var searchedItems: [Site] {
         let sortDescriptors: [NSSortDescriptor] = [NSSortDescriptor(keyPath: \Site.titleSort, ascending: true)]
         let predicate: NSPredicate? =
@@ -34,42 +34,42 @@ struct ContentView: View {
         let result = try? self.viewContext.fetch(request)
         return result ?? []
     }
-
+    
     var body: some View {
-        NavigationView {
-            List {
-                HStack {
+        List {
+            HStack {
                 SearchBar(text: self.$searchText)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    Text(String(self.updateCount))
-                        .frame(width: 0.0, height: 0.0, alignment: .trailing)
-                        .hidden()
-                }
-                ForEach(self.searchedItems, id: \.self) { item in
-                    VStack(alignment: .leading) {
-                        Text(item.title ?? "")
-                        Text(item.url ?? "")
-                            .italic()
-                            .frame(maxWidth: .infinity, alignment: .trailing)
-                            .font(.subheadline)
-                            .foregroundColor(.gray)
-                    }
-                }
-                .onDelete(perform: deleteItems)
+                Text(String(self.updateCount))
+                    .frame(width: 0.0, height: 0.0, alignment: .trailing)
+                    .hidden()
             }
-            .navigationBarTitle("Sites")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: addItem, label: {
-                        Image(systemName: "plus")
-                    })
+            ForEach(self.searchedItems, id: \.self) { item in
+                VStack(alignment: .leading) {
+                    Text(item.title ?? "")
+                    Text(item.url ?? "")
+                        .italic()
+                        .frame(maxWidth: .infinity, alignment: .trailing)
+                        .font(.subheadline)
+                        .foregroundColor(.gray)
                 }
-                ToolbarItem(placement: .navigationBarLeading) {
-                    EditButton()
-                }
+            }
+            .onDelete(perform: deleteItems)
+        }
+        .navigationTitle("Sites")
+        //            .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button(action: addItem, label: {
+                    Image(systemName: "plus")
+                })
+            }
+            ToolbarItem(placement: .navigationBarLeading) {
+                EditButton()
             }
         }
+        
+        .navigationBarBackButtonHidden(true)
         .onAppear {
             self.update()
         }
@@ -99,11 +99,11 @@ struct ContentView: View {
     
     private func deleteItems(offsets: IndexSet) {
         withAnimation {
-//            let deleted = offsets.map { self.searchedItems[$0] }
+            //            let deleted = offsets.map { self.searchedItems[$0] }
             offsets.map { self.searchedItems[$0] }.forEach {
                 viewContext.delete($0)
             }
-
+            
             do {
                 try viewContext.save()
                 self.update()

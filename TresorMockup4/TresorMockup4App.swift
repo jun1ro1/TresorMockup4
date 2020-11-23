@@ -10,28 +10,49 @@ import SwiftUI
 @main
 struct TresorMockup4App: App {
     let persistenceController = PersistenceController.shared
-    @State private var authentication: Bool = false
-    @ObservedObject var handler = AuthenticationHandler {
-        print($0 ? "OK" : "NG")
-    }
+    @State private var authenticated: Bool = false
+    @ObservedObject var handler = AuthenticationHandler {_ in}
     @State private var showView: Bool = false
     
     var body: some Scene {
         WindowGroup {
-            ContentView()
-                .environment(\.managedObjectContext, self.persistenceController.container.viewContext)
-                .onAppear {
-//                    self.handler.authenticate()
-                    self.saveDummyData()
-                }
-                .sheet(isPresented: self.$handler.shouldShow) {
-                    self.handler.view
-                }
-//            Button("Authenticate") {
-//                self.handler.authenticate()
-//            }
+            NavigationView {
+                NavigationLink("", destination: ContentView(),
+                               isActive: self.$handler.authenticated)
+                    .hidden()
+            }
+            .navigationBarHidden(true)
+            .environment(\.managedObjectContext, self.persistenceController.container.viewContext)
+            .sheet(isPresented: self.$handler.shouldShow) {
+                self.handler.view
+            }
+            .onAppear {
+                self.handler.authenticate()
+                #if DEBUG
+                self.saveDummyData()
+                #endif
+            }
         }
     }
+    
+    //    var body: some Scene {
+    //        WindowGroup {
+    //            ContentView()
+    //                .environment(\.managedObjectContext, self.persistenceController.container.viewContext)
+    //                .onAppear {
+    //                    self.handler.authenticate()
+    //                    #if DEBUG
+    //                    self.saveDummyData()
+    //                    #endif
+    //                }
+    //                .sheet(isPresented: self.$handler.shouldShow) {
+    //                    self.handler.view
+    //                }
+    //            Button("Authenticate") {
+    //                self.handler.authenticate()
+    //            }
+    //        }
+    //    }
     
     func saveDummyData() {
         let titles = [
