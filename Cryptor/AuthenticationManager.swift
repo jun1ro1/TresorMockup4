@@ -5,6 +5,8 @@
 //  Created by OKU Junichirou on 2020/11/15.
 //
 // https://stackoverflow.com/questions/60297637/biometric-authentication-evaluation-with-swiftui
+// https://swiftui-lab.com/state-changes/
+// https://stackoverflow.com/questions/60155947/swiftui-usage-of-toggles-console-logs-invalid-mode-kcfrunloopcommonmodes
 
 import Foundation
 import SwiftUI
@@ -16,7 +18,7 @@ class AuthenticationManger {
     
     static var shared: AuthenticationManger = {
         if _manager == nil {
-            #if false // DEBUG_DELETE_KEYCHAIN
+            #if true // DEBUG_DELETE_KEYCHAIN
             try? CryptorSeed.delete()
             try? Validator.delete()
             try? LocalPssword.delete()
@@ -148,10 +150,12 @@ class AuthenticationHandler: ObservableObject {
             }
         }
         else {
-            J1Logger.shared.info("Authentication with Biometrics is not enrolled \(authError!)")
-            self.view =
-                AnyView(EnterPasswordView(handler: self, authenticatedBlock: authenticatedBlock))
-            self.shouldShow = true
+            DispatchQueue.main.async {
+                J1Logger.shared.info("Authentication with Biometrics is not enrolled \(authError!)")
+                self.view =
+                    AnyView(EnterPasswordView(handler: self, authenticatedBlock: self.authenticatedBlock))
+                self.shouldShow = true
+            }
         }
     }
     
