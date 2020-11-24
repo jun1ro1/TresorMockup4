@@ -37,7 +37,7 @@ internal class J1Logger {
                         line:     Int = #line) {
         let (th, fl) = self.format(file: file)
         let msg = message()
-        self.logger_debug.debug("\(th) \(fl).\(function):\(line) - \(msg)")
+        self.logger_debug.debug("💚 \(th) \(fl).\(function):\(line) - \(msg)")
     }
     
     internal func info(_ message: @autoclosure () -> String,
@@ -46,7 +46,7 @@ internal class J1Logger {
                        line:     Int = #line) {
         let (th, fl) = self.format(file: file)
         let msg = message()
-        self.logger_info.info("\(th) \(fl).\(function):\(line) - \(msg)")
+        self.logger_info.info("💙 \(th) \(fl).\(function):\(line) - \(msg)")
     }
     
     internal func notice(_ message: @autoclosure () -> String,
@@ -55,7 +55,7 @@ internal class J1Logger {
                          line:     Int = #line) {
         let (th, fl) = self.format(file: file)
         let msg = message()
-        self.logger_notice.notice("\(th) \(fl).\(function):\(line) - \(msg)")
+        self.logger_notice.notice("💛 \(th) \(fl).\(function):\(line) - \(msg)")
     }
     
     internal func error(_ message: @autoclosure () -> String,
@@ -64,7 +64,7 @@ internal class J1Logger {
                         line:     Int = #line) {
         let (th, fl) = self.format(file: file)
         let msg = message()
-        self.logger_error.error("\(th) \(fl).\(function):\(line) - \(msg)")
+        self.logger_error.error("❤️ \(th) \(fl).\(function):\(line) - \(msg)")
     }
     
     internal func fault(_ message: @autoclosure () -> String,
@@ -73,6 +73,6 @@ internal class J1Logger {
                         line:     Int = #line) {
         let (th, fl) = self.format(file: file)
         let msg = message()
-        self.logger_fault.fault("\(th) \(fl).\(function):\(line) - \(msg)")
+        self.logger_fault.fault("🛑 \(th) \(fl).\(function):\(line) - \(msg)")
     }
 }
