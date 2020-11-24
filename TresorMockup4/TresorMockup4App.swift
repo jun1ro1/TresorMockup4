@@ -17,20 +17,17 @@ struct TresorMockup4App: App {
     var body: some Scene {
         WindowGroup {
             NavigationView {
-                NavigationLink("", destination: ContentView(),
-                               isActive: self.$handler.authenticated)
-                    .hidden()
+                ContentView()
             }
-            .navigationBarHidden(true)
             .environment(\.managedObjectContext, self.persistenceController.container.viewContext)
-            .sheet(isPresented: self.$handler.shouldShow) {
-                self.handler.view
-            }
             .onAppear {
                 self.handler.authenticate()
                 #if DEBUG
                 TestData.shared.saveDummyData()
                 #endif
+            }
+            .sheet(isPresented: self.$handler.shouldShow) {
+                self.handler.view
             }
         }
     }

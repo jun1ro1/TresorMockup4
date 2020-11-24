@@ -85,6 +85,7 @@ class AuthenticationHandler: ObservableObject {
         let authenticated = AuthenticationManger.shared.authenticated
         if authenticated {
             J1Logger.shared.debug("already authenticated")
+            AuthenticationManger.shared.authenticated = true
             self.authenticated = true
             self.authenticatedBlock(true)
             return
@@ -103,6 +104,7 @@ class AuthenticationHandler: ObservableObject {
         }
         catch let error {
             J1Logger.shared.debug("LocalPssword.doesExist=\(error)")
+            AuthenticationManger.shared.authenticated = false
             self.authenticated = false
             self.authenticatedBlock(false)
             return
@@ -116,7 +118,8 @@ class AuthenticationHandler: ObservableObject {
                                    localizedReason: reason) { (success, error) in
                 DispatchQueue.main.async {
                     checkPassword: do {
-                        guard success else {                        J1Logger.shared.error("Authenticaion Error \(error!)")
+                        guard success else {
+                            J1Logger.shared.error("Authenticaion Error \(error!)")
                             break checkPassword
                         }
                         J1Logger.shared.debug("evaluatePolicy=success")
@@ -259,6 +262,7 @@ class AuthenticationHandler: ObservableObject {
             catch let error {
                 J1Logger.shared.error("Cryptor.prepare error = \(error)")
                 handler?.shouldShow = false
+                AuthenticationManger.shared.authenticated = false
                 self.handler?.authenticated = false
                 self.authenticatedBlock?(false)
                 return
@@ -271,12 +275,14 @@ class AuthenticationHandler: ObservableObject {
             catch let error {
                 J1Logger.shared.error("SecureStore write pass Error \(error)")
                 handler?.shouldShow = false
+                AuthenticationManger.shared.authenticated = false
                 self.handler?.authenticated = false
                 self.authenticatedBlock?(false)
                 return
             }
             
             handler?.shouldShow = false
+            AuthenticationManger.shared.authenticated = true
             self.handler?.authenticated = true
             self.authenticatedBlock?(true)
         }
@@ -339,12 +345,14 @@ class AuthenticationHandler: ObservableObject {
             catch let error {
                 J1Logger.shared.error("Cryptor.prepare error = \(error)")
                 handler?.shouldShow = false
+                AuthenticationManger.shared.authenticated = false
                 self.handler?.authenticated = false
                 self.authenticatedBlock?(false)
                 return
             }
             
             handler?.shouldShow = false
+            AuthenticationManger.shared.authenticated = true
             self.handler?.authenticated = true
             self.authenticatedBlock?(true)
         }
