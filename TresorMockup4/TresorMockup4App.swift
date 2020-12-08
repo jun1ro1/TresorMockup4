@@ -11,7 +11,7 @@ import SwiftUI
 struct TresorMockup4App: App {
     let persistenceController = PersistenceController.shared
     @State private var authenticated: Bool = false
-    @ObservedObject var handler = AuthenticationHandler {_ in}
+    @ObservedObject var manager = AuthenticationManger.shared
     @State private var showView: Bool = false
     
     var body: some Scene {
@@ -21,13 +21,15 @@ struct TresorMockup4App: App {
             }
             .environment(\.managedObjectContext, self.persistenceController.container.viewContext)
             .onAppear {
-                self.handler.authenticate()
+                AuthenticationManger.shared.authenticate { success in
+                    print(success ? "OK" : "NG")
+                }
                 #if DEBUG
                 TestData.shared.saveDummyData()
                 #endif
             }
-            .sheet(isPresented: self.$handler.shouldShow) {
-                self.handler.view
+            .sheet(isPresented: self.$manager.shouldShow) {
+                self.manager.view
             }
         }
     }

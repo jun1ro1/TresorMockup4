@@ -13,7 +13,7 @@ import SwiftUI
 
 import LocalAuthentication
 
-class AuthenticationManger {
+class AuthenticationManger: ObservableObject {
     private static var _manager: AuthenticationManger? = nil
     
     static var shared: AuthenticationManger = {
@@ -53,30 +53,19 @@ class AuthenticationManger {
         }
     }
     
-    init() {}
-}
-// https://stackoverflow.com/questions/24158062/how-to-use-touch-id-sensor-in-ios-8/40612228
-
-class AuthenticationHandler: ObservableObject {
-    @Published var view: AnyView = AnyView(EmptyView())
-    @Published var shouldShow: Bool = false
-    @Published var authenticated: Bool = false
+    @Published var view:       AnyView = AnyView(EmptyView())
+    @Published var shouldShow: Bool    = false
     private    var authenticatedBlock: ((Bool) -> Void) = {_ in}
     
-    init() {}
-    
-    init(_ authenticatedBlock: @escaping (Bool) -> Void) {
+    func authenticate(authenticatedBlock: @escaping (Bool) -> Void = {_ in}) {
         self.authenticatedBlock = authenticatedBlock
-    }
-    
-    internal func authenticate() {
+        
         var authError: NSError? = nil
         
         guard Cryptor.isPrepared else {
             J1Logger.shared.debug("Cryptor is not prepared")
             self.view =
-                AnyView(RegisterPasswordView(handler: self,
-                                             authenticatedBlock: self.authenticatedBlock))
+                AnyView(RegisterPasswordView(authenticatedBlock: self.authenticatedBlock))
             self.shouldShow = true
             return
         }
@@ -96,8 +85,7 @@ class AuthenticationHandler: ObservableObject {
             guard try LocalPssword.doesExist() else {
                 J1Logger.shared.debug("local password does not exist")
                 self.view =
-                    AnyView(RegisterPasswordView(handler: self,
-                                                 authenticatedBlock: self.authenticatedBlock))
+                    AnyView(RegisterPasswordView(authenticatedBlock: self.authenticatedBlock))
                 self.shouldShow = true
                 return
             }
@@ -153,219 +141,269 @@ class AuthenticationHandler: ObservableObject {
             }
         }
         else {
-            DispatchQueue.main.async {
-                J1Logger.shared.info("Authentication with Biometrics is not enrolled \(authError!)")
-                self.view =
-                    AnyView(EnterPasswordView(handler: self, authenticatedBlock: self.authenticatedBlock))
-                self.shouldShow = true
-            }
+            J1Logger.shared.info("Authentication with Biometrics is not enrolled \(authError!)")
+            self.view =
+                AnyView(EnterPasswordView(authenticatedBlock: self.authenticatedBlock))
+            self.shouldShow = true
         }
     }
     
-    // MARK: - PasswordField
-    struct PasswordField: View {
-        @State   var text: String
-        @Binding var password: String
-        @Binding var showPassword: Bool
-        var onCommit: () -> Void
-        
-        var body: some View {
-            if self.showPassword {
-                TextField(self.text,
-                          text: self.$password,
-                          onCommit: self.onCommit)
-                    .textContentType(.password)
-                    .keyboardType(.asciiCapable)
-                    .autocapitalization(.none)
-                    .disableAutocorrection(true)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-            }
-            else {
-                SecureField(self.text,
-                            text: self.$password,
-                            onCommit: self.onCommit)
-                    .textContentType(.password)
-                    .keyboardType(.asciiCapable)
-                    .autocapitalization(.none)
-                    .disableAutocorrection(true)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-            }
+}
+// https://stackoverflow.com/questions/24158062/how-to-use-touch-id-sensor-in-ios-8/40612228
+
+class PasswordChecker: ObservableObject {
+    var authenticatedBlock: ((Bool) -> Void)?
+    
+    @Published var alertShow    = false
+    @Published var alertTitle   = ""
+    @Published var alertMessage = ""
+    @Published var disabled     = false
+    
+    var password1: String = ""
+    var password2: String = ""
+    
+    func check() {
+        guard self.password1 != "" && self.password2 != "" else {
+            self.alertTitle   = "Password empty"
+            self.alertMessage = "Please register again"
+            self.alertShow    = true
+            return
         }
+        guard self.password1 == self.password2 else {
+            self.alertTitle   = "Password unmatch"
+            self.alertMessage = "Please register again"
+            self.alertShow    = true
+            return
+        }
+        
+        do {
+            try Cryptor.prepare(password: self.password1)
+        }
+        catch let error {
+            J1Logger.shared.error("Cryptor.prepare error = \(error)")
+            AuthenticationManger.shared.shouldShow    = false
+            AuthenticationManger.shared.authenticated = false
+            self.authenticatedBlock?(false)
+            return
+        }
+        
+        let passwordStore = LocalPssword(self.password1)
+        do {
+            try LocalPssword.write(passwordStore)
+        }
+        catch let error {
+            J1Logger.shared.error("SecureStore write pass Error \(error)")
+            AuthenticationManger.shared.shouldShow    = false
+            AuthenticationManger.shared.authenticated = false
+            self.authenticatedBlock?(false)
+            return
+        }
+        
+        AuthenticationManger.shared.shouldShow    = false
+        AuthenticationManger.shared.authenticated = true
+        self.authenticatedBlock?(true)
+    }
+}
+
+// MARK: - RegisterPasswordView
+// https://stackoverflow.com/questions/58069516/how-can-i-have-two-alerts-on-one-view-in-swiftui
+struct RegisterPasswordView: View {
+    var authenticatedBlock: ((Bool) -> Void)?
+    
+    @StateObject private var checker = PasswordChecker()
+    
+    private enum ActiveAlert { case null, empty, unmatch }
+    @State private var showPassword = false
+    @State private var password1    = ""
+    @State private var password2    = ""
+    
+    func check() {
+        self.checker.password1 = self.password1
+        self.checker.password2 = self.password2
+        self.checker.authenticatedBlock = self.authenticatedBlock
+        self.checker.check()
     }
     
-    // MARK: - RegisterPasswordView
-    // https://stackoverflow.com/questions/58069516/how-can-i-have-two-alerts-on-one-view-in-swiftui
-    struct RegisterPasswordView: View {
-        var handler: AuthenticationHandler? = nil
-        @State var authenticatedBlock: ((Bool) -> Void)?
-        
-        private enum ActiveAlert { case null, empty, unmatch }
-        @State private var showPassword = false
-        @State private var password1    = ""
-        @State private var password2    = ""
-        @State private var showAlert    = false
-        @State private var activeAlert: ActiveAlert = .null
-        
-        var body: some View {
-            VStack {
-                Text("Register a password for this App to protect your data.")
-                    .font(.title2)
-                    .padding()
-                Toggle("Show Password", isOn: self.$showPassword)
-                    .padding()
-                PasswordField(text: "Enter Password",
-                              password: self.$password1,
-                              showPassword: self.$showPassword,
-                              onCommit: self.checkPassword)
-                    .padding()
-                PasswordField(text: "Confirm Passowrd",
-                              password: self.$password2,
-                              showPassword: self.$showPassword,
-                              onCommit: self.checkPassword)
-                    .padding()
-                Button("Register", action: { self.checkPassword() })
-                    .disabled(self.password1 == "" || self.password2 == "")
-                    .padding()
-            }
-            .alert(isPresented: self.$showAlert) {
-                switch self.activeAlert {
-                case .unmatch:
-                    return Alert(title: Text("Not Match"),
-                                 message: Text("Please enter again"),
-                                 dismissButton: .default(Text("OK")))
-                case .empty:
-                    return Alert(title: Text("Password Empty"),
-                                 message: Text("Please enter again"),
-                                 dismissButton: .default(Text("OK")))
-                default:
-                    return Alert(title: Text("activeAlert error"),
-                                 message: Text(""))
-                }
-            }
+    var body: some View {
+        VStack {
+            Text("Register a password for this App to protect your data.")
+                .font(.title2)
+                .padding()
+            Toggle("Show Password", isOn: self.$showPassword)
+                .padding()
+            PasswordField(text: "Enter Password",
+                          password: self.$password1,
+                          showPassword: self.$showPassword,
+                          disabled: self.$checker.disabled,
+                          onCommit: self.check)
+                .padding()
+            PasswordField(text: "Confirm Passowrd",
+                          password: self.$password2,
+                          showPassword: self.$showPassword,
+                          disabled: self.$checker.disabled,
+                          onCommit: self.check)
+                .padding()
+            Button("Register",
+                   action: self.check)
+                .disabled(self.password1 == "" || self.password2 == "")
+                .padding()
         }
-        
-        func checkPassword() {
-            guard self.password1 != "" && self.password2 != "" else {
-                self.showAlert   = true
-                self.activeAlert = .empty
-                return
-            }
-            guard self.password1 == self.password2 else {
-                self.showAlert   = true
-                self.activeAlert = .unmatch
-                return
-            }
-            
-            do {
-                try Cryptor.prepare(password: self.password1)
-            }
-            catch let error {
-                J1Logger.shared.error("Cryptor.prepare error = \(error)")
-                handler?.shouldShow = false
-                AuthenticationManger.shared.authenticated = false
-                self.handler?.authenticated = false
-                self.authenticatedBlock?(false)
-                return
-            }
-            
-            let passwordStore = LocalPssword(self.password1)
-            do {
-                try LocalPssword.write(passwordStore)
-            }
-            catch let error {
-                J1Logger.shared.error("SecureStore write pass Error \(error)")
-                handler?.shouldShow = false
-                AuthenticationManger.shared.authenticated = false
-                self.handler?.authenticated = false
-                self.authenticatedBlock?(false)
-                return
-            }
-            
-            handler?.shouldShow = false
-            AuthenticationManger.shared.authenticated = true
-            self.handler?.authenticated = true
-            self.authenticatedBlock?(true)
-        }
-    }
-    
-    // https://developer.apple.com/forums/thread/650112
-    struct EnterPasswordView: View {
-        var handler: AuthenticationHandler? = nil
-        var authenticatedBlock: ((Bool) -> Void)?
-        
-        private enum ActiveAlert { case null, empty, unmatch }
-        @State private var showPassword = false
-        @State private var password1 = ""
-        @State private var showAlert = false
-        @State private var activeAlert: ActiveAlert = .null
-        
-        var body: some View {
-            VStack {
-                Text("Enter Your Password")
-                    .font(.title2)
-                    .padding()
-                Toggle("Show Password", isOn: self.$showPassword)
-                    .padding()
-                PasswordField(text: "Enter Password",
-                              password: self.$password1,
-                              showPassword: self.$showPassword,
-                              onCommit: self.checkPassword)
-                    .padding()
-                Button("OK", action: { self.checkPassword() })
-                    .disabled(self.password1 == "")
-                    .padding()
-            }
-            .alert(isPresented: self.$showAlert) {
-                switch self.activeAlert {
-                case .unmatch:
-                    return Alert(title: Text("Not Match"),
-                                 message: Text("Please enter again"),
-                                 dismissButton: .default(Text("OK")))
-                case .empty:
-                    return Alert(title: Text("Password Empty"),
-                                 message: Text("Please enter again"),
-                                 dismissButton: .default(Text("OK")))
-                default:
-                    return Alert(title: Text("activeAlert error"),
-                                 message: Text(""))
-                }
-            }
-        }
-        
-        func checkPassword() {
-            guard self.password1 != "" else {
-                self.showAlert   = true
-                self.activeAlert = .empty
-                return
-            }
-            
-            do {
-                try Cryptor.prepare(password: self.password1)
-            }
-            catch let error {
-                J1Logger.shared.error("Cryptor.prepare error = \(error)")
-                handler?.shouldShow = false
-                AuthenticationManger.shared.authenticated = false
-                self.handler?.authenticated = false
-                self.authenticatedBlock?(false)
-                return
-            }
-            
-            handler?.shouldShow = false
-            AuthenticationManger.shared.authenticated = true
-            self.handler?.authenticated = true
-            self.authenticatedBlock?(true)
+        .foregroundColor((self.$checker.disabled.wrappedValue) ? Color.gray : Color.black)
+        .alert(isPresented: self.$checker.alertShow) {
+            Alert(title:   Text(self.checker.alertTitle),
+                  message: Text(self.checker.alertMessage),
+                  dismissButton: .default(Text("OK")))
         }
     }
 }
 
+
+// https://developer.apple.com/forums/thread/650112
+struct EnterPasswordView: View {
+    var authenticatedBlock: ((Bool) -> Void)?
+
+    @StateObject private var checker = PasswordChecker2()
+    
+    @State private var showPassword = false
+    @State private var password1 = ""
+    @State private var showAlert = false
+    
+    func check() {
+        self.checker.password1 = self.password1
+        self.checker.authenticatedBlock = self.authenticatedBlock
+        self.checker.check()
+    }
+
+    var body: some View {
+        VStack {
+            Text(self.checker.message)
+                .font(.title2)
+                .padding()
+            Toggle("Show Password", isOn: self.$showPassword)
+                .padding()
+            PasswordField(text: "Enter Password",
+                          password: self.$password1,
+                          showPassword: self.$showPassword,
+                          disabled: self.$checker.disabled,
+                          onCommit: self.check)
+                .padding()
+            Button("OK", action: self.check)
+                .disabled(self.password1 == "")
+                .padding()
+        }
+        .alert(isPresented: self.$checker.alertShow) {
+            Alert(title:   Text(self.checker.alertTitle),
+                  message: Text(self.checker.alertMessage),
+                  dismissButton: .default(Text("OK")))
+        }
+    }
+    
+}
+
+// MARK: - PasswordField
+class PasswordChecker2: ObservableObject {
+    var authenticatedBlock: ((Bool) -> Void)?
+    
+    @Published var alertShow    = false
+    @Published var alertTitle   = ""
+    @Published var alertMessage = ""
+    @Published var message      = "Enter your password"
+    @Published var disabled     = false
+    
+    var password1: String = ""
+    private var retries = 0
+    private let MAX_RETRIES = 6
+    
+    func check() {
+        guard self.password1 != "" else {
+            self.alertTitle   = "Password empty"
+            self.alertMessage = "Please enter again"
+            self.alertShow    = true
+            return
+        }
+        
+        retries += 1
+        if retries > MAX_RETRIES {
+            J1Logger.shared.error("retry count over = \(retries)")
+            AuthenticationManger.shared.shouldShow    = false
+            AuthenticationManger.shared.authenticated = false
+            self.authenticatedBlock?(false)
+        }
+        if retries % 3 == 0 {
+            let msg = {"Wait for \($0)" + ($0 > 1 ? " seconds." : " second.")}
+            self.disabled = true
+            var seconds = 20
+            self.message = msg(seconds)
+            _ = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) {
+                timer in
+                self.message = msg(seconds)
+                seconds -= 1
+                if seconds <= 0 {
+                    timer.invalidate()
+                    self.disabled = false
+                    self.message = "Enter your password."
+                }
+            }
+        }
+        
+        do {
+            try Cryptor.prepare(password: self.password1)
+        }
+        catch let error {
+            J1Logger.shared.error("Cryptor.prepare error = \(error)")
+            self.alertTitle   = "Incorrect password"
+            self.alertMessage = "Please enter again"
+            self.alertShow    = true
+            return
+        }
+        
+        AuthenticationManger.shared.shouldShow    = false
+        AuthenticationManger.shared.authenticated = true
+        self.authenticatedBlock?(true)
+    }
+}
+
+struct PasswordField: View {
+    @State   var text:         String
+    @Binding var password:     String
+    @Binding var showPassword: Bool
+    @Binding var disabled:     Bool
+    var onCommit: () -> Void
+    
+    var body: some View {
+        if self.showPassword {
+            TextField(self.text,
+                      text: self.$password,
+                      onCommit: self.onCommit)
+                .textContentType(.password)
+                .keyboardType(.asciiCapable)
+                .autocapitalization(.none)
+                .disableAutocorrection(true)
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+                .disabled(self.disabled)
+        }
+        else {
+            SecureField(self.text,
+                        text: self.$password,
+                        onCommit: self.onCommit)
+                .textContentType(.password)
+                .keyboardType(.asciiCapable)
+                .autocapitalization(.none)
+                .disableAutocorrection(true)
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+                .disabled(self.disabled)
+        }
+    }
+}
+
+// MARK: - Preview
 struct PasswordView_Previews: PreviewProvider {
     @State private var sa: Bool = false
     
     static var previews: some View {
         Group {
-            AuthenticationHandler.RegisterPasswordView()
-            AuthenticationHandler.EnterPasswordView()
+            RegisterPasswordView()
+            EnterPasswordView()
         }
     }
 }
