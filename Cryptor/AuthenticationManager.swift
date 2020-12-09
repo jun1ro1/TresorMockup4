@@ -212,7 +212,6 @@ struct RegisterPasswordView: View {
     
     @StateObject private var checker = PasswordChecker()
     
-    private enum ActiveAlert { case null, empty, unmatch }
     @State private var showPassword = false
     @State private var password1    = ""
     @State private var password2    = ""
@@ -225,6 +224,8 @@ struct RegisterPasswordView: View {
     }
     
     var body: some View {
+        let color = self.$checker.disabled.wrappedValue ? Color.gray : Color.black
+
         VStack {
             Text("Register a password for this App to protect your data.")
                 .font(.title2)
@@ -248,7 +249,7 @@ struct RegisterPasswordView: View {
                 .disabled(self.password1 == "" || self.password2 == "")
                 .padding()
         }
-        .foregroundColor((self.$checker.disabled.wrappedValue) ? Color.gray : Color.black)
+        .foregroundColor(color)
         .alert(isPresented: self.$checker.alertShow) {
             Alert(title:   Text(self.checker.alertTitle),
                   message: Text(self.checker.alertMessage),
@@ -275,6 +276,8 @@ struct EnterPasswordView: View {
     }
 
     var body: some View {
+        let color = self.$checker.disabled.wrappedValue ? Color.secondary : Color.primary
+
         VStack {
             Text(self.checker.message)
                 .font(.title2)
@@ -286,9 +289,10 @@ struct EnterPasswordView: View {
                           showPassword: self.$showPassword,
                           disabled: self.$checker.disabled,
                           onCommit: self.check)
+                .foregroundColor(color)
                 .padding()
             Button("OK", action: self.check)
-                .disabled(self.password1 == "")
+                .disabled(self.password1 == "" || self.checker.disabled)
                 .padding()
         }
         .alert(isPresented: self.$checker.alertShow) {
@@ -338,7 +342,7 @@ class PasswordChecker2: ObservableObject {
                 timer in
                 self.message = msg(seconds)
                 seconds -= 1
-                if seconds <= 0 {
+                if seconds < 0 {
                     timer.invalidate()
                     self.disabled = false
                     self.message = "Enter your password."
