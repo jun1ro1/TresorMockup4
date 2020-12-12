@@ -55,17 +55,12 @@ class AuthenticationManger: ObservableObject {
     
     @Published var view:       AnyView = AnyView(EmptyView())
     @Published var shouldShow: Bool    = false
-    private    var authenticatedBlock: ((Bool) -> Void) = {_ in}
     
     func authenticate(authenticatedBlock: @escaping (Bool) -> Void = {_ in}) {
-        self.authenticatedBlock = authenticatedBlock
-        
-        var authError: NSError? = nil
-        
         guard Cryptor.isPrepared else {
             J1Logger.shared.debug("Cryptor is not prepared")
             self.view =
-                AnyView(RegisterPasswordView(authenticatedBlock: self.authenticatedBlock))
+                AnyView(RegisterPasswordView(authenticatedBlock: authenticatedBlock))
             self.shouldShow = true
             return
         }
@@ -75,75 +70,83 @@ class AuthenticationManger: ObservableObject {
         if authenticated {
             J1Logger.shared.debug("already authenticated")
             AuthenticationManger.shared.authenticated = true
-            self.authenticated = true
-            self.authenticatedBlock(true)
+            authenticatedBlock(true)
             return
         }
-        assert(authenticated == false, "self.authenticated is not false")
+        assert(self.authenticated == false, "self.authenticated is not false")
         
         do {
             guard try LocalPssword.doesExist() else {
                 J1Logger.shared.debug("local password does not exist")
                 self.view =
-                    AnyView(RegisterPasswordView(authenticatedBlock: self.authenticatedBlock))
+                    AnyView(RegisterPasswordView(authenticatedBlock: authenticatedBlock))
                 self.shouldShow = true
                 return
             }
         }
         catch let error {
             J1Logger.shared.debug("LocalPssword.doesExist=\(error)")
-            AuthenticationManger.shared.authenticated = false
-            self.authenticated = false
-            self.authenticatedBlock(false)
+            self.view =
+                AnyView(RegisterPasswordView(authenticatedBlock: authenticatedBlock))
+            self.shouldShow = true
             return
         }
         
         let context = LAContext()
         let reason  = "This app uses Touch ID / Facd ID to secure your data."
+        var authError: NSError? = nil
         if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics,
                                      error: &authError) {
             context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics,
                                    localizedReason: reason) { (success, error) in
                 DispatchQueue.main.async {
-                    checkPassword: do {
-                        guard success else {
-                            J1Logger.shared.error("Authenticaion Error \(error!)")
-                            break checkPassword
-                        }
-                        J1Logger.shared.debug("evaluatePolicy=success")
-                        
-                        var localPass: LocalPssword? = nil
-                        do {
-                            localPass = try LocalPssword.read()
-                        }
-                        catch let error {
-                            J1Logger.shared.error("SecureStore read password Error \(error)")
-                            break checkPassword
-                        }
-                        guard localPass != nil else {
-                            J1Logger.shared.error("SecureStore read password failed")
-                            break checkPassword
-                        }
-                        do {
-                            try Cryptor.prepare(password: localPass!.password!)
-                        }
-                        catch let error {
-                            J1Logger.shared.error("Cryptor.prepare error = \(error)")
-                            break checkPassword
-                        }
-                        AuthenticationManger.shared.authenticated = true
+                    guard success else {
+                        J1Logger.shared.error("Authenticaion Error \(error!)")
+                        self.view =
+                            AnyView(EnterPasswordView(authenticatedBlock: authenticatedBlock))
+                        self.shouldShow = true
+                        return
                     }
-                    let val = AuthenticationManger.shared.authenticated
-                    J1Logger.shared.debug("authenticated=\(val)")
-                    self.authenticated = val
-                    self.authenticatedBlock(val)
+                    J1Logger.shared.debug("evaluatePolicy=success")
+                    
+                    var localPass: LocalPssword? = nil
+                    do {
+                        localPass = try LocalPssword.read()
+                    }
+                    catch let error {
+                        J1Logger.shared.error("SecureStore read password Error \(error)")
+                        self.view =
+                            AnyView(EnterPasswordView(authenticatedBlock: authenticatedBlock))
+                        self.shouldShow = true
+                        return
+                    }
+                    guard localPass != nil else {
+                        J1Logger.shared.error("SecureStore read password failed")
+                        self.view =
+                            AnyView(EnterPasswordView(authenticatedBlock: authenticatedBlock))
+                        self.shouldShow = true
+                        return
+                    }
+                    do {
+                        try Cryptor.prepare(password: localPass!.password!)
+                    }
+                    catch let error {
+                        J1Logger.shared.error("Cryptor.prepare error = \(error)")
+                        self.view =
+                            AnyView(EnterPasswordView(authenticatedBlock: authenticatedBlock))
+                        self.shouldShow = true
+                        return
+                    }
+                    J1Logger.shared.debug("authenticated by biometrics")
+                    AuthenticationManger.shared.authenticated = true
+                    authenticatedBlock(true)
                 }
             }
         }
         else {
             J1Logger.shared.info("Authentication with Biometrics is not enrolled \(authError!)")
             self.view =
-                AnyView(EnterPasswordView(authenticatedBlock: self.authenticatedBlock))
+                AnyView(EnterPasswordView(authenticatedBlock: authenticatedBlock))
             self.shouldShow = true
         }
     }
@@ -225,7 +228,7 @@ struct RegisterPasswordView: View {
     
     var body: some View {
         let color = self.$checker.disabled.wrappedValue ? Color.gray : Color.black
-
+        
         VStack {
             Text("Register a password for this App to protect your data.")
                 .font(.title2)
@@ -262,7 +265,7 @@ struct RegisterPasswordView: View {
 // https://developer.apple.com/forums/thread/650112
 struct EnterPasswordView: View {
     var authenticatedBlock: ((Bool) -> Void)?
-
+    
     @StateObject private var checker = PasswordChecker2()
     
     @State private var showPassword = false
@@ -274,10 +277,10 @@ struct EnterPasswordView: View {
         self.checker.authenticatedBlock = self.authenticatedBlock
         self.checker.check()
     }
-
+    
     var body: some View {
         let color = self.$checker.disabled.wrappedValue ? Color.secondary : Color.primary
-
+        
         VStack {
             Text(self.checker.message)
                 .font(.title2)
@@ -318,6 +321,8 @@ class PasswordChecker2: ObservableObject {
     private var retries = 0
     private let MAX_RETRIES = 6
     
+    private let msg = {"Wait for \($0)" + ($0 > 1 ? " seconds." : " second.")}
+    
     func check() {
         guard self.password1 != "" else {
             self.alertTitle   = "Password empty"
@@ -334,13 +339,12 @@ class PasswordChecker2: ObservableObject {
             self.authenticatedBlock?(false)
         }
         if retries % 3 == 0 {
-            let msg = {"Wait for \($0)" + ($0 > 1 ? " seconds." : " second.")}
             self.disabled = true
             var seconds = 20
             self.message = msg(seconds)
             _ = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) {
                 timer in
-                self.message = msg(seconds)
+                self.message = self.msg(seconds)
                 seconds -= 1
                 if seconds < 0 {
                     timer.invalidate()
