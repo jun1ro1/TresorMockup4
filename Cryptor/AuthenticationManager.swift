@@ -21,7 +21,7 @@ class AuthenticationManger: ObservableObject {
             #if false // DEBUG_DELETE_KEYCHAIN
             try? CryptorSeed.delete()
             try? Validator.delete()
-            try? LocalPssword.delete()
+            try? LocalPassword.delete()
             #endif
             _manager     = AuthenticationManger()
         }
@@ -59,15 +59,16 @@ class AuthenticationManger: ObservableObject {
     func authenticate(authenticatedBlock: @escaping (Bool) -> Void = {_ in}) {
         guard Cryptor.isPrepared else {
             J1Logger.shared.debug("Cryptor is not prepared")
-            self.view =
-                AnyView(RegisterPasswordView(authenticatedBlock: authenticatedBlock))
+            self.view = AnyView(
+                RegistrationView(message: "Register a password for this App to secure your data.",
+                                 authenticatedBlock: authenticatedBlock))
             self.shouldShow = true
             return
         }
         
         // It has been already authenticated in 30 seconds
-        let authenticated = AuthenticationManger.shared.authenticated
-        if authenticated {
+        let authed = AuthenticationManger.shared.authenticated
+        if authed {
             J1Logger.shared.debug("already authenticated")
             AuthenticationManger.shared.authenticated = true
             authenticatedBlock(true)
@@ -76,18 +77,20 @@ class AuthenticationManger: ObservableObject {
         assert(self.authenticated == false, "self.authenticated is not false")
         
         do {
-            guard try LocalPssword.doesExist() else {
+            guard try LocalPassword.doesExist() else {
                 J1Logger.shared.debug("local password does not exist")
-                self.view =
-                    AnyView(RegisterPasswordView(authenticatedBlock: authenticatedBlock))
+                self.view = AnyView(
+                    RegistrationView(message: "Register a password",
+                                     authenticatedBlock: authenticatedBlock))
                 self.shouldShow = true
                 return
             }
         }
         catch let error {
             J1Logger.shared.debug("LocalPssword.doesExist=\(error)")
-            self.view =
-                AnyView(RegisterPasswordView(authenticatedBlock: authenticatedBlock))
+            self.view = AnyView(
+                RegistrationView(message: "Stored local password does not exist, then register a password.",
+                                 authenticatedBlock: authenticatedBlock))
             self.shouldShow = true
             return
         }
@@ -102,28 +105,31 @@ class AuthenticationManger: ObservableObject {
                 DispatchQueue.main.async {
                     guard success else {
                         J1Logger.shared.error("Authenticaion Error \(error!)")
-                        self.view =
-                            AnyView(EnterPasswordView(authenticatedBlock: authenticatedBlock))
+                        self.view = AnyView(
+                            EnterPasswordView(message: "Biometrics authentication failed, please enter a password for this app.",
+                                              authenticatedBlock: authenticatedBlock))
                         self.shouldShow = true
                         return
                     }
                     J1Logger.shared.debug("evaluatePolicy=success")
                     
-                    var localPass: LocalPssword? = nil
+                    var localPass: LocalPassword? = nil
                     do {
-                        localPass = try LocalPssword.read()
+                        localPass = try LocalPassword.read()
                     }
                     catch let error {
                         J1Logger.shared.error("SecureStore read password Error \(error)")
-                        self.view =
-                            AnyView(EnterPasswordView(authenticatedBlock: authenticatedBlock))
+                        self.view = AnyView(
+                            EnterPasswordView(message: "Cannot read a local password, please enter a password.",
+                                                      authenticatedBlock: authenticatedBlock))
                         self.shouldShow = true
                         return
                     }
                     guard localPass != nil else {
                         J1Logger.shared.error("SecureStore read password failed")
-                        self.view =
-                            AnyView(EnterPasswordView(authenticatedBlock: authenticatedBlock))
+                        self.view = AnyView(
+                            EnterPasswordView(message: "A local password is nil, please enter a password.",
+                                              authenticatedBlock: authenticatedBlock))
                         self.shouldShow = true
                         return
                     }
@@ -132,8 +138,9 @@ class AuthenticationManger: ObservableObject {
                     }
                     catch let error {
                         J1Logger.shared.error("Cryptor.prepare error = \(error)")
-                        self.view =
-                            AnyView(EnterPasswordView(authenticatedBlock: authenticatedBlock))
+                        self.view = AnyView(
+                            EnterPasswordView(message: "A local password is incorrect, please enter a password.",
+                                authenticatedBlock: authenticatedBlock))
                         self.shouldShow = true
                         return
                     }
@@ -145,8 +152,9 @@ class AuthenticationManger: ObservableObject {
         }
         else {
             J1Logger.shared.info("Authentication with Biometrics is not enrolled \(authError!)")
-            self.view =
-                AnyView(EnterPasswordView(authenticatedBlock: authenticatedBlock))
+            self.view = AnyView(
+                EnterPasswordView(message: "Enter a password for this app.",
+                                  authenticatedBlock: authenticatedBlock))
             self.shouldShow = true
         }
     }
@@ -165,7 +173,7 @@ class PasswordChecker: ObservableObject {
     var password1: String = ""
     var password2: String = ""
     
-    func check() {
+    func validate() {
         guard self.password1 != "" && self.password2 != "" else {
             self.alertTitle   = "Password empty"
             self.alertMessage = "Please register again"
@@ -190,9 +198,9 @@ class PasswordChecker: ObservableObject {
             return
         }
         
-        let passwordStore = LocalPssword(self.password1)
+        let passwordStore = LocalPassword(self.password1)
         do {
-            try LocalPssword.write(passwordStore)
+            try LocalPassword.write(passwordStore)
         }
         catch let error {
             J1Logger.shared.error("SecureStore write pass Error \(error)")
@@ -208,9 +216,10 @@ class PasswordChecker: ObservableObject {
     }
 }
 
-// MARK: - RegisterPasswordView
+// MARK: - RegistrationView
 // https://stackoverflow.com/questions/58069516/how-can-i-have-two-alerts-on-one-view-in-swiftui
-struct RegisterPasswordView: View {
+struct RegistrationView: View {
+    var message: String
     var authenticatedBlock: ((Bool) -> Void)?
     
     @StateObject private var checker = PasswordChecker()
@@ -219,40 +228,41 @@ struct RegisterPasswordView: View {
     @State private var password1    = ""
     @State private var password2    = ""
     
-    func check() {
+    func validate() {
         self.checker.password1 = self.password1
         self.checker.password2 = self.password2
         self.checker.authenticatedBlock = self.authenticatedBlock
-        self.checker.check()
+        self.checker.validate()
     }
     
     var body: some View {
         let color = self.$checker.disabled.wrappedValue ? Color.gray : Color.black
         
         VStack {
-            Text("Register a password for this App to protect your data.")
+            Text(self.message)
                 .font(.title2)
                 .padding()
+                .foregroundColor(color)
             Toggle("Show Password", isOn: self.$showPassword)
                 .padding()
+                .foregroundColor(color)
             PasswordField(text: "Enter Password",
                           password: self.$password1,
                           showPassword: self.$showPassword,
                           disabled: self.$checker.disabled,
-                          onCommit: self.check)
+                          onCommit: self.validate)
                 .padding()
             PasswordField(text: "Confirm Passowrd",
                           password: self.$password2,
                           showPassword: self.$showPassword,
                           disabled: self.$checker.disabled,
-                          onCommit: self.check)
+                          onCommit: self.validate)
                 .padding()
             Button("Register",
-                   action: self.check)
+                   action: self.validate)
                 .disabled(self.password1 == "" || self.password2 == "")
                 .padding()
         }
-        .foregroundColor(color)
         .alert(isPresented: self.$checker.alertShow) {
             Alert(title:   Text(self.checker.alertTitle),
                   message: Text(self.checker.alertMessage),
@@ -262,8 +272,10 @@ struct RegisterPasswordView: View {
 }
 
 
+// MARK: - EnterPasswordView
 // https://developer.apple.com/forums/thread/650112
 struct EnterPasswordView: View {
+    var message: String
     var authenticatedBlock: ((Bool) -> Void)?
     
     @StateObject private var checker = PasswordChecker2()
@@ -275,18 +287,18 @@ struct EnterPasswordView: View {
     func check() {
         self.checker.password1 = self.password1
         self.checker.authenticatedBlock = self.authenticatedBlock
-        self.checker.check()
+        self.checker.validate()
     }
     
     var body: some View {
-        let color = self.$checker.disabled.wrappedValue ? Color.secondary : Color.primary
+        let color = self.checker.disabled ? Color.secondary : Color.primary
         
         VStack {
-            Text(self.checker.message)
+            Text(self.checker.message ?? self.message) // DEBUGGING
                 .font(.title2)
                 .padding()
             Toggle("Show Password", isOn: self.$showPassword)
-                .padding()
+                .padding()	
             PasswordField(text: "Enter Password",
                           password: self.$password1,
                           showPassword: self.$showPassword,
@@ -314,16 +326,19 @@ class PasswordChecker2: ObservableObject {
     @Published var alertShow    = false
     @Published var alertTitle   = ""
     @Published var alertMessage = ""
-    @Published var message      = "Enter your password"
+    @Published var message: String? = nil
     @Published var disabled     = false
     
     var password1: String = ""
     private var retries = 0
     private let MAX_RETRIES = 6
+    private var seconds = 0
     
-    private let msg = {"Wait for \($0)" + ($0 > 1 ? " seconds." : " second.")}
+    func msg(_ sec: Int) -> String {
+        return "Wait for \(String(sec))" + (sec > 1 ? " seconds." : " second.")
+    }
     
-    func check() {
+    func validate() {
         guard self.password1 != "" else {
             self.alertTitle   = "Password empty"
             self.alertMessage = "Please enter again"
@@ -340,16 +355,16 @@ class PasswordChecker2: ObservableObject {
         }
         if retries % 3 == 0 {
             self.disabled = true
-            var seconds = 20
-            self.message = msg(seconds)
+            self.seconds = 20
+            self.message = self.msg(self.seconds)
             _ = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) {
                 timer in
-                self.message = self.msg(seconds)
-                seconds -= 1
-                if seconds < 0 {
+                self.message = self.msg(self.seconds)   // DEBUGGING
+                self.seconds -= 1                       // DEBUGGING
+                if self.seconds < 0 {
                     timer.invalidate()
                     self.disabled = false
-                    self.message = "Enter your password."
+                    self.message = nil
                 }
             }
         }
@@ -410,8 +425,8 @@ struct PasswordView_Previews: PreviewProvider {
     
     static var previews: some View {
         Group {
-            RegisterPasswordView()
-            EnterPasswordView()
+            RegistrationView(message: "Registration View")
+            EnterPasswordView(message: "Password Entry View")
         }
     }
 }
