@@ -22,7 +22,9 @@ struct TresorMockup4App: App {
             .environment(\.managedObjectContext, self.persistenceController.container.viewContext)
             .onAppear {
                 AuthenticationManger.shared.authenticate { success in
-                    print(success ? "OK" : "NG")
+                    if !success {
+                        // 
+                    }
                 }
                 #if DEBUG
                 TestData.shared.saveDummyData()
