@@ -58,10 +58,8 @@ class AuthenticationManger: ObservableObject {
     
     @Published var view:       AnyView = AnyView(EmptyView())
     @Published var shouldShow: Bool    = false
-    private var haltIfFailed: Bool     = false
     
-    func authenticate(halt haltIfFailed: Bool = false,
-                      authenticatedBlock: @escaping (Bool) -> Void = {_ in}) {
+    func authenticate(authenticatedBlock: @escaping (Bool) -> Void = {_ in}) {
         guard Cryptor.isPrepared else {
             J1Logger.shared.debug("Cryptor is not prepared")
             self.view = AnyView(
@@ -206,7 +204,6 @@ struct PasswordRegistrationView: View {
             AuthenticationManger.shared.shouldShow    = false
             AuthenticationManger.shared.authenticated = false
             self.authenticatedBlock?(false)
-            AuthenticationManger.shared.view = AnyView(HaltView())
             return
         }
         
@@ -219,7 +216,6 @@ struct PasswordRegistrationView: View {
             AuthenticationManger.shared.shouldShow    = false
             AuthenticationManger.shared.authenticated = false
             self.authenticatedBlock?(false)
-            AuthenticationManger.shared.view = AnyView(HaltView())
             return
         }
         
@@ -281,7 +277,7 @@ struct PasswordEntryView: View {
     @State private var alertMessage = ""
     @State private var disabled     = false
     
-    private let MAX_RETRIES = 6
+    private let MAX_RETRIES = 2 // 6
     @State private var retries = 0
     @State private var seconds = 0
     
@@ -301,15 +297,16 @@ struct PasswordEntryView: View {
             return
         }
         
-        retries += 1
-        if retries > MAX_RETRIES {
+        self.retries += 1
+        guard self.retries <= MAX_RETRIES else {
             J1Logger.shared.error("retry count over = \(retries)")
             AuthenticationManger.shared.shouldShow    = false
             AuthenticationManger.shared.authenticated = false
             self.authenticatedBlock?(false)
-            AuthenticationManger.shared.view = AnyView(HaltView())
+            return
         }
-        if retries % 3 == 0 {
+        
+        if self.retries % 3 == 0 {
             self.disabled = true
             self.seconds = 20
             self.messageSaved = self.message
