@@ -277,7 +277,7 @@ struct PasswordEntryView: View {
     @State private var alertMessage = ""
     @State private var disabled     = false
     
-    private let MAX_RETRIES = 2 // 6
+    private let MAX_RETRIES    = 6
     @State private var retries = 0
     @State private var seconds = 0
     
