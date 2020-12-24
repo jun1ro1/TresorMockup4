@@ -24,9 +24,10 @@ struct ContentView: View {
     
     var items: [Site] {
         let sortDescriptors: [NSSortDescriptor] = [NSSortDescriptor(keyPath: \Site.titleSort, ascending: true)]
+        let text = self.$searchText.wrappedValue
         let predicate: NSPredicate? =
             (self.$searchText.wrappedValue == "") ?
-            nil : NSPredicate(format: "title CONTAINS[cd] %@",  self.$searchText.wrappedValue)
+            nil : NSPredicate(format: "title CONTAINS[cd] %@ OR url CONTAINS[cd] %@", text, text)
         
         let request = NSFetchRequest<Site>(entityName: Site.entity().name!)
         request.sortDescriptors = sortDescriptors

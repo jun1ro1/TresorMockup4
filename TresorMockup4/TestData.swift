@@ -19,6 +19,9 @@ class TestData {
     
     func saveDummyData() {
         let titles = [
+            "アップル",
+            "アマゾン",
+            "楽天",
             "antipreparedness",
             "decaphyllous",
             "rightle",
@@ -60,6 +63,9 @@ class TestData {
         ]
         
         let urls = [
+            "https://www.apple.com",
+            "https://www.amazon.co.jp",
+            "https://www.rakuten.co.jp",
             "https://auth.antipreparedness.ad.am",
             "https://www2.decaphyllous.co.gov",
             "https://rightle.ac.wf",
