@@ -373,7 +373,7 @@ struct PasswordEntryView: View {
 // MARK: - HaltView
 struct HaltView: View {
     private let title = Bundle.main.object(forInfoDictionaryKey: kCFBundleNameKey as String) as! String
-
+    
     var body: some View {
         VStack {
             Text(title)
@@ -395,28 +395,26 @@ struct PasswordField: View {
     var onCommit: () -> Void
     
     var body: some View {
-        if self.showPassword {
-            TextField(self.text,
-                      text: self.$password,
-                      onCommit: self.onCommit)
-                .textContentType(.password)
-                .keyboardType(.asciiCapable)
-                .autocapitalization(.none)
-                .disableAutocorrection(true)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .disabled(self.disabled)
+        Group {
+            if self.showPassword {
+                TextField(self.text,
+                          text: self.$password,
+                          onCommit: self.onCommit)
+            }
+            else {
+                SecureField(self.text,
+                            text: self.$password,
+                            onCommit: self.onCommit)
+                
+            }
         }
-        else {
-            SecureField(self.text,
-                        text: self.$password,
-                        onCommit: self.onCommit)
-                .textContentType(.password)
-                .keyboardType(.asciiCapable)
-                .autocapitalization(.none)
-                .disableAutocorrection(true)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .disabled(self.disabled)
-        }
+        .textContentType(.password)
+        .keyboardType(.asciiCapable)
+        .autocapitalization(.none)
+        .disableAutocorrection(true)
+        .textFieldStyle(RoundedBorderTextFieldStyle())
+        .disabled(self.disabled)
+        
     }
 }
 

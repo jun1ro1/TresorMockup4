@@ -81,6 +81,7 @@ struct ContentView: View {
     private func update() {
         self.updateCount = (self.updateCount + 1) % 8
     }
+   
     private func addItem() {
         withAnimation {
             let newItem = Site(context: viewContext)

@@ -25,6 +25,8 @@
 		F9730A7725614FF8007109F7 /* AuthenticationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9730A7625614FF8007109F7 /* AuthenticationManager.swift */; };
 		F9851EC2256BEC0500784485 /* TestData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9851EC1256BEC0500784485 /* TestData.swift */; };
 		F9851ECA256BEEA800784485 /* DetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9851EC9256BEEA800784485 /* DetailView.swift */; };
+		F9C91A4325974D8300918D07 /* ViewUtilityes.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C91A4225974D8300918D07 /* ViewUtilityes.swift */; };
+		F9C91A4D2597676400918D07 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C91A4C2597676400918D07 /* Utilities.swift */; };
 		F9ECF1DA2568B7AA00936DAF /* Site+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9ECF1D92568B7AA00936DAF /* Site+Extensions.swift */; };
 		F9ECF1E52568CBF700936DAF /* TresorMockup4.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = F9730A0525600D05007109F7 /* TresorMockup4.xcdatamodeld */; };
 		F9ECF1F625695C7600936DAF /* SearchBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9ECF1F525695C7600936DAF /* SearchBar.swift */; };
@@ -74,7 +76,10 @@
 		F9730A7625614FF8007109F7 /* AuthenticationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationManager.swift; sourceTree = "<group>"; };
 		F9851EC1256BEC0500784485 /* TestData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestData.swift; sourceTree = "<group>"; };
 		F9851EC9256BEEA800784485 /* DetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailView.swift; sourceTree = "<group>"; };
-		F9ECF1D92568B7AA00936DAF /* Site+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Site+Extensions.swift"; path = "TresorMockup4/Site+Extensions.swift"; sourceTree = "<group>"; };
+		F9C91A4225974D8300918D07 /* ViewUtilityes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewUtilityes.swift; sourceTree = "<group>"; };
+		F9C91A4C2597676400918D07 /* Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
+		F9C91A672597828A00918D07 /* Simulator Screen Shot - iPhone SE (2nd generation) - 2020-12-25 at 23.36.19.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Simulator Screen Shot - iPhone SE (2nd generation) - 2020-12-25 at 23.36.19.png"; sourceTree = "<group>"; };
+		F9ECF1D92568B7AA00936DAF /* Site+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Site+Extensions.swift"; sourceTree = "<group>"; };
 		F9ECF1DE2568C01400936DAF /* memo.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = memo.rtf; sourceTree = "<group>"; };
 		F9ECF1F525695C7600936DAF /* SearchBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchBar.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -107,8 +112,7 @@
 		F97309EE25600D04007109F7 = {
 			isa = PBXGroup;
 			children = (
-				F9ECF1DE2568C01400936DAF /* memo.rtf */,
-				F9ECF1D92568B7AA00936DAF /* Site+Extensions.swift */,
+				F9C91A602597815300918D07 /* Reference */,
 				F9730A3A25600DFB007109F7 /* Cryptor */,
 				F9ECF0F02568303800936DAF /* TresorMockup4 */,
 				F9730A1025600D05007109F7 /* TresorMockup4Tests */,
@@ -164,14 +168,24 @@
 				F9730A4025600E17007109F7 /* RandomData.swift */,
 				F9730A3C25600E17007109F7 /* SecureStore.swift */,
 				F91D3A102562D0BC0018238B /* FocusableTextField.swift */,
-				F94207AF256579CE008F4883 /* log.rtf */,
 			);
 			path = Cryptor;
+			sourceTree = "<group>";
+		};
+		F9C91A602597815300918D07 /* Reference */ = {
+			isa = PBXGroup;
+			children = (
+				F94207AF256579CE008F4883 /* log.rtf */,
+				F9ECF1DE2568C01400936DAF /* memo.rtf */,
+				F9C91A672597828A00918D07 /* Simulator Screen Shot - iPhone SE (2nd generation) - 2020-12-25 at 23.36.19.png */,
+			);
+			path = Reference;
 			sourceTree = "<group>";
 		};
 		F9ECF0F02568303800936DAF /* TresorMockup4 */ = {
 			isa = PBXGroup;
 			children = (
+				F9ECF1D92568B7AA00936DAF /* Site+Extensions.swift */,
 				F9730A6325600E75007109F7 /* J1Logger.swift */,
 				F97309FA25600D05007109F7 /* TresorMockup4App.swift */,
 				F97309FC25600D05007109F7 /* ContentView.swift */,
@@ -179,6 +193,8 @@
 				F9730A0325600D05007109F7 /* Persistence.swift */,
 				F9ECF1F525695C7600936DAF /* SearchBar.swift */,
 				F9851EC1256BEC0500784485 /* TestData.swift */,
+				F9C91A4C2597676400918D07 /* Utilities.swift */,
+				F9C91A4225974D8300918D07 /* ViewUtilityes.swift */,
 				F9730A0825600D05007109F7 /* Info.plist */,
 				F9730A0525600D05007109F7 /* TresorMockup4.xcdatamodeld */,
 				F97309FE25600D05007109F7 /* Assets.xcassets */,
@@ -332,6 +348,8 @@
 				F97309FB25600D05007109F7 /* TresorMockup4App.swift in Sources */,
 				F9ECF1DA2568B7AA00936DAF /* Site+Extensions.swift in Sources */,
 				F91D3A112562D0BD0018238B /* FocusableTextField.swift in Sources */,
+				F9C91A4325974D8300918D07 /* ViewUtilityes.swift in Sources */,
+				F9C91A4D2597676400918D07 /* Utilities.swift in Sources */,
 				F9730A4825600E18007109F7 /* LocalPassword.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
