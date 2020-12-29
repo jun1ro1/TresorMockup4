@@ -6,6 +6,7 @@
 //
 // https://developer.apple.com/forums/thread/128366
 // https://capibara1969.com/2625/
+// https://capibara1969.com/2303/
 // https://stackoverflow.com/questions/57947581/why-buttons-dont-work-when-embedded-in-a-swiftui-form
 // https://stackoverflow.com/questions/57518874/swiftui-how-to-center-text-in-a-form
 
@@ -34,6 +35,17 @@ struct DetailView: View {
         }
     }
 }
+
+struct NewItemView: View {
+    @Environment(\.editMode) var editMode
+    @Environment(\.managedObjectContext) private var viewContext
+
+    var body: some View {
+        DetailView(item: Site(context: self.viewContext))
+            .environment(\.editMode, Binding.constant(EditMode.active))
+    }
+}
+
 
 struct EditView: View {
     @ObservedObject var item:  Site

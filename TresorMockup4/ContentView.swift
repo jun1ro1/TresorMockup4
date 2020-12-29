@@ -9,6 +9,8 @@
 // https://note.com/dngri/n/n26e807c880db
 // https://www.raywenderlich.com/9335365-core-data-with-swiftui-tutorial-getting-started
 // https://stackoverflow.com/questions/56533511/how-update-a-swiftui-list-without-animation
+// https://stackoverflow.com/questions/63602263/swiftui-toolbaritem-doesnt-present-a-view-from-a-navigationlink
+// https://stackoverflow.com/questions/57946197/navigationlink-on-swiftui-pushes-view-twice
 
 import SwiftUI
 import CoreData
@@ -17,6 +19,12 @@ struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @State private var updateCount: Int = 0
     @State private var searchText = ""
+    
+    @State private var added = false
+    
+//    init() {
+//        J1Logger.shared.debug("init")
+//    }
     
     //    @FetchRequest(
     //        sortDescriptors: [NSSortDescriptor(keyPath: \Site.titleSort, ascending: true)],
@@ -62,15 +70,14 @@ struct ContentView: View {
         .navigationTitle("Sites")
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                Button(action: addItem, label: {
+                NavigationLink(destination: NewItemView()) {
                     Image(systemName: "plus")
-                })
+                }
             }
             ToolbarItem(placement: .navigationBarLeading) {
                 EditButton()
             }
         }
-        
         .navigationBarBackButtonHidden(true)
         .onAppear {
             self.update()
@@ -80,24 +87,6 @@ struct ContentView: View {
     
     private func update() {
         self.updateCount = (self.updateCount + 1) % 8
-    }
-   
-    private func addItem() {
-        withAnimation {
-            let newItem = Site(context: viewContext)
-            newItem.title     = "newly added"
-            newItem.titleSort = newItem.title
-            
-            do {
-                try viewContext.save()
-                self.update()
-            } catch {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                let nsError = error as NSError
-                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-            }
-        }
     }
     
     private func deleteItems(offsets: IndexSet) {
