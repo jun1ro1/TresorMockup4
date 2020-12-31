@@ -9,11 +9,12 @@
 // https://capibara1969.com/2303/
 // https://stackoverflow.com/questions/57947581/why-buttons-dont-work-when-embedded-in-a-swiftui-form
 // https://stackoverflow.com/questions/57518874/swiftui-how-to-center-text-in-a-form
+// https://stackoverflow.com/questions/56923351/in-swiftui-how-do-i-set-the-environment-variable-of-editmode-in-an-xcodepreview
 
 import SwiftUI
 
 struct DetailView: View {
-    @ObservedObject var item: Site
+    @StateObject var item: Site
     @Environment(\.editMode) var editMode
     
     var formatter = DateFormatter()
@@ -37,12 +38,12 @@ struct DetailView: View {
 }
 
 struct NewItemView: View {
-    @Environment(\.editMode) var editMode
     @Environment(\.managedObjectContext) private var viewContext
+    @State var editMode: EditMode = .active
 
     var body: some View {
         DetailView(item: Site(context: self.viewContext))
-            .environment(\.editMode, Binding.constant(EditMode.active))
+           .environment(\.editMode, $editMode)
     }
 }
 
@@ -138,6 +139,7 @@ struct EditView: View {
                 Text(self.item.memo ?? "")
             }
         }
+        .navigationTitle(self.title)
         .onAppear {
             self.title    = self.item.title ?? ""
             self.url      = self.item.url   ?? ""
@@ -202,6 +204,7 @@ struct PresentView: View {
                 Text(self.item.memo ?? "")
             }
         }
+        .navigationTitle(self.item.title ?? "")
     }
 }
 
