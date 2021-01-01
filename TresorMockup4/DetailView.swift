@@ -40,10 +40,10 @@ struct DetailView: View {
 struct NewItemView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @State var editMode: EditMode = .active
-
+    
     var body: some View {
         DetailView(item: Site(context: self.viewContext))
-           .environment(\.editMode, $editMode)
+            .environment(\.editMode, $editMode)
     }
 }
 
@@ -72,7 +72,7 @@ struct EditView: View {
         CypherCharacterSet.ArithmeticCharactersSet,
         CypherCharacterSet.AlphaNumericSymbolsSet,
     ]  // .sorted { $0.rawValue < $1.rawValue }
-
+    
     var body: some View {
         Form {
             Section(header: Text("Site")) {
@@ -123,7 +123,7 @@ struct EditView: View {
                 Button {
                     if let val = try? RandomData.shared.get(count: Int(self.mlength),
                                                             in: self.charsArray[self.chars]) {
-                    // self.detailItem?.passwordCurrent = val as NSString  // ***ENCRYPT***
+                        // self.detailItem?.passwordCurrent = val as NSString  // ***ENCRYPT***
                         self.password = val
                     }
                 } label: {
@@ -141,6 +141,11 @@ struct EditView: View {
         }
         .navigationTitle(self.title)
         .onAppear {
+            J1Logger.shared.debug("onAppear")
+            var state = SiteState(rawValue: self.item.state)
+            _ = state.insert(.editing)
+            self.item.state = state.rawValue
+            
             self.title    = self.item.title ?? ""
             self.url      = self.item.url   ?? ""
             self.userid   = self.item.userid ?? ""
@@ -148,13 +153,13 @@ struct EditView: View {
             self.mlength  = max(Float(self.item.maxLength), 4.0)
             self.chars    = (self.charsArray.firstIndex {$0.rawValue >= self.item.charSet}) ?? 0
         }
-        .onDisappear() {
+        .onDisappear {
             let editing = self.editMode?.wrappedValue.isEditing
             J1Logger.shared.debug("editMode.isEditing = \(String(describing: editing))")
             
-            guard self.editMode?.wrappedValue.isEditing == false else {
-                return
-            }
+            var state = SiteState(rawValue: self.item.state)
+            state.remove(.editing)
+            self.item.state = state.rawValue
 
             update(&self.item.title   , with: self.title)
             update(&self.item.url     , with: self.url)
@@ -164,13 +169,27 @@ struct EditView: View {
             if self.item.maxLength != i {
                 self.item.maxLength = i
             }
-//            update(&self.item.maxLength, with: Int16(self.mlength))
+            if self.item.charSet != self.chars {
+                self.item.charSet = Int32(self.chars)
+            }
+            
+            if self.editMode?.wrappedValue.isEditing == true {
+                // editing is cancelled
+                if state.isEmpty {
+                    // new item is cancelled
+                    J1Logger.shared.debug("Site will delete \(self.item.description)")
+                    withAnimation {
+                        self.viewContext.delete(self.item)
+                    }
+                }
+            }
 
             guard self.viewContext.hasChanges else {
                 return
             }
             
             do {
+                J1Logger.shared.debug("Site will save \(self.item.description)")
                 try self.viewContext.save()
             } catch {
                 let nsError = error as NSError

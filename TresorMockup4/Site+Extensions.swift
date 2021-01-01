@@ -8,6 +8,18 @@
 import Foundation
 import CoreData
 
+struct SiteState: OptionSet, Hashable {
+    let rawValue:  Int16
+    var hashValue: Int { return Int(self.rawValue) }
+    
+    init(rawValue: Int16) { self.rawValue = rawValue }
+    
+    static let editing = SiteState(rawValue: 0x0001)
+    static let saved   = SiteState(rawValue: 0x0002)
+    static let deleted = SiteState(rawValue: 0x0004)
+}
+
+
 extension Site {
     override public func awakeFromInsert() {
         self.setPrimitiveValue(Date(), forKey: "createdAt")
