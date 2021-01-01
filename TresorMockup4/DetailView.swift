@@ -160,7 +160,7 @@ struct EditView: View {
             var state = SiteState(rawValue: self.item.state)
             state.remove(.editing)
             self.item.state = state.rawValue
-
+            
             update(&self.item.title   , with: self.title)
             update(&self.item.url     , with: self.url)
             update(&self.item.userid  , with: self.userid)
@@ -173,17 +173,24 @@ struct EditView: View {
                 self.item.charSet = Int32(self.chars)
             }
             
-            if self.editMode?.wrappedValue.isEditing == true {
-                // editing is cancelled
-                if state.isEmpty {
-                    // new item is cancelled
-                    J1Logger.shared.debug("Site will delete \(self.item.description)")
-                    withAnimation {
-                        self.viewContext.delete(self.item)
-                    }
+            if self.editMode?.wrappedValue.isEditing == true &&
+                state.isEmpty &&
+                self.title    == "" &&
+                self.url      == "" &&
+                self.userid   == "" &&
+                self.password == "" {
+                // new item is cancelled
+                J1Logger.shared.debug("Site will delete \(self.item.description)")
+                withAnimation {
+                    self.viewContext.delete(self.item)
                 }
             }
-
+            else {
+                var state = SiteState(rawValue: self.item.state)
+                _ = state.insert(.saved)
+                self.item.state = state.rawValue
+            }
+            
             guard self.viewContext.hasChanges else {
                 return
             }

@@ -23,7 +23,7 @@ struct TresorMockup4App: App {
                 .onAppear {
                     AuthenticationManger.shared.authenticate { self.success = $0 }
                     #if DEBUG
-                    //                TestData.shared.saveDummyData()
+                    TestData.shared.saveDummyData()
                     #endif
                 }
                 .sheet(isPresented: self.$manager.shouldShow) {

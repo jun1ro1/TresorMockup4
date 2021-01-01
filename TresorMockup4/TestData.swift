@@ -19,6 +19,9 @@ class TestData {
     
     func saveDummyData() {
         let titles = [
+            "T1",
+            "T2",
+            "T3",
             "アップル",
             "アマゾン",
             "楽天",
@@ -63,6 +66,9 @@ class TestData {
         ]
         
         let urls = [
+            "URL1",
+            "URL2",
+            "URL3",
             "https://www.apple.com",
             "https://www.amazon.co.jp",
             "https://www.rakuten.co.jp",
@@ -231,7 +237,7 @@ class TestData {
                   "selectAt": formatter.string(from: Date())
                 ]
             
-            switch i {
+            switch i % 2 {
             case 0:
                 site["memo"] = Deutsch
             case 1:
