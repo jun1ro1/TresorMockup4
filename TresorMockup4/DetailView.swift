@@ -28,7 +28,7 @@ struct DetailView: View {
                 PresentView(item: self.item)
             }
         }
-        .navigationTitle(self.item.title ?? "")
+//        .navigationTitle(self.item.title ?? "")
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 EditButton()
@@ -51,12 +51,13 @@ struct NewItemView: View {
 struct EditView: View {
     @ObservedObject var item:  Site
     
-    @State private var title:    String = ""
-    @State private var url:      String = ""
-    @State private var userid:   String = ""
-    @State private var password: String = "PASSWORD"
-    @State private var mlength:  Float  = 4.0
-    @State private var chars:    Int    = 0
+    @State private var title:       String = ""
+    @State private var titleSort:   String = ""
+    @State private var url:         String = ""
+    @State private var userid:      String = ""
+    @State private var password:    String = "PASSWORD"
+    @State private var mlength:     Float  = 4.0
+    @State private var chars:       Int    = 0
     
     @State private var showPassowrd: Bool = false
     
@@ -73,18 +74,42 @@ struct EditView: View {
         CypherCharacterSet.AlphaNumericSymbolsSet,
     ]  // .sorted { $0.rawValue < $1.rawValue }
     
+    var section_site: some View {
+        Section(header: Text("Site")) {
+            TextField("URL",
+                      text: self.$url,
+                      onCommit: {
+                        if self.title.isEmpty,
+                           let host = getDomain(from: self.url) {
+                            self.title = host
+                            if self.titleSort.isEmpty {
+                                self.titleSort = host
+                            }
+                        }
+                      })
+                .modifier(ClearButton(text: self.$url))
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+                .keyboardType(.URL)
+                .autocapitalization(.none)
+                .disableAutocorrection(true)
+            TextField("Title",
+                      text: self.$title,
+                      onCommit: {
+                        if self.titleSort.isEmpty && !self.title.isEmpty {
+                            self.titleSort = self.title
+                        }
+                      })
+                .modifier(ClearButton(text: self.$title))
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+            TextField("Sort Title", text: self.$titleSort)
+                .modifier(ClearButton(text: self.$titleSort))
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+        }
+    }
+
     var body: some View {
         Form {
-            Section(header: Text("Site")) {
-                TextField("Title", text: self.$title)
-                    .modifier(ClearButton(text: self.$title))
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                TextField("URL", text: self.$url)
-                    .modifier(ClearButton(text: self.$url))
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .keyboardType(.URL)
-                    .disableAutocorrection(true)
-            }
+            section_site
             Section(header: Text("Account")) {
                 TextField("userid", text: self.$userid)
                     .modifier(ClearButton(text: self.$userid))
@@ -146,12 +171,14 @@ struct EditView: View {
             _ = state.insert(.editing)
             self.item.state = state.rawValue
             
-            self.title    = self.item.title ?? ""
-            self.url      = self.item.url   ?? ""
-            self.userid   = self.item.userid ?? ""
-            self.password = self.item.password ?? ""
-            self.mlength  = max(Float(self.item.maxLength), 4.0)
-            self.chars    = (self.charsArray.firstIndex {$0.rawValue >= self.item.charSet}) ?? 0
+            self.title     = self.item.title ?? ""
+            self.titleSort = self.item.titleSort ?? ""
+            self.url       = self.item.url   ?? ""
+            self.userid    = self.item.userid ?? ""
+            self.password  = self.item.password ?? ""
+            self.mlength   = max(Float(self.item.maxLength), 4.0)
+            self.chars     = (self.charsArray.firstIndex {
+                                $0.rawValue >= self.item.charSet}) ?? 0
         }
         .onDisappear {
             let editing = self.editMode?.wrappedValue.isEditing
@@ -161,10 +188,11 @@ struct EditView: View {
             state.remove(.editing)
             self.item.state = state.rawValue
             
-            update(&self.item.title   , with: self.title)
-            update(&self.item.url     , with: self.url)
-            update(&self.item.userid  , with: self.userid)
-            update(&self.item.password, with: self.password)
+            update(&self.item.title    , with: self.title)
+            update(&self.item.titleSort, with: self.titleSort)
+            update(&self.item.url      , with: self.url)
+            update(&self.item.userid   , with: self.userid)
+            update(&self.item.password , with: self.password)
             let i = Int16(self.mlength)
             if self.item.maxLength != i {
                 self.item.maxLength = i
@@ -213,7 +241,6 @@ struct PresentView: View {
     var body: some View {
         Form {
             Section(header: Text("Site")) {
-                Text(self.item.title ?? "")
                 Text(self.item.url ?? "")
                     .italic()
             }

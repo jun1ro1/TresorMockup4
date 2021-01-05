@@ -24,7 +24,6 @@ extension Site {
     override public func awakeFromInsert() {
         self.setPrimitiveValue(Date(), forKey: "createdAt")
         self.setPrimitiveValue(UUID().uuidString, forKey: "uuid")
-        self.setPrimitiveValue(true, forKey: "active")
     }
 
     public var currentPassword: Password? {
