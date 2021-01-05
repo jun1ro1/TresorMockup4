@@ -241,8 +241,8 @@ struct PresentView: View {
     var body: some View {
         Form {
             Section(header: Text("Site")) {
-                Text(self.item.url ?? "")
-                    .italic()
+//                Text(self.item.url ?? "")
+                Link(self.item.url ?? "", destination: URL(string: self.item.url ?? "")!)
             }
             Section(header: Text("Account")) {
                 Text(self.item.userid ?? "")
