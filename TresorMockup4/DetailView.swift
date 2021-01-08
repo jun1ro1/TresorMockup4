@@ -241,8 +241,12 @@ struct PresentView: View {
     var body: some View {
         Form {
             Section(header: Text("Site")) {
-//                Text(self.item.url ?? "")
-                Link(self.item.url ?? "", destination: URL(string: self.item.url ?? "")!)
+                if let url = URL(string: self.item.url ?? "") {
+                    Link(url.absoluteString, destination: url)
+                }
+                else {
+                    Text(self.item.url ?? "")
+                }
             }
             Section(header: Text("Account")) {
                 Text(self.item.userid ?? "")
