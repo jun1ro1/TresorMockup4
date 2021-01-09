@@ -12,6 +12,7 @@
 // https://stackoverflow.com/questions/56923351/in-swiftui-how-do-i-set-the-environment-variable-of-editmode-in-an-xcodepreview
 
 import SwiftUI
+import Introspect
 
 struct DetailView: View {
     @StateObject var item: Site
@@ -75,7 +76,7 @@ struct EditView: View {
     ]  // .sorted { $0.rawValue < $1.rawValue }
     
     var section_site: some View {
-        Section(header: Text("Site")) {
+        Section(header: Text("URL")) {
             TextField("URL",
                       text: self.$url,
                       onCommit: {
@@ -87,11 +88,19 @@ struct EditView: View {
                             }
                         }
                       })
+                .introspectTextField { textField in
+                    textField.becomeFirstResponder()
+                }
                 .modifier(ClearButton(text: self.$url))
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .keyboardType(.URL)
                 .autocapitalization(.none)
                 .disableAutocorrection(true)
+        }
+    }
+    
+    var section_title: some View {
+        Section(header: Text("Title")) {
             TextField("Title",
                       text: self.$title,
                       onCommit: {
@@ -106,63 +115,72 @@ struct EditView: View {
                 .textFieldStyle(RoundedBorderTextFieldStyle())
         }
     }
-
-    var body: some View {
-        Form {
-            section_site
-            Section(header: Text("Account")) {
-                TextField("userid", text: self.$userid)
-                    .modifier(ClearButton(text: self.$userid))
+    
+    var section_account: some View {
+        Section(header: Text("Account")) {
+            TextField("userid", text: self.$userid)
+                .modifier(ClearButton(text: self.$userid))
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+                .disableAutocorrection(true)
+            
+            HStack {
+                PasswordTextField(title: "Password",
+                                  text: self.$password,
+                                  showPassword: self.$showPassowrd)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .disableAutocorrection(true)
-                
-                HStack {
-                    PasswordTextField(title: "Password",
-                                      text: self.$password,
-                                      showPassword: self.$showPassowrd)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                    Spacer()
-                    Button {
-                        if !self.showPassowrd {
-                            AuthenticationManger.shared.authenticate {
-                                if $0 { self.showPassowrd.toggle() }
-                            }
-                        }
-                        else {
-                            self.showPassowrd.toggle()
-                        }
-                    } label: {
-                        Image(systemName: self.showPassowrd ? "eye.slash.fill" : "eye.fill")
-                            .foregroundColor(.secondary)
-                    }
-                    .buttonStyle(PlainButtonStyle())
-                }
-                HStack {
-                    Text("\(Int(self.mlength))")   // String(format: "%3d", self.mlength))
-                    Spacer()
-                    Slider(value: self.$mlength, in: 4...32)
-                }
-                Stepper(self.charsArray[self.chars].description,
-                        value: self.$chars,
-                        in: 0...self.charsArray.count - 1)
+                Spacer()
                 Button {
-                    if let val = try? RandomData.shared.get(count: Int(self.mlength),
-                                                            in: self.charsArray[self.chars]) {
-                        // self.detailItem?.passwordCurrent = val as NSString  // ***ENCRYPT***
-                        self.password = val
+                    if !self.showPassowrd {
+                        AuthenticationManger.shared.authenticate {
+                            if $0 { self.showPassowrd.toggle() }
+                        }
+                    }
+                    else {
+                        self.showPassowrd.toggle()
                     }
                 } label: {
-                    Text("Generate Password")
-                        .frame(minWidth : 0, maxWidth: .infinity,
-                               minHeight: 0, maxHeight: .infinity,
-                               alignment: .center)
-                        .foregroundColor(.accentColor)
+                    Image(systemName: self.showPassowrd ? "eye.slash.fill" : "eye.fill")
+                        .foregroundColor(.secondary)
                 }
                 .buttonStyle(PlainButtonStyle())
             }
-            Section(header: Text("Memo")) {
-                Text(self.item.memo ?? "")
+            HStack {
+                Text("\(Int(self.mlength))")   // String(format: "%3d", self.mlength))
+                Spacer()
+                Slider(value: self.$mlength, in: 4...32)
             }
+            Stepper(self.charsArray[self.chars].description,
+                    value: self.$chars,
+                    in: 0...self.charsArray.count - 1)
+            Button {
+                if let val = try? RandomData.shared.get(count: Int(self.mlength),
+                                                        in: self.charsArray[self.chars]) {
+                    // self.detailItem?.passwordCurrent = val as NSString  // ***ENCRYPT***
+                    self.password = val
+                }
+            } label: {
+                Text("Generate Password")
+                    .frame(minWidth : 0, maxWidth: .infinity,
+                           minHeight: 0, maxHeight: .infinity,
+                           alignment: .center)
+                    .foregroundColor(.accentColor)
+            }
+            .buttonStyle(PlainButtonStyle())
+        }
+    }
+
+    var section_memo: some View {
+        Section(header: Text("Memo")) {
+            Text(self.item.memo ?? "")
+        }
+    }
+    
+    var body: some View {
+        Form {
+            section_site
+            section_title
+            section_account
+            section_memo
         }
         .navigationTitle(self.title)
         .onAppear {

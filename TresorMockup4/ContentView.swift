@@ -15,6 +15,7 @@
 // https://www.hackingwithswift.com/books/ios-swiftui/dynamically-filtering-fetchrequest-with-swiftui
 
 import SwiftUI
+import Introspect
 import CoreData
 
 struct ContentView: View {
@@ -23,12 +24,15 @@ struct ContentView: View {
     @State private var predicate: NSPredicate? = nil
     
     @State private var searchText: String = ""
-    
+       
     var body: some View {
         List {
             HStack {
                 SearchBar(text: self.$searchText)
                     .frame(maxWidth: .infinity, alignment: .leading)
+                    .introspectTextField { textField in
+                        textField.becomeFirstResponder()
+                    }
             }
             ItemsView(items: FetchRequest<Site>(
                         entity: Site.entity(),
@@ -53,7 +57,6 @@ struct ContentView: View {
         }
         .navigationBarBackButtonHidden(true)
         .onAppear {
-            //            self.update()
             let text = self.$searchText.wrappedValue
             self.predicate =
                 (text == "") ?
@@ -67,7 +70,6 @@ struct ItemsView: View {
     @FetchRequest var items: FetchedResults<Site>
     
     var body: some View {
-        //        List {
         ForEach(self.items, id: \.self) { item in
             NavigationLink(destination: DetailView(item: item)) {
                 VStack(alignment: .leading) {
@@ -81,19 +83,16 @@ struct ItemsView: View {
             }
         }
         .onDelete(perform: deleteItems)
-        //        }
     }
     
     private func deleteItems(offsets: IndexSet) {
         withAnimation {
-            //            let deleted = offsets.map { self.searchedItems[$0] }
             offsets.map { self.items[$0] }.forEach {
                 viewContext.delete($0)
             }
             
             do {
                 try viewContext.save()
-                //                self.update()
             } catch {
                 // Replace this implementation with code to handle the error appropriately.
                 // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.

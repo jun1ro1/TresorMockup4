@@ -9,31 +9,44 @@ import SwiftUI
 
 @main
 struct TresorMockup4App: App {
-    let persistenceController = PersistenceController.shared
+    let persistenceController   = PersistenceController.shared
     @ObservedObject var manager = AuthenticationManger.shared
-    @State          var success: Bool = true
+    @State          var success: Bool? = nil
     
     var body: some Scene {
         WindowGroup {
-            if self.success {
+            switch self.success {
+            case true:
                 NavigationView {
                     ContentView()
                 }
                 .environment(\.managedObjectContext, self.persistenceController.container.viewContext)
-                .onAppear {
-                    AuthenticationManger.shared.authenticate { self.success = $0 }
-                    #if DEBUG
-                    TestData.shared.saveDummyData()
-                    #endif
-                }
-                .sheet(isPresented: self.$manager.shouldShow) {
-                    self.manager.view
-                }
-            }
-            else {
+            case false:
                 HaltView()
+            default:
+                NavigationView {
+                    OpeningView()
+                        .onAppear {
+                            AuthenticationManger.shared.authenticate { self.success = $0 }
+                            #if DEBUG
+                            TestData.shared.saveDummyData()
+                            #endif
+                        }
+                        .sheet(isPresented: self.$manager.shouldShow) {
+                            self.manager.view
+                        }
+                }
             }
         }
     }
 }
 
+struct OpeningView: View {
+    private let title = Bundle.main.object(forInfoDictionaryKey: kCFBundleNameKey as String) as! String
+    
+    var body: some View {
+        Text(title)
+            .font(.largeTitle)
+            .padding()
+    }
+}

@@ -9,9 +9,11 @@
 // https://stackoverflow.com/questions/60155947/swiftui-usage-of-toggles-console-logs-invalid-mode-kcfrunloopcommonmodes
 // https://stackoverflow.com/questions/24158062/how-to-use-touch-id-sensor-in-ios-8/40612228
 // https://developer.apple.com/forums/thread/650112
+// https://github.com/siteline/SwiftUI-Introspect
 
 import Foundation
 import SwiftUI
+import Introspect
 
 import LocalAuthentication
 
@@ -358,6 +360,9 @@ struct PasswordEntryView: View {
                           onCommit: self.validate)
                 .foregroundColor(color)
                 .padding()
+                .introspectTextField { textField in
+                    textField.becomeFirstResponder()
+                }
             Button("OK", action: self.validate)
                 .disabled(self.password1 == "" || self.disabled)
                 .padding()
@@ -405,7 +410,6 @@ struct PasswordField: View {
                 SecureField(self.text,
                             text: self.$password,
                             onCommit: self.onCommit)
-                
             }
         }
         .textContentType(.password)
