@@ -47,6 +47,7 @@ struct OpeningView: View {
     var body: some View {
         Text(title)
             .font(.largeTitle)
+            .multilineTextAlignment(.center)
             .padding()
     }
 }

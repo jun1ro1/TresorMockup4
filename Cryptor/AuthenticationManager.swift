@@ -383,9 +383,11 @@ struct HaltView: View {
         VStack {
             Text(title)
                 .font(.title)
+                .multilineTextAlignment(.center)
                 .padding()
             Text("Authentication Failed\nCan not continue.")
                 .font(.title2)
+                .multilineTextAlignment(.center)
                 .padding()
         }
     }
