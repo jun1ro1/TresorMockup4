@@ -41,6 +41,7 @@ struct TresorMockup4App: App {
     }
 }
 
+// MARK: - OpeningView
 struct OpeningView: View {
     private let title = Bundle.main.object(forInfoDictionaryKey: kCFBundleNameKey as String) as! String
     
@@ -49,5 +50,23 @@ struct OpeningView: View {
             .font(.largeTitle)
             .multilineTextAlignment(.center)
             .padding()
+    }
+}
+
+// MARK: - HaltView
+struct HaltView: View {
+    private let title = Bundle.main.object(forInfoDictionaryKey: kCFBundleNameKey as String) as! String
+    
+    var body: some View {
+        VStack {
+            Text(title)
+                .font(.title)
+                .multilineTextAlignment(.center)
+                .padding()
+            Text("Authentication Failed\nCan not continue.")
+                .font(.title2)
+                .multilineTextAlignment(.center)
+                .padding()
+        }
     }
 }

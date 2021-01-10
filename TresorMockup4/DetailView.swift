@@ -22,6 +22,9 @@ struct DetailView: View {
     
     var body: some View {
         Group {
+//            if self.item == nil {
+//                NotSelectedView()
+//            }
             if self.editMode?.wrappedValue.isEditing == true {
                 EditView(item: self.item)
             }
@@ -35,6 +38,14 @@ struct DetailView: View {
                 EditButton()
             }
         }
+    }
+}
+
+struct NotSelectedView: View {
+    var body: some View {
+        Text("No item is selected")
+            .font(.largeTitle)
+            .multilineTextAlignment(.center)
     }
 }
 
@@ -198,7 +209,7 @@ struct EditView: View {
             self.chars     = (self.charsArray.firstIndex {
                                 $0.rawValue >= self.item.charSet}) ?? 0
         }
-        .onDisappear {
+        .onDisappear { () -> Void in
             let editing = self.editMode?.wrappedValue.isEditing
             J1Logger.shared.debug("editMode.isEditing = \(String(describing: editing))")
             
@@ -237,17 +248,21 @@ struct EditView: View {
                 self.item.state = state.rawValue
             }
             
-            guard self.viewContext.hasChanges else {
-                return
-            }
-            
-            do {
-                J1Logger.shared.debug("Site will save \(self.item.description)")
-                try self.viewContext.save()
-            } catch {
-                let nsError = error as NSError
-                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-            }
+            // NOTICE
+            // Don't save Core Data context in this view,
+            // otherwise the app crashes at "self.viewContext.save()"
+            // as "Fatal error: Attempted to read an unowned reference but the object was already deallocated".
+            // Save the context in the content view.
+//            guard self.viewContext.hasChanges else {
+//                return
+//            }
+//            J1Logger.shared.debug("Site will save \(self.item.description)")
+//            do {
+//                try self.viewContext.save()
+//            } catch {
+//                let nsError = error as NSError
+//                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+//            }
         }
     }
 }
@@ -258,7 +273,7 @@ struct PresentView: View {
     
     var body: some View {
         Form {
-            Section(header: Text("Site")) {
+            Section(header: Text("URL")) {
                 if let url = URL(string: self.item.url ?? "") {
                     Link(url.absoluteString, destination: url)
                 }

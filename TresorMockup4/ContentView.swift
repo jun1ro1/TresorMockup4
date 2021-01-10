@@ -83,6 +83,17 @@ struct ItemsView: View {
             }
         }
         .onDelete(perform: deleteItems)
+        .onAppear {
+            if self.viewContext.hasChanges {
+                do {
+                    try self.viewContext.save()
+                } catch {
+                    let nsError = error as NSError
+                    fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+                }
+                J1Logger.shared.debug("save context")
+            }            
+        }
     }
     
     private func deleteItems(offsets: IndexSet) {
