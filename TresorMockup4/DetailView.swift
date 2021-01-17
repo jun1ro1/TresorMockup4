@@ -142,7 +142,7 @@ struct EditView: View {
                 Spacer()
                 Button {
                     if !self.showPassowrd {
-                        AuthenticationManger.shared.authenticate {
+                        Cryptor.shared.open {
                             if $0 { self.showPassowrd.toggle() }
                         }
                     }

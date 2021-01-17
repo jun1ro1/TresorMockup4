@@ -9,95 +9,17 @@ import Foundation
 import CryptoKit
 import CommonCrypto
 
-public enum CryptorError: Error {
-    case unexpected
-    case outOfRange
-    case invalidCharacter
-    case wrongPassword
-    case notOpened
-    case alreadyOpened
-    case notPrepared
-    case alreadyRegistered
-    case SecItemBroken
-    case timeOut
-    case sealError
-    case CryptoKitError(error: CryptoKitError)
-    case SecItemError(error: OSStatus)
-}
-
-extension CryptorError: LocalizedError {
-    /// Returns a description of the error.
-    public var errorDescription: String?  {
-        switch self {
-        case .unexpected:
-            return "Unexpected Error"
-        case .outOfRange:
-            return "Out of Range"
-        case .invalidCharacter:
-            return "Invalid Character"
-        case .wrongPassword:
-            return "Wrong Password"
-        case .notOpened:
-            return "Cryptor is not Opened"
-        case .alreadyOpened:
-            return "Cryptor is already Opened"
-        case .notPrepared:
-            return "Prepare is not called"
-        case .alreadyRegistered:
-            return "Register is called twice"
-        case .SecItemBroken:
-            return "SecItem is broken"
-        case .timeOut:
-            return "Time Out to acquire a lock"
-        case .sealError:
-            return "AES.GCM.seal error"
-        case .CryptoKitError(let error):
-            return "CryptokitError(\(error)"
-        case .SecItemError(let error):
-            return "SecItem Error(\(error))"
-        }
-    }
-}
-
-// https://stackoverflow.com/questions/39972512/cannot-invoke-xctassertequal-with-an-argument-list-errortype-xmpperror
-extension CryptorError: Equatable {
-    /// Returns a Boolean value indicating whether two values are equal.
-    ///
-    /// - Parameters:
-    ///   - lhs: A left hand side expression.
-    ///   - rhs: A right hand side expression.
-    /// - Returns: `True` if `lhs` equals `rhs`, otherwise `false`.
-    public static func == (lhs: CryptorError, rhs: CryptorError) -> Bool {
-        switch (lhs, rhs) {
-        case (.unexpected,         .unexpected),
-             (.outOfRange,         .outOfRange),
-             (.invalidCharacter,   .invalidCharacter),
-             (.wrongPassword,      .wrongPassword),
-             (.notOpened,          .notOpened),
-             (.alreadyRegistered,  .alreadyRegistered),
-             (.alreadyOpened,      .alreadyOpened),
-             (.notPrepared,        .notPrepared),
-             (.SecItemBroken,      .SecItemBroken),
-             (.timeOut,            .timeOut),
-             (.sealError,          .sealError):
-            return true
-        case (.CryptoKitError(let error1), .CryptoKitError(let error2)):
-            return error1.localizedDescription  == error2.localizedDescription
-        case (.SecItemError(let error1), .SecItemError(let error2)):
-            return error1 == error2
-        default:
-            return false
-        }
-    }
-}
+typealias InterKey = SymmetricKey
+typealias KeyEncryptionKey = SymmetricKey
+typealias ContentsEncryptionKey = SymmetricKey
 
 // MARK: -
 private struct Session {
     var cryptor: Cryptor
-    var itk:     SymmetricKey
+    var itk:     InterKey
     // Inter key: the KEK(Key kncryption Key) encrypted using SEK(Session Key)
     
-    init(cryptor: Cryptor, itk: SymmetricKey) {
+    init(cryptor: Cryptor, itk: InterKey) {
         self.cryptor = cryptor
         self.itk  = itk
     }
@@ -124,11 +46,10 @@ internal class CryptorCore {
         }
     }
     
-    private init() {
-    }
+    private init() {}
     
-    // MARK: - methods
-    private func getKEK(password: String, seed: CryptorSeed) throws -> SymmetricKey {
+    // MARK: - private methods
+    private func getKEK(password: String, seed: CryptorSeed) throws -> KeyEncryptionKey {
         // check password
         guard case 1...CryptorCore.MAX_PASSWORD_LENGTH = password.count else {
             throw CryptorError.outOfRange
@@ -159,40 +80,21 @@ internal class CryptorCore {
         return kek
     }
     
-    func prepare(password: String) throws -> SymmetricKey {
-        guard var seed = try CryptorSeed.read() else {
-            throw CryptorError.SecItemBroken
-        }
-        defer { seed.reset() }
+    private func engage(_ kek: KeyEncryptionKey, cryptor: Cryptor) throws {
+        var sek: SessionKey = SymmetricKey(size: .bits256)
+        defer { sek.reset() }
         
-        guard let validator = try Validator.read() else {
-            throw CryptorError.SecItemBroken
-        }
-        defer { validator.reset() }
+        var itk: SymmetricKey = try SymmetricKey(data: kek.data.encrypt(using: sek))
+        defer { itk.reset() }
         
-        // get a CEK encrypted with a KEK
-        guard var cekEnc = seed.key else {
-            throw CryptorError.SecItemBroken
-        }
-        defer{ cekEnc.reset() }
-        
-        // derivate a KEK with the password and the SALT
-        var kek = try self.getKEK(password: password, seed: seed)
-        defer{ kek.reset() }
-        
-        // get a CEK
-        var cek = try SymmetricKey(data: cekEnc.data.decrypt(using: kek))
-        defer{ cek.reset() }
-        
-        guard validator.validate(key: cek) == true else {
-            throw CryptorError.wrongPassword
-        }
-        
-        return kek
+        let session = Session(cryptor: cryptor, itk: itk)
+        cryptor.key = sek
+        self.mutex.lock()
+        self.sessions[ObjectIdentifier(cryptor).hashValue] = session
+        self.mutex.unlock()
     }
     
-    
-    func register(password: String) throws -> SymmetricKey {
+    func register(password: String, cryptor: Cryptor) throws {
         guard !self.isPrepared else {
             throw CryptorError.alreadyRegistered
         }
@@ -241,29 +143,41 @@ internal class CryptorCore {
         J1Logger.shared.debug("cekEnc=\(cekEnc.data as NSData)")
         #endif
         
-        return kek
+        try self.engage(kek, cryptor: cryptor)
     }
     
-    
-    func open(password: String, cryptor: Cryptor) throws -> SymmetricKey {
-        var kek = try self.prepare(password: password)
-        defer { kek.reset() }
+    func prepare(password: String, cryptor: Cryptor) throws {
+        guard var seed = try CryptorSeed.read() else {
+            throw CryptorError.SecItemBroken
+        }
+        defer { seed.reset() }
         
-        var sek: SymmetricKey = SymmetricKey(size: .bits256)
-        defer { sek.reset() }
+        guard let validator = try Validator.read() else {
+            throw CryptorError.SecItemBroken
+        }
+        defer { validator.reset() }
         
-        var itk: SymmetricKey = try SymmetricKey(data: kek.data.encrypt(using: sek))
-        defer { itk.reset() }
+        // get a CEK encrypted with a KEK
+        guard var cekEnc = seed.key else {
+            throw CryptorError.SecItemBroken
+        }
+        defer{ cekEnc.reset() }
         
-        let session = Session(cryptor: cryptor, itk: itk)
-        self.mutex.lock()
-        self.sessions[ObjectIdentifier(cryptor).hashValue] = session
-        self.mutex.unlock()
+        // derivate a KEK with the password and the SALT
+        var kek = try self.getKEK(password: password, seed: seed)
+        defer{ kek.reset() }
         
-        return sek
+        // get a CEK
+        var cek = try SymmetricKey(data: cekEnc.data.decrypt(using: kek))
+        defer{ cek.reset() }
+        
+        guard validator.validate(key: cek) == true else {
+            throw CryptorError.wrongPassword
+        }
+        
+        try self.engage(kek, cryptor: cryptor)
     }
-    
-    
+        
     func close(cryptor: Cryptor) throws {
         self.mutex.lock()
         let result = self.sessions.removeValue(forKey: ObjectIdentifier(cryptor).hashValue)
@@ -355,7 +269,7 @@ internal class CryptorCore {
         J1Logger.shared.debug("newkekEnc=\(newcekEnc.data)")
         #endif
     }
-    
+
     func encrypt(cryptor: Cryptor, plain: Data) throws -> Data {
         guard let sek = cryptor.key else {
             throw CryptorError.notOpened

@@ -10,7 +10,7 @@ import SwiftUI
 @main
 struct TresorMockup4App: App {
     let persistenceController   = PersistenceController.shared
-    @ObservedObject var manager = AuthenticationManger.shared
+    @ObservedObject var manager = Cryptor.shared
     @State          var success: Bool? = nil
     
     var body: some Scene {
@@ -27,7 +27,7 @@ struct TresorMockup4App: App {
                 NavigationView {
                     OpeningView()
                         .onAppear {
-                            AuthenticationManger.shared.authenticate { self.success = $0 }
+                            Cryptor.shared.open { self.success = $0 }
                             #if DEBUG
                             TestData.shared.saveDummyData()
                             #endif

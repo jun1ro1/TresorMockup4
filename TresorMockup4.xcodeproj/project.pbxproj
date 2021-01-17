@@ -31,9 +31,11 @@
 		F9730A5125600E18007109F7 /* RandomData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9730A4025600E17007109F7 /* RandomData.swift */; };
 		F9730A5425600E18007109F7 /* Cryptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9730A4125600E18007109F7 /* Cryptor.swift */; };
 		F9730A6425600E75007109F7 /* J1Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9730A6325600E75007109F7 /* J1Logger.swift */; };
-		F9730A7725614FF8007109F7 /* AuthenticationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9730A7625614FF8007109F7 /* AuthenticationManager.swift */; };
 		F9851EC2256BEC0500784485 /* TestData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9851EC1256BEC0500784485 /* TestData.swift */; };
 		F9851ECA256BEEA800784485 /* DetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9851EC9256BEEA800784485 /* DetailView.swift */; };
+		F9AE18B525B33336007373E0 /* CryptorError.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9AE18B425B33336007373E0 /* CryptorError.swift */; };
+		F9AE18B625B33336007373E0 /* CryptorError.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9AE18B425B33336007373E0 /* CryptorError.swift */; };
+		F9AE18B725B33336007373E0 /* CryptorError.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9AE18B425B33336007373E0 /* CryptorError.swift */; };
 		F9C91A4325974D8300918D07 /* ViewUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C91A4225974D8300918D07 /* ViewUtilities.swift */; };
 		F9C91A4D2597676400918D07 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C91A4C2597676400918D07 /* Utilities.swift */; };
 		F9ECF1DA2568B7AA00936DAF /* Site+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9ECF1D92568B7AA00936DAF /* Site+Extensions.swift */; };
@@ -96,6 +98,7 @@
 		F9730A7625614FF8007109F7 /* AuthenticationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationManager.swift; sourceTree = "<group>"; };
 		F9851EC1256BEC0500784485 /* TestData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestData.swift; sourceTree = "<group>"; };
 		F9851EC9256BEEA800784485 /* DetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailView.swift; sourceTree = "<group>"; };
+		F9AE18B425B33336007373E0 /* CryptorError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptorError.swift; sourceTree = "<group>"; };
 		F9C91A4225974D8300918D07 /* ViewUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewUtilities.swift; sourceTree = "<group>"; };
 		F9C91A4C2597676400918D07 /* Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
 		F9C91A672597828A00918D07 /* Simulator Screen Shot - iPhone SE (2nd generation) - 2020-12-25 at 23.36.19.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Simulator Screen Shot - iPhone SE (2nd generation) - 2020-12-25 at 23.36.19.png"; sourceTree = "<group>"; };
@@ -211,6 +214,7 @@
 				F9730A7625614FF8007109F7 /* AuthenticationManager.swift */,
 				F9730A4125600E18007109F7 /* Cryptor.swift */,
 				F9730A3F25600E17007109F7 /* CryptorCore.swift */,
+				F9AE18B425B33336007373E0 /* CryptorError.swift */,
 				F9730A3E25600E17007109F7 /* CryptorExtensions.swift */,
 				F9730A3D25600E17007109F7 /* LocalPassword.swift */,
 				F9730A4025600E17007109F7 /* RandomData.swift */,
@@ -493,6 +497,7 @@
 				F9730A0425600D05007109F7 /* Persistence.swift in Sources */,
 				F9730A4525600E18007109F7 /* SecureStore.swift in Sources */,
 				F9851ECA256BEEA800784485 /* DetailView.swift in Sources */,
+				F9AE18B525B33336007373E0 /* CryptorError.swift in Sources */,
 				F9ECF1F625695C7600936DAF /* SearchBar.swift in Sources */,
 				F965519225AB5F0E00FFD4E8 /* Validator.swift in Sources */,
 				F9ECF1E52568CBF700936DAF /* TresorMockup4.xcdatamodeld in Sources */,
@@ -504,7 +509,6 @@
 				F9730A4B25600E18007109F7 /* CryptorExtensions.swift in Sources */,
 				F9730A4E25600E18007109F7 /* CryptorCore.swift in Sources */,
 				F965518B25AB5EB400FFD4E8 /* CryptorSeed.swift in Sources */,
-				F9730A7725614FF8007109F7 /* AuthenticationManager.swift in Sources */,
 				F97309FB25600D05007109F7 /* TresorMockup4App.swift in Sources */,
 				F9ECF1DA2568B7AA00936DAF /* Site+Extensions.swift in Sources */,
 				F91D3A112562D0BD0018238B /* FocusableTextField.swift in Sources */,
@@ -520,6 +524,7 @@
 			files = (
 				F965518C25AB5EB400FFD4E8 /* CryptorSeed.swift in Sources */,
 				F965519325AB5F0E00FFD4E8 /* Validator.swift in Sources */,
+				F9AE18B625B33336007373E0 /* CryptorError.swift in Sources */,
 				F9730A1225600D05007109F7 /* TresorMockup4Tests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -530,6 +535,7 @@
 			files = (
 				F965518D25AB5EB400FFD4E8 /* CryptorSeed.swift in Sources */,
 				F965519425AB5F0E00FFD4E8 /* Validator.swift in Sources */,
+				F9AE18B725B33336007373E0 /* CryptorError.swift in Sources */,
 				F9730A1D25600D06007109F7 /* TresorMockup4UITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -601,7 +607,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.3;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -656,7 +662,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.3;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
