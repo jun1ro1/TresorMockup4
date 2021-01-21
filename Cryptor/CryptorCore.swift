@@ -9,8 +9,9 @@ import Foundation
 import CryptoKit
 import CommonCrypto
 
-typealias InterKey = SymmetricKey
-typealias KeyEncryptionKey = SymmetricKey
+typealias InterKey              = SymmetricKey
+typealias SessionKey            = SymmetricKey
+typealias KeyEncryptionKey      = SymmetricKey
 typealias ContentsEncryptionKey = SymmetricKey
 
 // MARK: -
@@ -25,6 +26,44 @@ private struct Session {
     }
 }
 
+private struct Sessions {
+    private var sessions: [Int: Session] = [:]
+    private var mutex: NSLock = NSLock()
+    
+    var count: Int {
+        self.mutex.lock()
+        let count = self.sessions.count
+        self.mutex.unlock()
+        return count
+    }
+    
+    var first: Session? {
+        self.mutex.lock()
+        let session = self.sessions.first?.value
+        self.mutex.unlock()
+        return session
+    }
+    
+    mutating func add(cryptor: Cryptor, session: Session) {
+        self.mutex.lock()
+        self.sessions[ObjectIdentifier(cryptor).hashValue] = session
+        self.mutex.unlock()
+    }
+    
+    mutating func remove(cryptor: Cryptor) -> Bool {
+        self.mutex.lock()
+        let result = self.sessions.removeValue(forKey: ObjectIdentifier(cryptor).hashValue)
+        self.mutex.unlock()
+        return result != nil
+    }
+    
+    func get(cryptor: Cryptor) -> Session? {
+        self.mutex.lock()
+        let session = self.sessions[ObjectIdentifier(cryptor).hashValue]
+        self.mutex.unlock()
+        return session
+    }
+}
 
 // MARK: -
 internal class CryptorCore {
@@ -32,7 +71,7 @@ internal class CryptorCore {
     public static let MAX_PASSWORD_LENGTH = 1000
     
     // instance variables
-    private var sessions: [Int: Session] = [:]
+    private var sessions: Sessions = Sessions()
     private var mutex: NSLock = NSLock()
     
     static var shared = CryptorCore()
@@ -67,6 +106,7 @@ internal class CryptorCore {
         }
         defer { salt.reset() }
         
+        // get pseudo random key
         let prk: SymmetricKey = SymmetricKey(data: binPASS.hash())
         
         guard self.mutex.lock(before: Date(timeIntervalSinceNow: 30)) else {
@@ -80,21 +120,19 @@ internal class CryptorCore {
         return kek
     }
     
-    private func engage(_ kek: KeyEncryptionKey, cryptor: Cryptor) throws {
+    private func engage(cryptor: Cryptor, _ kek: KeyEncryptionKey) throws {
         var sek: SessionKey = SymmetricKey(size: .bits256)
         defer { sek.reset() }
         
-        var itk: SymmetricKey = try SymmetricKey(data: kek.data.encrypt(using: sek))
+        var itk: InterKey = try SymmetricKey(data: kek.data.encrypt(using: sek))
         defer { itk.reset() }
         
-        let session = Session(cryptor: cryptor, itk: itk)
         cryptor.key = sek
-        self.mutex.lock()
-        self.sessions[ObjectIdentifier(cryptor).hashValue] = session
-        self.mutex.unlock()
+        let session = Session(cryptor: cryptor, itk: itk)
+        self.sessions.add(cryptor: cryptor, session: session)
     }
     
-    func register(password: String, cryptor: Cryptor) throws {
+    func register(cryptor: Cryptor, password: String) throws {
         guard !self.isPrepared else {
             throw CryptorError.alreadyRegistered
         }
@@ -110,14 +148,14 @@ internal class CryptorCore {
         defer { salt.reset() }
         
         // create a CryptorSeed
-        var seed = CryptorSeed(version: "2", salt: salt)
+        var seed = CryptorSeed(version: "1", salt: salt)
         
         // derivate a KEK with the password and the SALT
         var kek = try self.getKEK(password: password, seed: seed)
         defer { kek.reset() }
         
         // create a CEK
-        var cek: SymmetricKey = SymmetricKey(size: .bits256)
+        var cek: ContentsEncryptionKey = SymmetricKey(size: .bits256)
         defer { cek.reset() }
         
         // create a Validator
@@ -143,10 +181,10 @@ internal class CryptorCore {
         J1Logger.shared.debug("cekEnc=\(cekEnc.data as NSData)")
         #endif
         
-        try self.engage(kek, cryptor: cryptor)
+        try self.engage(cryptor: cryptor, kek)
     }
     
-    func prepare(password: String, cryptor: Cryptor) throws {
+    func prepare(cryptor: Cryptor, password: String) throws {
         guard var seed = try CryptorSeed.read() else {
             throw CryptorError.SecItemBroken
         }
@@ -175,41 +213,20 @@ internal class CryptorCore {
             throw CryptorError.wrongPassword
         }
         
-        try self.engage(kek, cryptor: cryptor)
+        try self.engage(cryptor: cryptor, kek)
     }
-        
+    
     func close(cryptor: Cryptor) throws {
-        self.mutex.lock()
-        let result = self.sessions.removeValue(forKey: ObjectIdentifier(cryptor).hashValue)
-        self.mutex.unlock()
-        
-        guard result != nil else {
+        guard self.sessions.remove(cryptor: cryptor) else {
             throw CryptorError.notOpened
         }
     }
     
     func closeAll() throws {
-        var errors = 0
-        while true {
-            self.mutex.lock()
-            let before = self.sessions.count
-            let session = self.sessions.first?.value
-            self.mutex.unlock()
-            
-            guard session != nil else {
-                break
-            }
-            try self.close(cryptor: session!.cryptor)
-            
-            self.mutex.lock()
-            let after = self.sessions.count
-            self.mutex.unlock()
-            if before >= after {
-                errors += 1
-            }
-            guard errors < 100 else {
-                throw CryptorError.unexpected
-            }
+        var count = self.sessions.count
+        while let session = self.sessions.first {
+            try self.close(cryptor: session.cryptor)
+            count -= 1
         }
     }
     
@@ -251,7 +268,6 @@ internal class CryptorCore {
             throw CryptorError.wrongPassword
         }
         
-        
         // change KEK
         var newkek = try self.getKEK(password: newpass, seed: seed)
         defer { newkek.reset() }
@@ -269,14 +285,13 @@ internal class CryptorCore {
         J1Logger.shared.debug("newkekEnc=\(newcekEnc.data)")
         #endif
     }
-
-    func encrypt(cryptor: Cryptor, plain: Data) throws -> Data {
+    
+    func getCEK(cryptor: Cryptor) throws -> ContentsEncryptionKey {
         guard let sek = cryptor.key else {
             throw CryptorError.notOpened
         }
-        self.mutex.lock()
-        let session = self.sessions[ObjectIdentifier(cryptor).hashValue]
-        self.mutex.unlock()
+        
+        let session = self.sessions.get(cryptor: cryptor)
         
         #if DEBUG
         J1Logger.shared.debug("session.itk=\(String(describing: session?.itk.data))")
@@ -301,121 +316,27 @@ internal class CryptorCore {
         }
         defer{ cekEnc.reset() }
         
-        var cek: SymmetricKey = try SymmetricKey(data: cekEnc.data.decrypt(using: kek))
-        defer { cek.reset() }
-        
+        let  cek: SymmetricKey = try SymmetricKey(data: cekEnc.data.decrypt(using: kek))
+        return cek
+    }
+    
+    func encrypt(cryptor: Cryptor, plain: Data) throws -> Data {
+        let cek = try self.getCEK(cryptor: cryptor)
         return try plain.encrypt(using: cek)
     }
     
     func decrypt(cryptor: Cryptor, cipher: Data) throws -> Data {
-        guard let sek = cryptor.key else {
-            throw CryptorError.notOpened
-        }
-        self.mutex.lock()
-        let session = self.sessions[ObjectIdentifier(cryptor).hashValue]
-        self.mutex.unlock()
-        
-        #if DEBUG
-        J1Logger.shared.debug("session.itk=\(String(describing: session?.itk.data))")
-        #endif
-        guard var itk = session?.itk else {
-            throw CryptorError.notOpened
-        }
-        defer { itk.reset() }
-        
-        var kek = try SymmetricKey(data: itk.data.decrypt(using: sek))
-        defer { kek.reset() }
-        
-        // get a seed
-        guard var seed = try CryptorSeed.read() else {
-            throw CryptorError.notPrepared
-        }
-        defer { seed.reset() }
-        
-        // get a CEK encrypted with a KEK
-        guard var cekEnc = seed.key else {
-            throw CryptorError.SecItemBroken
-        }
-        defer{ cekEnc.reset() }
-        
-        var cek: SymmetricKey = try SymmetricKey(data: cekEnc.data.decrypt(using: kek))
-        defer { cek.reset() }
-        
+        let cek = try self.getCEK(cryptor: cryptor)
         return try cipher.decrypt(using: cek)
     }
     
     func encrypt(cryptor: Cryptor, plain: String) throws -> String {
-        guard let sek = cryptor.key else {
-            throw CryptorError.notOpened
-        }
-        self.mutex.lock()
-        let session = self.sessions[ObjectIdentifier(cryptor).hashValue]
-        self.mutex.unlock()
-        
-        #if DEBUG
-        J1Logger.shared.debug("session.itk=\(String(describing: session?.itk.data))")
-        #endif
-        guard var itk = session?.itk else {
-            throw CryptorError.notOpened
-        }
-        defer { itk.reset() }
-        
-        var kek = try SymmetricKey(data: itk.data.decrypt(using: sek))
-        defer { kek.reset() }
-        
-        // get a seed
-        guard var seed = try CryptorSeed.read() else {
-            throw CryptorError.notPrepared
-        }
-        defer { seed.reset() }
-        
-        // get a CEK encrypted with a KEK
-        guard var cekEnc = seed.key else {
-            throw CryptorError.SecItemBroken
-        }
-        defer{ cekEnc.reset() }
-        
-        var cek: SymmetricKey = try SymmetricKey(data: cekEnc.data.decrypt(using: kek))
-        defer { cek.reset() }
-        
+        let cek = try self.getCEK(cryptor: cryptor)
         return try plain.encrypt(using: cek)
     }
     
     func decrypt(cryptor: Cryptor, cipher: String) throws -> String {
-        guard let sek = cryptor.key else {
-            throw CryptorError.notOpened
-        }
-        
-        self.mutex.lock()
-        let session = self.sessions[ObjectIdentifier(cryptor).hashValue]
-        self.mutex.unlock()
-        
-        #if DEBUG
-        J1Logger.shared.debug("session.itk=\(String(describing: session?.itk.data))")
-        #endif
-        guard var itk = session?.itk else {
-            throw CryptorError.notOpened
-        }
-        defer { itk.reset() }
-        
-        var kek = try SymmetricKey(data: itk.data.decrypt(using: sek))
-        defer { kek.reset() }
-        
-        // get a seed
-        guard var seed = try CryptorSeed.read() else {
-            throw CryptorError.notPrepared
-        }
-        defer { seed.reset() }
-        
-        // get a CEK encrypted with a KEK
-        guard var cekEnc = seed.key else {
-            throw CryptorError.SecItemBroken
-        }
-        defer{ cekEnc.reset() }
-        
-        var cek: SymmetricKey = try SymmetricKey(data: cekEnc.data.decrypt(using: kek))
-        defer { cek.reset() }
-        
+        let cek = try self.getCEK(cryptor: cryptor)
         return try cipher.decrypt(using: cek)
     }
 }

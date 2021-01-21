@@ -271,6 +271,8 @@ struct EditView: View {
 struct PresentView: View {
     @ObservedObject var item: Site
     
+    @State private var showPassowrd: Bool = false
+    
     var body: some View {
         Form {
             Section(header: Text("URL")) {
@@ -283,7 +285,32 @@ struct PresentView: View {
             }
             Section(header: Text("Account")) {
                 Text(self.item.userid ?? "")
-                Text(self.item.password ?? "")
+                HStack {
+                    Group {
+                        if self.showPassowrd {
+                            Text(self.item.password ?? "")
+                        }
+                        else {
+                            Text("*******")
+                        }
+                    }
+                    Spacer()
+                    Button {
+                        if !self.showPassowrd {
+                            Cryptor.shared.open {
+                                if $0 { self.showPassowrd.toggle() }
+                            }
+                        }
+                        else {
+                            self.showPassowrd.toggle()
+                        }
+                    } label: {
+                        Image(systemName: self.showPassowrd ? "eye.slash.fill" : "eye.fill")
+                            .foregroundColor(.secondary)
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                }
+                
                 Text(self.item.selectAt == nil ?
                         "" :
                         DateFormatter.localizedString(from: self.item.selectAt!,

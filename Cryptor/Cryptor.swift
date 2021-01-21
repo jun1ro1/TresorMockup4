@@ -12,9 +12,6 @@ import SwiftUI
 
 import Introspect
 
-typealias SessionKey = SymmetricKey
-
-
 /// The class to encrypt and decrypt a string or data
 public class Cryptor: ObservableObject {
     /// A class variable for a singleton pattern
@@ -61,10 +58,10 @@ public class Cryptor: ObservableObject {
     
     func open(password: String) throws {
         if Cryptor.core.isPrepared {
-            try Cryptor.core.prepare(password: password, cryptor: self) // excep
+            try Cryptor.core.prepare(cryptor: self, password: password) // excep
         }
         else {
-            try Cryptor.core.register(password: password, cryptor: self)
+            try Cryptor.core.register(cryptor: self, password: password)
         }
     }
     
@@ -200,7 +197,7 @@ public class Cryptor: ObservableObject {
                         return
                     }
                     do {
-                        try Cryptor.core.prepare(password: localPass!.password!, cryptor: self)
+                        try Cryptor.core.prepare(cryptor: self, password: localPass!.password!)
                     }
                     catch let error {
                         J1Logger.shared.error("Cryptor.prepare error = \(error)")
@@ -262,7 +259,7 @@ struct PasswordRegistrationView: View {
         }
         
         do {
-            try Cryptor.core.prepare(password: self.password1, cryptor: cryptor)
+            try Cryptor.core.prepare(cryptor: cryptor, password: self.password1)
         }
         catch let error {
             J1Logger.shared.error("Cryptor.prepare error = \(error)")
@@ -390,7 +387,7 @@ struct PasswordEntryView: View {
         }
         
         do {
-            try Cryptor.core.prepare(password: self.password1, cryptor: cryptor)
+            try Cryptor.core.prepare(cryptor: cryptor, password: self.password1)
         }
         catch let error {
             J1Logger.shared.error("Cryptor.prepare error = \(error)")
