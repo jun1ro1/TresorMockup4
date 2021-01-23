@@ -62,6 +62,7 @@ struct NewItemView: View {
 
 struct EditView: View {
     @ObservedObject var item:  Site
+    @ObservedObject var manager = Cryptor.shared
     
     @State private var title:       String = ""
     @State private var titleSort:   String = ""
@@ -71,7 +72,7 @@ struct EditView: View {
     @State private var mlength:     Float  = 4.0
     @State private var chars:       Int    = 0
     
-    @State private var showPassowrd: Bool = false
+    @State private var showPassword: Bool = false
     
     @Environment(\.editMode) var editMode
     @Environment(\.managedObjectContext) private var viewContext
@@ -137,20 +138,18 @@ struct EditView: View {
             HStack {
                 PasswordTextField(title: "Password",
                                   text: self.$password,
-                                  showPassword: self.$showPassowrd)
+                                  showPassword: self.$showPassword)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                 Spacer()
                 Button {
-                    if !self.showPassowrd {
-                        Cryptor.shared.open {
-                            if $0 { self.showPassowrd.toggle() }
-                        }
+                    if !self.showPassword {
+                        self.manager.open { if $0 { self.showPassword.toggle() } }
                     }
                     else {
-                        self.showPassowrd.toggle()
+                        self.showPassword.toggle()
                     }
                 } label: {
-                    Image(systemName: self.showPassowrd ? "eye.slash.fill" : "eye.fill")
+                    Image(systemName: self.showPassword ? "eye.slash.fill" : "eye.fill")
                         .foregroundColor(.secondary)
                 }
                 .buttonStyle(PlainButtonStyle())
@@ -252,17 +251,9 @@ struct EditView: View {
             // Don't save Core Data context in this view,
             // otherwise the app crashes at "self.viewContext.save()"
             // as "Fatal error: Attempted to read an unowned reference but the object was already deallocated".
-            // Save the context in the content view.
-//            guard self.viewContext.hasChanges else {
-//                return
-//            }
-//            J1Logger.shared.debug("Site will save \(self.item.description)")
-//            do {
-//                try self.viewContext.save()
-//            } catch {
-//                let nsError = error as NSError
-//                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-//            }
+        }
+        .sheet(isPresented: self.$manager.shouldShow) {
+            self.manager.view
         }
     }
 }
@@ -270,8 +261,9 @@ struct EditView: View {
 
 struct PresentView: View {
     @ObservedObject var item: Site
+    @ObservedObject var manager = Cryptor.shared
     
-    @State private var showPassowrd: Bool = false
+    @State private var showPassword: Bool = false
     
     var body: some View {
         Form {
@@ -287,7 +279,7 @@ struct PresentView: View {
                 Text(self.item.userid ?? "")
                 HStack {
                     Group {
-                        if self.showPassowrd {
+                        if self.showPassword {
                             Text(self.item.password ?? "")
                         }
                         else {
@@ -296,16 +288,14 @@ struct PresentView: View {
                     }
                     Spacer()
                     Button {
-                        if !self.showPassowrd {
-                            Cryptor.shared.open {
-                                if $0 { self.showPassowrd.toggle() }
-                            }
+                        if !self.showPassword {
+                            self.manager.open { if $0 { self.showPassword.toggle() } }
                         }
                         else {
-                            self.showPassowrd.toggle()
+                            self.showPassword.toggle()
                         }
                     } label: {
-                        Image(systemName: self.showPassowrd ? "eye.slash.fill" : "eye.fill")
+                        Image(systemName: self.showPassword ? "eye.slash.fill" : "eye.fill")
                             .foregroundColor(.secondary)
                     }
                     .buttonStyle(PlainButtonStyle())
@@ -322,6 +312,9 @@ struct PresentView: View {
             }
         }
         .navigationTitle(self.item.title ?? "")
+        .sheet(isPresented: self.$manager.shouldShow) {
+            self.manager.view
+        }
     }
 }
 

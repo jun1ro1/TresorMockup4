@@ -95,7 +95,6 @@
 		F9730A4025600E17007109F7 /* RandomData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RandomData.swift; sourceTree = "<group>"; };
 		F9730A4125600E18007109F7 /* Cryptor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Cryptor.swift; sourceTree = "<group>"; };
 		F9730A6325600E75007109F7 /* J1Logger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = J1Logger.swift; sourceTree = "<group>"; };
-		F9730A7625614FF8007109F7 /* AuthenticationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationManager.swift; sourceTree = "<group>"; };
 		F9851EC1256BEC0500784485 /* TestData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestData.swift; sourceTree = "<group>"; };
 		F9851EC9256BEEA800784485 /* DetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailView.swift; sourceTree = "<group>"; };
 		F9AE18B425B33336007373E0 /* CryptorError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptorError.swift; sourceTree = "<group>"; };
@@ -211,7 +210,6 @@
 		F9730A3A25600DFB007109F7 /* Cryptor */ = {
 			isa = PBXGroup;
 			children = (
-				F9730A7625614FF8007109F7 /* AuthenticationManager.swift */,
 				F9730A4125600E18007109F7 /* Cryptor.swift */,
 				F9730A3F25600E17007109F7 /* CryptorCore.swift */,
 				F9AE18B425B33336007373E0 /* CryptorError.swift */,

@@ -117,7 +117,7 @@ public class Cryptor: ObservableObject {
         guard Cryptor.core.isPrepared else {
             J1Logger.shared.debug("Cryptor is not prepared")
             self.view = AnyView(
-                PasswordRegistrationView(message: "Register a password for this App to secure your data.",
+                PasswordRegistrationView(message: "Register a master password for this App to secure your data.",
                                          authenticatedBlock: authenticatedBlock,
                                          cryptor: self))
             self.shouldShow = true
@@ -138,7 +138,7 @@ public class Cryptor: ObservableObject {
             guard try LocalPassword.doesExist() else {
                 J1Logger.shared.debug("local password does not exist")
                 self.view = AnyView(
-                    PasswordRegistrationView(message: "Register a password",
+                    PasswordRegistrationView(message: "Register a master password",
                                              authenticatedBlock: authenticatedBlock,
                                              cryptor: self))
                 self.shouldShow = true
@@ -148,7 +148,7 @@ public class Cryptor: ObservableObject {
         catch let error {
             J1Logger.shared.debug("LocalPssword.doesExist=\(error)")
             self.view = AnyView(
-                PasswordRegistrationView(message: "Stored local password does not exist, then register a password.",
+                PasswordRegistrationView(message: "Stored local password does not exist, then register a master password.",
                                          authenticatedBlock: authenticatedBlock,
                                          cryptor: self))
             self.shouldShow = true
@@ -166,7 +166,7 @@ public class Cryptor: ObservableObject {
                     guard success else {
                         J1Logger.shared.error("Authenticaion Error \(error!)")
                         self.view = AnyView(
-                            PasswordEntryView(message: "Biometrics authentication failed, please enter a password for this app.",
+                            PasswordEntryView(message: "Biometrics authentication failed, please enter a master password for this app.",
                                               authenticatedBlock: authenticatedBlock,
                                               cryptor: self))
                         self.shouldShow = true
@@ -181,7 +181,7 @@ public class Cryptor: ObservableObject {
                     catch let error {
                         J1Logger.shared.error("SecureStore read password Error \(error)")
                         self.view = AnyView(
-                            PasswordEntryView(message: "Cannot read a local password, please enter a password.",
+                            PasswordEntryView(message: "Cannot read a local password, please enter a master password.",
                                               authenticatedBlock: authenticatedBlock,
                                               cryptor: self))
                         self.shouldShow = true
@@ -190,9 +190,10 @@ public class Cryptor: ObservableObject {
                     guard localPass != nil else {
                         J1Logger.shared.error("SecureStore read password failed")
                         self.view = AnyView(
-                            PasswordEntryView(message: "A local password is nil, please enter a password.",
-                                              authenticatedBlock: authenticatedBlock,
-                                              cryptor: self))
+                            PasswordEntryView(
+                                message: "A local password is nil, please enter a master password.",
+                                authenticatedBlock: authenticatedBlock,
+                                cryptor: self))
                         self.shouldShow = true
                         return
                     }
@@ -202,9 +203,10 @@ public class Cryptor: ObservableObject {
                     catch let error {
                         J1Logger.shared.error("Cryptor.prepare error = \(error)")
                         self.view = AnyView(
-                            PasswordEntryView(message: "A local password is incorrect, please enter a password.",
-                                              authenticatedBlock: authenticatedBlock,
-                                              cryptor: self))
+                            PasswordEntryView(
+                                message: "A local password is incorrect, please enter a master password.",
+                                authenticatedBlock: authenticatedBlock,
+                                cryptor: self))
                         self.shouldShow = true
                         return
                     }
@@ -217,7 +219,7 @@ public class Cryptor: ObservableObject {
         else {
             J1Logger.shared.info("Authentication with Biometrics is not enrolled \(authError!)")
             self.view = AnyView(
-                PasswordEntryView(message: "Enter a password for this app.",
+                PasswordEntryView(message: "Enter a master password for this app.",
                                   authenticatedBlock: authenticatedBlock,
                                   cryptor: self))
             self.shouldShow = true
@@ -259,7 +261,7 @@ struct PasswordRegistrationView: View {
         }
         
         do {
-            try Cryptor.core.prepare(cryptor: cryptor, password: self.password1)
+            try Cryptor.core.register(cryptor: cryptor, password: self.password1)
         }
         catch let error {
             J1Logger.shared.error("Cryptor.prepare error = \(error)")
@@ -297,21 +299,41 @@ struct PasswordRegistrationView: View {
                 .font(.title2)
                 .padding()
                 .foregroundColor(color)
-            Toggle("Show Password", isOn: self.$showPassword)
-                .padding()
-                .foregroundColor(color)
-            PasswordField(text: "Enter Password",
-                          password: self.$password1,
-                          showPassword: self.$showPassword,
-                          disabled: self.$disabled,
-                          onCommit: self.validate)
-                .padding()
-            PasswordField(text: "Confirm Passowrd",
-                          password: self.$password2,
-                          showPassword: self.$showPassword,
-                          disabled: self.$disabled,
-                          onCommit: self.validate)
-                .padding()
+            HStack {
+                PasswordField(text: "Enter Password",
+                              password: self.$password1,
+                              showPassword: self.$showPassword,
+                              disabled: self.$disabled,
+                              onCommit: self.validate)
+                    .introspectTextField { textField in
+                        textField.becomeFirstResponder()
+                    }
+                Spacer()
+                Button {
+                    self.showPassword.toggle()
+                } label: {
+                    Image(systemName: self.showPassword ? "eye.slash.fill" : "eye.fill")
+                        .foregroundColor(.secondary)
+                }
+                .buttonStyle(PlainButtonStyle())
+            }
+            .padding()
+            HStack {
+                PasswordField(text: "Confirm Passowrd",
+                              password: self.$password2,
+                              showPassword: self.$showPassword,
+                              disabled: self.$disabled,
+                              onCommit: self.validate)
+                Spacer()
+                Button {
+                    self.showPassword.toggle()
+                } label: {
+                    Image(systemName: self.showPassword ? "eye.slash.fill" : "eye.fill")
+                        .foregroundColor(.secondary)
+                }
+                .buttonStyle(PlainButtonStyle())
+            }
+            .padding()
             Button("Register",
                    action: self.validate)
                 .disabled(self.password1 == "" || self.password2 == "")
@@ -412,18 +434,26 @@ struct PasswordEntryView: View {
             Text(self.message)
                 .font(.title2)
                 .padding()
-            Toggle("Show Password", isOn: self.$showPassword)
-                .padding()
-            PasswordField(text: "Enter Password",
-                          password: self.$password1,
-                          showPassword: self.$showPassword,
-                          disabled: self.$disabled,
-                          onCommit: self.validate)
-                .foregroundColor(color)
-                .padding()
-                .introspectTextField { textField in
-                    textField.becomeFirstResponder()
+            HStack {
+                PasswordField(text: "Enter Password",
+                              password: self.$password1,
+                              showPassword: self.$showPassword,
+                              disabled: self.$disabled,
+                              onCommit: self.validate)
+                    .foregroundColor(color)
+                    .introspectTextField { textField in
+                        textField.becomeFirstResponder()
+                    }
+                Spacer()
+                Button {
+                    self.showPassword.toggle()
+                } label: {
+                    Image(systemName: self.showPassword ? "eye.slash.fill" : "eye.fill")
+                        .foregroundColor(.secondary)
                 }
+                .buttonStyle(PlainButtonStyle())
+            }
+            .padding()
             Button("OK", action: self.validate)
                 .disabled(self.password1 == "" || self.disabled)
                 .padding()
