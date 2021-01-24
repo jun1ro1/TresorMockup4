@@ -62,7 +62,7 @@ struct NewItemView: View {
 
 struct EditView: View {
     @ObservedObject var item:  Site
-    @ObservedObject var manager = Cryptor.shared
+    @ObservedObject var manager = CryptorUI.shared
     
     @State private var title:       String = ""
     @State private var titleSort:   String = ""
@@ -261,7 +261,7 @@ struct EditView: View {
 
 struct PresentView: View {
     @ObservedObject var item: Site
-    @ObservedObject var manager = Cryptor.shared
+    @ObservedObject var manager = CryptorUI.shared
     
     @State private var showPassword: Bool = false
     
@@ -289,10 +289,10 @@ struct PresentView: View {
                     Spacer()
                     Button {
                         if !self.showPassword {
-                            self.manager.open { if $0 { self.showPassword.toggle() } }
+                            self.manager.open { self.showPassword = $0 }
                         }
                         else {
-                            self.showPassword.toggle()
+                            self.showPassword = false
                         }
                     } label: {
                         Image(systemName: self.showPassword ? "eye.slash.fill" : "eye.fill")

@@ -10,7 +10,7 @@ import SwiftUI
 @main
 struct TresorMockup4App: App {
     let persistenceController   = PersistenceController.shared
-    @ObservedObject var manager = Cryptor.shared
+    @ObservedObject var ui = CryptorUI.shared
     @State          var success: Bool? = nil
     
     var body: some Scene {
@@ -27,13 +27,13 @@ struct TresorMockup4App: App {
                 NavigationView {
                     OpeningView()
                         .onAppear {
-                            Cryptor.shared.open { self.success = $0 }
+                            self.ui.open { self.success = $0 }
                             #if DEBUG
                             TestData.shared.saveDummyData()
                             #endif
                         }
-                        .sheet(isPresented: self.$manager.shouldShow) {
-                            self.manager.view
+                        .sheet(isPresented: self.$ui.shouldShow) {
+                            self.ui.view
                         }
                 }
             }
