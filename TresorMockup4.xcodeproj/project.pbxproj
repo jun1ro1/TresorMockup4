@@ -214,8 +214,8 @@
 		F9730A3A25600DFB007109F7 /* Cryptor */ = {
 			isa = PBXGroup;
 			children = (
-				F9730A4125600E18007109F7 /* Cryptor.swift */,
 				F968B0C325BC59FA00B6296F /* CryptorUI.swift */,
+				F9730A4125600E18007109F7 /* Cryptor.swift */,
 				F9730A3F25600E17007109F7 /* CryptorCore.swift */,
 				F9AE18B425B33336007373E0 /* CryptorError.swift */,
 				F9730A3E25600E17007109F7 /* CryptorExtensions.swift */,

@@ -23,6 +23,10 @@ public class Cryptor {
     internal var key:    SessionKey?       = nil
     internal var block:  ((Bool) -> Void)? = nil
     
+    init(_ block: @escaping (Bool) -> Void = {_ in }) {
+        self.block = block
+    }
+    
     private var mutex = NSLock()
     var opened: Bool {
         get {
@@ -46,9 +50,7 @@ public class Cryptor {
         }
     }
     
-    func open(password: String,
-              _ block: @escaping (Bool) -> Void ) throws {
-        self.block  = block
+    func open(password: String) throws {
         if Cryptor.core.isPrepared {
             do {
                 try Cryptor.core.prepare(cryptor: self, password: password) // excep
@@ -119,5 +121,4 @@ public class Cryptor {
         }
         return try Cryptor.core.decrypt(cryptor: self, cipher: cipher)
     }
-    
 }

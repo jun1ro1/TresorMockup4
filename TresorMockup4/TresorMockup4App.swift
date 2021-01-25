@@ -27,7 +27,7 @@ struct TresorMockup4App: App {
                 NavigationView {
                     OpeningView()
                         .onAppear {
-                            self.ui.open { self.success = $0 }
+                            self.ui.open()
                             #if DEBUG
                             TestData.shared.saveDummyData()
                             #endif

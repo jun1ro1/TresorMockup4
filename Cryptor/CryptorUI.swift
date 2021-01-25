@@ -16,12 +16,12 @@ public class CryptorUI: Cryptor, ObservableObject {
     @Published var view:       AnyView  = AnyView(EmptyView())
     @Published var shouldShow: Bool     = false
     
-    func open(block: @escaping (Bool) -> Void = {_ in}) {
+    func open() {
         guard Cryptor.core.isPrepared else {
             J1Logger.shared.debug("Cryptor is not prepared")
             self.view = AnyView(
                 PasswordRegistrationView(message: "Register a master password for this App to secure your data.",
-                                         block: block, cryptorUI: self))
+                                         cryptorUI: self))
             self.shouldShow = true
             return
         }
@@ -31,7 +31,6 @@ public class CryptorUI: Cryptor, ObservableObject {
         if opened {
             J1Logger.shared.debug("already authenticated")
             self.opened = true
-            self.block  = block
             self.block?(true)
             return
         }
@@ -41,7 +40,7 @@ public class CryptorUI: Cryptor, ObservableObject {
                 J1Logger.shared.debug("local password does not exist")
                 self.view = AnyView(
                     PasswordRegistrationView(message: "Register a master password",
-                                             block: block, cryptorUI: self))
+                                             cryptorUI: self))
                 self.shouldShow = true
                 return
             }
@@ -50,7 +49,7 @@ public class CryptorUI: Cryptor, ObservableObject {
             J1Logger.shared.debug("LocalPssword.doesExist=\(error)")
             self.view = AnyView(
                 PasswordRegistrationView(message: "Stored local password does not exist, then register a master password.",
-                                         block: block, cryptorUI: self))
+                                         cryptorUI: self))
             self.shouldShow = true
             return
         }
@@ -67,7 +66,7 @@ public class CryptorUI: Cryptor, ObservableObject {
                         J1Logger.shared.error("Authenticaion Error \(error!)")
                         self.view = AnyView(
                             PasswordEntryView(message: "Biometrics authentication failed, please enter a master password for this app.",
-                                              block: block, cryptorUI: self))
+                                              cryptorUI: self))
                         self.shouldShow = true
                         return
                     }
@@ -81,7 +80,7 @@ public class CryptorUI: Cryptor, ObservableObject {
                         J1Logger.shared.error("SecureStore read password Error \(error)")
                         self.view = AnyView(
                             PasswordEntryView(message: "Cannot read a local password, please enter a master password.",
-                                              block: block, cryptorUI: self))
+                                              cryptorUI: self))
                         self.shouldShow = true
                         return
                     }
@@ -90,7 +89,7 @@ public class CryptorUI: Cryptor, ObservableObject {
                         self.view = AnyView(
                             PasswordEntryView(
                                 message: "A local password is nil, please enter a master password.",
-                                block: block, cryptorUI: self))
+                                cryptorUI: self))
                         self.shouldShow = true
                         return
                     }
@@ -102,13 +101,12 @@ public class CryptorUI: Cryptor, ObservableObject {
                         self.view = AnyView(
                             PasswordEntryView(
                                 message: "A local password is incorrect, please enter a master password.",
-                                block: block, cryptorUI: self))
+                                cryptorUI: self))
                         self.shouldShow = true
                         return
                     }
                     J1Logger.shared.debug("authenticated by biometrics")
                     self.opened = true
-                    self.block  = block
                     self.block?(true)
                 }
             }
@@ -117,7 +115,7 @@ public class CryptorUI: Cryptor, ObservableObject {
             J1Logger.shared.info("Authentication with Biometrics is not enrolled \(authError!)")
             self.view = AnyView(
                 PasswordEntryView(message: "Enter a master password for this app.",
-                                  block: block, cryptorUI: self))
+                                  cryptorUI: self))
             self.shouldShow = true
         }
     } // open
@@ -127,7 +125,6 @@ public class CryptorUI: Cryptor, ObservableObject {
 // https://stackoverflow.com/questions/58069516/how-can-i-have-two-alerts-on-one-view-in-swiftui
 struct PasswordRegistrationView: View {
     @State var message:   String
-    var block:     ((Bool) -> Void)?
     var cryptorUI: CryptorUI
     
     @State private var showPassword = false
@@ -246,7 +243,6 @@ struct PasswordRegistrationView: View {
 // MARK: - PasswordEntryView
 struct PasswordEntryView: View {
     @State var message:   String
-    var block:     ((Bool) -> Void)?
     var cryptorUI: CryptorUI
 
     @State private var showPassword = false

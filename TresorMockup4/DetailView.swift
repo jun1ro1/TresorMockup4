@@ -1,6 +1,6 @@
 //
 //  DetailView.swift
-//  TresorMockup4
+//  TresorMockup4o
 //
 //  Created by OKU Junichirou on 2020/11/23.
 //
@@ -143,7 +143,7 @@ struct EditView: View {
                 Spacer()
                 Button {
                     if !self.showPassword {
-                        self.manager.open { if $0 { self.showPassword.toggle() } }
+                        self.manager.open()
                     }
                     else {
                         self.showPassword.toggle()
@@ -258,13 +258,10 @@ struct EditView: View {
     }
 }
 
-
 struct PresentView: View {
     @ObservedObject var item: Site
-    @ObservedObject var manager = CryptorUI.shared
-    
-    @State private var showPassword: Bool = false
-    
+    @ObservedObject var manager = CryptorUI()
+        
     var body: some View {
         Form {
             Section(header: Text("URL")) {
@@ -279,7 +276,7 @@ struct PresentView: View {
                 Text(self.item.userid ?? "")
                 HStack {
                     Group {
-                        if self.showPassword {
+                        if self.manager.opened {
                             Text(self.item.password ?? "")
                         }
                         else {
@@ -288,14 +285,14 @@ struct PresentView: View {
                     }
                     Spacer()
                     Button {
-                        if !self.showPassword {
-                            self.manager.open { self.showPassword = $0 }
+                        if !self.manager.opened {
+                            self.manager.open()
                         }
                         else {
-                            self.showPassword = false
+                            try? self.manager.close()
                         }
                     } label: {
-                        Image(systemName: self.showPassword ? "eye.slash.fill" : "eye.fill")
+                        Image(systemName: self.manager.opened ? "eye.slash.fill" : "eye.fill")
                             .foregroundColor(.secondary)
                     }
                     .buttonStyle(PlainButtonStyle())
