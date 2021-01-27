@@ -16,77 +16,69 @@ public class Cryptor {
     /// A calss variable to access the class `CryptorCore`
     internal static var core: CryptorCore = CryptorCore.shared
     
-    private static let DURATION = DispatchTimeInterval.seconds(30)
-
     /// The instance variable to store a session key
-    private  var opened_private: Bool      = false
-    internal var key:    SessionKey?       = nil
-    internal var block:  ((Bool) -> Void)? = nil
+    private  var timer:  Timer?       = nil
+    internal var key:    SessionKey?  = nil
+
+//    private var mutex = NSLock()
+//    var authenticated: Bool {
+//        get {
+//            self.mutex.lock()
+//            let val = self.opened_private
+//            self.mutex.unlock()
+//            return val
+//        }
+//        set {
+//            self.mutex.lock()
+//            self.opened_private = newValue
+//            self.mutex.unlock()
+////            if newValue {
+////                DispatchQueue.global(qos: .background)
+////                    .asyncAfter(deadline: .now() + Cryptor.DURATION) {
+////                        J1Logger.shared.debug("authenticated time out=\(Cryptor.DURATION)")
+////                        self.opened_private = false
+////                    }
+////            }
+//        }
+//    }
     
-    init(_ block: @escaping (Bool) -> Void = {_ in }) {
-        self.block = block
-    }
-    
-    private var mutex = NSLock()
-    var opened: Bool {
-        get {
-            self.mutex.lock()
-            let val = self.opened_private
-            self.mutex.unlock()
-            return val
-        }
-        set {
-            self.mutex.lock()
-            self.opened_private = newValue
-            self.mutex.unlock()
-            if newValue {
-                DispatchQueue.global(qos: .background)
-                    .asyncAfter(deadline: .now() + Cryptor.DURATION) {
-                        J1Logger.shared.debug("authenticated time out=\(Cryptor.DURATION)")
-                        self.opened_private = false
-                        self.block?(false)
-                    }
-            }
-        }
-    }
-    
-    func open(password: String) throws {
+    func open(password: String,
+              _ block: ((Bool) -> Void)? = nil) throws {
         if Cryptor.core.isPrepared {
             do {
                 try Cryptor.core.prepare(cryptor: self, password: password) // excep
             } catch {
-                self.block?(false)
-                self.block = nil
+                block?(false)
             }
         }
         else {
             do {
                 try Cryptor.core.register(cryptor: self, password: password)
             } catch {
-                self.block?(false)
-                self.block = nil
+                block?(false)
             }
        }
-        self.opened = true
-        self.block?(true)
+        block?(true)
     }
     
     func close() throws {
-        self.opened = false
         try Cryptor.core.close(cryptor: self)
         self.key   = nil
-        self.block?(false)
-        self.block = nil
     }
     
-//    func open(password: String, _ body:() throws -> Void ) throws {
-//        try self.open(password: password)
-//        defer {
-//            try? self.close()
-//        }
-//        try body()
-//    }
-    
+    func timeOut(_ duration: Double = 30.0,
+                 _ block: @escaping () -> Void = {}) {
+        if let t = self.timer, t.isValid {
+            t.invalidate()
+        }
+        self.timer = Timer.scheduledTimer(withTimeInterval: TimeInterval( duration ),
+                                          repeats: false) { _ in
+            J1Logger.shared.debug("authenticated time out=\(duration)")
+            block()
+            try? self.close()
+        }
+    }
+        
     func change(password oldpass: String, to newpass: String) throws {
         guard self.key == nil else {
             throw CryptorError.notOpened

@@ -18,8 +18,6 @@ struct DetailView: View {
     @StateObject var item: Site
     @Environment(\.editMode) var editMode
     
-    var formatter = DateFormatter()
-    
     var body: some View {
         Group {
 //            if self.item == nil {
@@ -62,7 +60,7 @@ struct NewItemView: View {
 
 struct EditView: View {
     @ObservedObject var item:  Site
-    @ObservedObject var manager = CryptorUI.shared
+    @ObservedObject var ui = CryptorUI.shared
     
     @State private var title:       String = ""
     @State private var titleSort:   String = ""
@@ -143,7 +141,7 @@ struct EditView: View {
                 Spacer()
                 Button {
                     if !self.showPassword {
-                        self.manager.open()
+                        self.ui.open()
                     }
                     else {
                         self.showPassword.toggle()
@@ -252,16 +250,16 @@ struct EditView: View {
             // otherwise the app crashes at "self.viewContext.save()"
             // as "Fatal error: Attempted to read an unowned reference but the object was already deallocated".
         }
-        .sheet(isPresented: self.$manager.shouldShow) {
-            self.manager.view
+        .sheet(isPresented: self.$ui.shouldShow) {
+            self.ui.view
         }
     }
 }
 
 struct PresentView: View {
     @ObservedObject var item: Site
-    @ObservedObject var manager = CryptorUI()
-        
+    @ObservedObject var ui = CryptorUI()
+
     var body: some View {
         Form {
             Section(header: Text("URL")) {
@@ -276,7 +274,7 @@ struct PresentView: View {
                 Text(self.item.userid ?? "")
                 HStack {
                     Group {
-                        if self.manager.opened {
+                        if self.ui.authenticated {
                             Text(self.item.password ?? "")
                         }
                         else {
@@ -285,14 +283,17 @@ struct PresentView: View {
                     }
                     Spacer()
                     Button {
-                        if !self.manager.opened {
-                            self.manager.open()
+                        if !self.ui.authenticated {
+                            self.ui.open {
+                                guard $0 else { return }
+                                self.ui.timeOut()
+                            }
                         }
                         else {
-                            try? self.manager.close()
+                            try? self.ui.close()
                         }
                     } label: {
-                        Image(systemName: self.manager.opened ? "eye.slash.fill" : "eye.fill")
+                        Image(systemName: self.ui.authenticated ? "eye.slash.fill" : "eye.fill")
                             .foregroundColor(.secondary)
                     }
                     .buttonStyle(PlainButtonStyle())
@@ -309,8 +310,8 @@ struct PresentView: View {
             }
         }
         .navigationTitle(self.item.title ?? "")
-        .sheet(isPresented: self.$manager.shouldShow) {
-            self.manager.view
+        .sheet(isPresented: self.$ui.shouldShow) {
+            self.ui.view
         }
     }
 }

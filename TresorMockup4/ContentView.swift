@@ -21,8 +21,7 @@ import CoreData
 struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @State private var added = false
-    @State private var predicate: NSPredicate? = nil
-    
+    @State private var predicate: NSPredicate? = nil    
     @State private var searchText: String = ""
        
     var body: some View {

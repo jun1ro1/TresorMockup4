@@ -21,16 +21,25 @@ struct TresorMockup4App: App {
                     ContentView()
                 }
                 .environment(\.managedObjectContext, self.persistenceController.container.viewContext)
+                .onAppear {
+                    #if DEBUG
+                    TestData.shared.saveDummyData()
+                    #endif
+                }
             case false:
                 HaltView()
             default:
                 NavigationView {
                     OpeningView()
                         .onAppear {
-                            self.ui.open()
-                            #if DEBUG
-                            TestData.shared.saveDummyData()
-                            #endif
+//                            DispatchQueue.global(qos: .background)
+//                                .asyncAfter(deadline: .now() + Cryptor.DURATION) {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                self.ui.open { self.success = $0 }
+                            }
+//                            #if DEBUG
+//                            TestData.shared.saveDummyData()
+//                            #endif
                         }
                         .sheet(isPresented: self.$ui.shouldShow) {
                             self.ui.view
