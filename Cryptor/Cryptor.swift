@@ -19,31 +19,18 @@ public class Cryptor {
     /// The instance variable to store a session key
     internal var key:    SessionKey?  = nil
 
-    func open(password: String,
-              _ block: ((Bool?) -> Void)? = nil) throws {
+    func open(password: String) throws {
         if Cryptor.core.isPrepared {
-            do {
-                try Cryptor.core.prepare(cryptor: self, password: password) // excep
-            } catch {
-                block?(nil)
-            }
-        }
-        else {
-            do {
-                try Cryptor.core.register(cryptor: self, password: password)
-            } catch {
-                block?(nil)
-            }
+            try Cryptor.core.prepare(cryptor: self, password: password) // excep
+        } else {
+            try Cryptor.core.register(cryptor: self, password: password)
        }
-        block?(true)
     }
     
-    func close(_ block: ((Bool) -> Void)? = nil) throws {
+    func close() throws {
         try Cryptor.core.close(cryptor: self)
         self.key   = nil
-        block?(false)
-    }
-    
+    }    
         
     func change(password oldpass: String, to newpass: String) throws {
         guard self.key == nil else {

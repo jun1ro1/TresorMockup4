@@ -9,1219 +9,160 @@
 \deftab494
 \pard\tx494\pardeftab494\pardirnatural\partightenfactor0
 
-\f0\b\fs20 \cf2 \cb3 ObservedObject item\
+\f0\b\fs20 \cf2 \cb3 2021-01-31 23:07:55.244043+0900 TresorMockup4[6572:678184] [INFO] 
+\f1\b0 \uc0\u55357 \u56473 
+\f0\b  main TresorMockup4/CryptorUI.open(_:):162 - Authentication with Biometrics is not enrolled Error Domain=com.apple.LocalAuthentication Code=-7 "No identities are enrolled." UserInfo=\{NSLocalizedDescription=No identities are enrolled.\}\
+2021-01-31 23:08:01.887195+0900 TresorMockup4[6572:678184] [LayoutConstraints] Unable to simultaneously satisfy constraints.\
+	Probably at least one of the constraints in the following list is one you don't want. \
+	Try this: \
+		(1) look at each constraint and try to figure out which you don't expect; \
+		(2) find the code that added the unwanted constraint or constraints and fix it. \
+(\
+    "<NSLayoutConstraint:0x600000fc9ea0 'BIB_Trailing_CB_Leading' H:[_UIModernBarButton:0x7fa409d23500]-(6)-[_UIModernBarButton:0x7fa409d19db0'Sites']   (active)>",\
+    "<NSLayoutConstraint:0x600000fc9ef0 'CB_Trailing_Trailing' _UIModernBarButton:0x7fa409d19db0'Sites'.trailing <= _UIButtonBarButton:0x7fa409d196a0.trailing   (active)>",\
+    "<NSLayoutConstraint:0x600000fcacb0 'UINav_static_button_horiz_position' _UIModernBarButton:0x7fa409d23500.leading == UILayoutGuide:0x6000015a5f80'UIViewLayoutMarginsGuide'.leading   (active)>",\
+    "<NSLayoutConstraint:0x600000fbde50 'UINavItemContentGuide-leading' H:[_UIButtonBarButton:0x7fa409d196a0]-(0)-[UILayoutGuide:0x6000015a5ea0'UINavigationBarItemContentLayoutGuide']   (active)>",\
+    "<NSLayoutConstraint:0x600000fa6e90 'UINavItemContentGuide-trailing' UILayoutGuide:0x6000015a5ea0'UINavigationBarItemContentLayoutGuide'.trailing == _UINavigationBarContentView:0x7fa409d11320.trailing   (active)>",\
+    "<NSLayoutConstraint:0x600000fbe3a0 'UIView-Encapsulated-Layout-Width' _UINavigationBarContentView:0x7fa409d11320.width == 0   (active)>",\
+    "<NSLayoutConstraint:0x600000fa72a0 'UIView-leftMargin-guide-constraint' H:|-(0)-[UILayoutGuide:0x6000015a5f80'UIViewLayoutMarginsGuide'](LTR)   (active, names: '|':_UINavigationBarContentView:0x7fa409d11320 )>"\
+)\
 \
-2021-01-10 10:31:25.042466+0900 TresorMockup4[2507:171268] [DEBUG] 
+Will attempt to recover by breaking constraint \
+<NSLayoutConstraint:0x600000fc9ea0 'BIB_Trailing_CB_Leading' H:[_UIModernBarButton:0x7fa409d23500]-(6)-[_UIModernBarButton:0x7fa409d19db0'Sites']   (active)>\
+\
+Make a symbolic breakpoint at UIViewAlertForUnsatisfiableConstraints to catch this in the debugger.\
+The methods in the UIConstraintBasedLayoutDebugging category on UIView listed in <UIKitCore/UIView.h> may also be helpful.\
+2021-01-31 23:08:05.886084+0900 TresorMockup4[6572:678184] [INFO] 
+\f1\b0 \uc0\u55357 \u56473 
+\f0\b  main TresorMockup4/CryptorUI.open(_:):162 - Authentication with Biometrics is not enrolled Error Domain=com.apple.LocalAuthentication Code=-7 "No identities are enrolled." UserInfo=\{NSLocalizedDescription=No identities are enrolled.\}\
+2021-01-31 23:08:18.205738+0900 TresorMockup4[6572:678184] [DEBUG] 
 \f1\b0 \uc0\u55357 \u56474 
-\f0\b  main TresorMockup4/SecureStore.doseExist(label:iCloud:):67 - label=CryptorSeed query=[r_Data:1, svce:com.gmail.jun1ro1.TresorMockup4, m_Limit:m_LimitOne, r_Attributes:1, sync:1, acct:CryptorSeed, class:genp] SecItemCopyMatching=0:No error.\
-2021-01-10 10:31:25.043970+0900 TresorMockup4[2507:171268] [DEBUG] 
+\f0\b  main TresorMockup4/CryptorUI.open(_:):91 - already authenticated\
+2021-01-31 23:08:18.210781+0900 TresorMockup4[6572:678184] [DEBUG] 
 \f1\b0 \uc0\u55357 \u56474 
-\f0\b  main TresorMockup4/SecureStore.read(label:iCloud:):98 - label=Password query=[acct:Password, svce:com.gmail.jun1ro1.TresorMockup4, r_Data:1, m_Limit:m_LimitOne, r_Attributes:1, class:genp, sync:0] SecItemCopyMatching=0:No error.\
-2021-01-10 10:31:28.926059+0900 TresorMockup4[2507:171268] [DEBUG] 
+\f0\b  main TresorMockup4/CryptorUI.authenticated:32 - authenticated timer canceled\
+2021-01-31 23:08:21.765239+0900 TresorMockup4[6572:678184] [DEBUG] 
 \f1\b0 \uc0\u55357 \u56474 
-\f0\b  main TresorMockup4/AuthenticationManager.authenticate(authenticatedBlock:):119 - evaluatePolicy=success\
-2021-01-10 10:31:28.928012+0900 TresorMockup4[2507:171268] [DEBUG] 
+\f0\b  main TresorMockup4/CryptorUI.open(_:):91 - already authenticated\
+2021-01-31 23:08:21.770812+0900 TresorMockup4[6572:678184] [DEBUG] 
 \f1\b0 \uc0\u55357 \u56474 
-\f0\b  main TresorMockup4/SecureStore.read(label:iCloud:):98 - label=Password query=[acct:Password, m_Limit:m_LimitOne, svce:com.gmail.jun1ro1.TresorMockup4, r_Attributes:1, class:genp, sync:0, r_Data:1] SecItemCopyMatching=0:No error.\
-2021-01-10 10:31:28.929825+0900 TresorMockup4[2507:171268] [DEBUG] 
+\f0\b  main TresorMockup4/CryptorUI.authenticated:32 - authenticated timer canceled\
+2021-01-31 23:08:30.826005+0900 TresorMockup4[6572:678184] [DEBUG] 
 \f1\b0 \uc0\u55357 \u56474 
-\f0\b  main TresorMockup4/SecureStore.doseExist(label:iCloud:):67 - label=CryptorSeed query=[r_Data:1, sync:1, svce:com.gmail.jun1ro1.TresorMockup4, acct:CryptorSeed, class:genp, r_Attributes:1, m_Limit:m_LimitOne] SecItemCopyMatching=0:No error.\
-2021-01-10 10:31:28.931282+0900 TresorMockup4[2507:171268] [DEBUG] 
+\f0\b  main TresorMockup4/CryptorUI.open(_:):91 - already authenticated\
+2021-01-31 23:08:30.830895+0900 TresorMockup4[6572:678184] [DEBUG] 
 \f1\b0 \uc0\u55357 \u56474 
-\f0\b  main TresorMockup4/SecureStore.read(label:iCloud:):98 - label=CryptorSeed query=[acct:CryptorSeed, m_Limit:m_LimitOne, svce:com.gmail.jun1ro1.TresorMockup4, r_Attributes:1, class:genp, sync:1, r_Data:1] SecItemCopyMatching=0:No error.\
-2021-01-10 10:31:28.936835+0900 TresorMockup4[2507:171268] [DEBUG] 
+\f0\b  main TresorMockup4/CryptorUI.authenticated:32 - authenticated timer canceled\
+2021-01-31 23:09:00.831825+0900 TresorMockup4[6572:678184] [DEBUG] 
 \f1\b0 \uc0\u55357 \u56474 
-\f0\b  main TresorMockup4/SecureStore.read(label:iCloud:):98 - label=Validator query=[r_Data:1, sync:1, svce:com.gmail.jun1ro1.TresorMockup4, acct:Validator, class:genp, r_Attributes:1, m_Limit:m_LimitOne] SecItemCopyMatching=0:No error.\
-2021-01-10 10:31:28.939543+0900 TresorMockup4[2507:171268] [DEBUG] 
+\f0\b  main TresorMockup4/CryptorUI.authenticated:42 - authenticated time out=30\
+2021-01-31 23:09:00.832185+0900 TresorMockup4[6572:678184] [DEBUG] 
 \f1\b0 \uc0\u55357 \u56474 
-\f0\b  main TresorMockup4/CryptorCore.getKEK(password:seed:):365 - KEK=\{length = 32, bytes = 0x4ba9ce7e 3a723c4d fe6b3642 44daf325 ... 87bef338 be6bc24c \}\
-2021-01-10 10:31:28.939899+0900 TresorMockup4[2507:171268] [DEBUG] 
+\f0\b  main TresorMockup4/CryptorUI.authenticated:32 - authenticated timer canceled\
+2021-01-31 23:09:12.808577+0900 TresorMockup4[6572:678184] [DEBUG] 
 \f1\b0 \uc0\u55357 \u56474 
-\f0\b  main TresorMockup4/CryptorCore.validate(key:):262 - hashedMark=\{length = 32, bytes = 0xbd4e8767 308214bc 67e9edf1 ae130903 ... dbe3ede7 44b0e403 \}\
-2021-01-10 10:31:28.940043+0900 TresorMockup4[2507:171268] [DEBUG] 
+\f0\b  main TresorMockup4/DetailView.body:237 - onAppear\
+2021-01-31 23:09:12.957460+0900 TresorMockup4[6572:678184] [DEBUG] 
 \f1\b0 \uc0\u55357 \u56474 
-\f0\b  main TresorMockup4/CryptorCore.validate(key:):263 - hashedDecryptedMark=\{length = 32, bytes = 0xbd4e8767 308214bc 67e9edf1 ae130903 ... dbe3ede7 44b0e403 \}\
-2021-01-10 10:31:28.940273+0900 TresorMockup4[2507:171268] [DEBUG] 
+\f0\b  main TresorMockup4/ContentView.body:93 - save context\
+2021-01-31 23:09:37.061620+0900 TresorMockup4[6572:678184] [DEBUG] 
 \f1\b0 \uc0\u55357 \u56474 
-\f0\b  main TresorMockup4/AuthenticationManager.authenticate(authenticatedBlock:):152 - authenticated by biometrics\
-2021-01-10 10:31:28.983120+0900 TresorMockup4[2507:171268] [LayoutConstraints] Unable to simultaneously satisfy constraints.\
-	Probably at least one of the constraints in the following list is one you don't want. \
-	Try this: \
-		(1) look at each constraint and try to figure out which you don't expect; \
-		(2) find the code that added the unwanted constraint or constraints and fix it. \
-(\
-    "<NSLayoutConstraint:0x60000119da40 'BIB_Trailing_CB_Leading' H:[_UIModernBarButton:0x7fa03640b690]-(6)-[_UIModernBarButton:0x7fa036405ba0'Sites']   (active)>",\
-    "<NSLayoutConstraint:0x60000119da90 'CB_Trailing_Trailing' _UIModernBarButton:0x7fa036405ba0'Sites'.trailing <= _UIButtonBarButton:0x7fa0388101b0.trailing   (active)>",\
-    "<NSLayoutConstraint:0x60000119e760 'UINav_static_button_horiz_position' _UIModernBarButton:0x7fa03640b690.leading == UILayoutGuide:0x600000bb8620'UIViewLayoutMarginsGuide'.leading   (active)>",\
-    "<NSLayoutConstraint:0x60000119e7b0 'UINavItemContentGuide-leading' H:[_UIButtonBarButton:0x7fa0388101b0]-(0)-[UILayoutGuide:0x600000bb8540'UINavigationBarItemContentLayoutGuide']   (active)>",\
-    "<NSLayoutConstraint:0x600001198fa0 'UINavItemContentGuide-trailing' UILayoutGuide:0x600000bb8540'UINavigationBarItemContentLayoutGuide'.trailing == _UINavigationBarContentView:0x7fa038c079f0.trailing   (active)>",\
-    "<NSLayoutConstraint:0x600001192e40 'UIView-Encapsulated-Layout-Width' _UINavigationBarContentView:0x7fa038c079f0.width == 0   (active)>",\
-    "<NSLayoutConstraint:0x600001199360 'UIView-leftMargin-guide-constraint' H:|-(0)-[UILayoutGuide:0x600000bb8620'UIViewLayoutMarginsGuide'](LTR)   (active, names: '|':_UINavigationBarContentView:0x7fa038c079f0 )>"\
-)\
-\
-Will attempt to recover by breaking constraint \
-<NSLayoutConstraint:0x60000119da40 'BIB_Trailing_CB_Leading' H:[_UIModernBarButton:0x7fa03640b690]-(6)-[_UIModernBarButton:0x7fa036405ba0'Sites']   (active)>\
-\
-Make a symbolic breakpoint at UIViewAlertForUnsatisfiableConstraints to catch this in the debugger.\
-The methods in the UIConstraintBasedLayoutDebugging category on UIView listed in <UIKitCore/UIView.h> may also be helpful.\
-2021-01-10 10:31:31.822568+0900 TresorMockup4[2507:171268] [LayoutConstraints] Unable to simultaneously satisfy constraints.\
-	Probably at least one of the constraints in the following list is one you don't want. \
-	Try this: \
-		(1) look at each constraint and try to figure out which you don't expect; \
-		(2) find the code that added the unwanted constraint or constraints and fix it. \
-	(Note: If you're seeing NSAutoresizingMaskLayoutConstraints that you don't understand, refer to the documentation for the UIView property translatesAutoresizingMaskIntoConstraints) \
-(\
-    "<NSAutoresizingMaskLayoutConstraint:0x6000011c1fe0 h=--& v=--& _UIButtonBarButton:0x7fa036737e00.height == 0   (active)>",\
-    "<NSLayoutConstraint:0x6000011efca0 _UIUCBKBSelectionBackground:0x7fa036738600.bottom == _UIButtonBarButton:0x7fa036737e00.bottom - 6   (active)>",\
-    "<NSLayoutConstraint:0x6000011efc00 V:|-(6)-[_UIUCBKBSelectionBackground:0x7fa036738600]   (active, names: '|':_UIButtonBarButton:0x7fa036737e00 )>"\
-)\
-\
-Will attempt to recover by breaking constraint \
-<NSLayoutConstraint:0x6000011efca0 _UIUCBKBSelectionBackground:0x7fa036738600.bottom == _UIButtonBarButton:0x7fa036737e00.bottom - 6   (active)>\
-\
-Make a symbolic breakpoint at UIViewAlertForUnsatisfiableConstraints to catch this in the debugger.\
-The methods in the UIConstraintBasedLayoutDebugging category on UIView listed in <UIKitCore/UIView.h> may also be helpful.\
-2021-01-10 10:31:31.823024+0900 TresorMockup4[2507:171268] [LayoutConstraints] Unable to simultaneously satisfy constraints.\
-	Probably at least one of the constraints in the following list is one you don't want. \
-	Try this: \
-		(1) look at each constraint and try to figure out which you don't expect; \
-		(2) find the code that added the unwanted constraint or constraints and fix it. \
-	(Note: If you're seeing NSAutoresizingMaskLayoutConstraints that you don't understand, refer to the documentation for the UIView property translatesAutoresizingMaskIntoConstraints) \
-(\
-    "<NSAutoresizingMaskLayoutConstraint:0x6000011c1c70 h=--& v=--& _UIButtonBarButton:0x7fa036737280.height == 0   (active)>",\
-    "<NSLayoutConstraint:0x6000011ef930 V:|-(6)-[_UIUCBKBSelectionBackground:0x7fa036737c80]   (active, names: '|':_UIButtonBarButton:0x7fa036737280 )>",\
-    "<NSLayoutConstraint:0x6000011ef9d0 _UIUCBKBSelectionBackground:0x7fa036737c80.bottom == _UIButtonBarButton:0x7fa036737280.bottom - 6   (active)>"\
-)\
-\
-Will attempt to recover by breaking constraint \
-<NSLayoutConstraint:0x6000011ef9d0 _UIUCBKBSelectionBackground:0x7fa036737c80.bottom == _UIButtonBarButton:0x7fa036737280.bottom - 6   (active)>\
-\
-Make a symbolic breakpoint at UIViewAlertForUnsatisfiableConstraints to catch this in the debugger.\
-The methods in the UIConstraintBasedLayoutDebugging category on UIView listed in <UIKitCore/UIView.h> may also be helpful.\
-2021-01-10 10:31:31.831255+0900 TresorMockup4[2507:171268] [LayoutConstraints] Unable to simultaneously satisfy constraints.\
-	Probably at least one of the constraints in the following list is one you don't want. \
-	Try this: \
-		(1) look at each constraint and try to figure out which you don't expect; \
-		(2) find the code that added the unwanted constraint or constraints and fix it. \
-	(Note: If you're seeing NSAutoresizingMaskLayoutConstraints that you don't understand, refer to the documentation for the UIView property translatesAutoresizingMaskIntoConstraints) \
-(\
-    "<NSAutoresizingMaskLayoutConstraint:0x6000011c1900 h=--& v=--& _UIButtonBarButton:0x7fa0367360f0.height == 0   (active)>",\
-    "<NSLayoutConstraint:0x6000011ef660 V:|-(6)-[_UIUCBKBSelectionBackground:0x7fa036736f00]   (active, names: '|':_UIButtonBarButton:0x7fa0367360f0 )>",\
-    "<NSLayoutConstraint:0x6000011ef700 _UIUCBKBSelectionBackground:0x7fa036736f00.bottom == _UIButtonBarButton:0x7fa0367360f0.bottom - 6   (active)>"\
-)\
-\
-Will attempt to recover by breaking constraint \
-<NSLayoutConstraint:0x6000011ef700 _UIUCBKBSelectionBackground:0x7fa036736f00.bottom == _UIButtonBarButton:0x7fa0367360f0.bottom - 6   (active)>\
-\
-Make a symbolic breakpoint at UIViewAlertForUnsatisfiableConstraints to catch this in the debugger.\
-The methods in the UIConstraintBasedLayoutDebugging category on UIView listed in <UIKitCore/UIView.h> may also be helpful.\
-2021-01-10 10:31:31.831717+0900 TresorMockup4[2507:171268] [LayoutConstraints] Unable to simultaneously satisfy constraints.\
-	Probably at least one of the constraints in the following list is one you don't want. \
-	Try this: \
-		(1) look at each constraint and try to figure out which you don't expect; \
-		(2) find the code that added the unwanted constraint or constraints and fix it. \
-	(Note: If you're seeing NSAutoresizingMaskLayoutConstraints that you don't understand, refer to the documentation for the UIView property translatesAutoresizingMaskIntoConstraints) \
-(\
-    "<NSAutoresizingMaskLayoutConstraint:0x6000011c23a0 h=--& v=--& _UIButtonBarButton:0x7fa03640b140.height == 0   (active)>",\
-    "<NSLayoutConstraint:0x6000011c14f0 V:|-(6)-[_UIUCBKBSelectionBackground:0x7fa0365ad4f0]   (active, names: '|':_UIButtonBarButton:0x7fa03640b140 )>",\
-    "<NSLayoutConstraint:0x6000011c1590 _UIUCBKBSelectionBackground:0x7fa0365ad4f0.bottom == _UIButtonBarButton:0x7fa03640b140.bottom - 6   (active)>"\
-)\
-\
-Will attempt to recover by breaking constraint \
-<NSLayoutConstraint:0x6000011c1590 _UIUCBKBSelectionBackground:0x7fa0365ad4f0.bottom == _UIButtonBarButton:0x7fa03640b140.bottom - 6   (active)>\
-\
-Make a symbolic breakpoint at UIViewAlertForUnsatisfiableConstraints to catch this in the debugger.\
-The methods in the UIConstraintBasedLayoutDebugging category on UIView listed in <UIKitCore/UIView.h> may also be helpful.\
-2021-01-10 10:31:31.833375+0900 TresorMockup4[2507:171268] [LayoutConstraints] Unable to simultaneously satisfy constraints.\
-	Probably at least one of the constraints in the following list is one you don't want. \
-	Try this: \
-		(1) look at each constraint and try to figure out which you don't expect; \
-		(2) find the code that added the unwanted constraint or constraints and fix it. \
-	(Note: If you're seeing NSAutoresizingMaskLayoutConstraints that you don't understand, refer to the documentation for the UIView property translatesAutoresizingMaskIntoConstraints) \
-(\
-    "<NSAutoresizingMaskLayoutConstraint:0x6000011c2e40 h=--& v=--& _UIButtonBarButton:0x7fa0365aff90.height == 0   (active)>",\
-    "<NSLayoutConstraint:0x6000011c2bc0 V:|-(6)-[_UIUCBKBSelectionBackground:0x7fa0365b0db0]   (active, names: '|':_UIButtonBarButton:0x7fa0365aff90 )>",\
-    "<NSLayoutConstraint:0x6000011c2c60 _UIUCBKBSelectionBackground:0x7fa0365b0db0.bottom == _UIButtonBarButton:0x7fa0365aff90.bottom - 6   (active)>"\
-)\
-\
-Will attempt to recover by breaking constraint \
-<NSLayoutConstraint:0x6000011c2c60 _UIUCBKBSelectionBackground:0x7fa0365b0db0.bottom == _UIButtonBarButton:0x7fa0365aff90.bottom - 6   (active)>\
-\
-Make a symbolic breakpoint at UIViewAlertForUnsatisfiableConstraints to catch this in the debugger.\
-The methods in the UIConstraintBasedLayoutDebugging category on UIView listed in <UIKitCore/UIView.h> may also be helpful.\
-2021-01-10 10:31:31.836609+0900 TresorMockup4[2507:171268] [LayoutConstraints] Unable to simultaneously satisfy constraints.\
-	Probably at least one of the constraints in the following list is one you don't want. \
-	Try this: \
-		(1) look at each constraint and try to figure out which you don't expect; \
-		(2) find the code that added the unwanted constraint or constraints and fix it. \
-	(Note: If you're seeing NSAutoresizingMaskLayoutConstraints that you don't understand, refer to the documentation for the UIView property translatesAutoresizingMaskIntoConstraints) \
-(\
-    "<NSAutoresizingMaskLayoutConstraint:0x6000011dc4b0 h=--& v=--& _UIButtonBarButton:0x7fa036738ea0.height == 0   (active)>",\
-    "<NSLayoutConstraint:0x6000011eff70 V:|-(6)-[_UIUCBKBSelectionBackground:0x7fa036739f20]   (active, names: '|':_UIButtonBarButton:0x7fa036738ea0 )>",\
-    "<NSLayoutConstraint:0x6000011a4050 _UIUCBKBSelectionBackground:0x7fa036739f20.bottom == _UIButtonBarButton:0x7fa036738ea0.bottom - 6   (active)>"\
-)\
-\
-Will attempt to recover by breaking constraint \
-<NSLayoutConstraint:0x6000011a4050 _UIUCBKBSelectionBackground:0x7fa036739f20.bottom == _UIButtonBarButton:0x7fa036738ea0.bottom - 6   (active)>\
-\
-Make a symbolic breakpoint at UIViewAlertForUnsatisfiableConstraints to catch this in the debugger.\
-The methods in the UIConstraintBasedLayoutDebugging category on UIView listed in <UIKitCore/UIView.h> may also be helpful.\
-2021-01-10 10:31:31.837136+0900 TresorMockup4[2507:171268] [LayoutConstraints] Unable to simultaneously satisfy constraints.\
-	Probably at least one of the constraints in the following list is one you don't want. \
-	Try this: \
-		(1) look at each constraint and try to figure out which you don't expect; \
-		(2) find the code that added the unwanted constraint or constraints and fix it. \
-	(Note: If you're seeing NSAutoresizingMaskLayoutConstraints that you don't understand, refer to the documentation for the UIView property translatesAutoresizingMaskIntoConstraints) \
-(\
-    "<NSAutoresizingMaskLayoutConstraint:0x6000011dcb90 h=--& v=--& _UIButtonBarButton:0x7fa03673ab40.height == 0   (active)>",\
-    "<NSLayoutConstraint:0x6000011dc280 _UIUCBKBSelectionBackground:0x7fa03673b460.bottom == _UIButtonBarButton:0x7fa03673ab40.bottom - 6   (active)>",\
-    "<NSLayoutConstraint:0x6000011dc1e0 V:|-(6)-[_UIUCBKBSelectionBackground:0x7fa03673b460]   (active, names: '|':_UIButtonBarButton:0x7fa03673ab40 )>"\
-)\
-\
-Will attempt to recover by breaking constraint \
-<NSLayoutConstraint:0x6000011dc280 _UIUCBKBSelectionBackground:0x7fa03673b460.bottom == _UIButtonBarButton:0x7fa03673ab40.bottom - 6   (active)>\
-\
-Make a symbolic breakpoint at UIViewAlertForUnsatisfiableConstraints to catch this in the debugger.\
-The methods in the UIConstraintBasedLayoutDebugging category on UIView listed in <UIKitCore/UIView.h> may also be helpful.\
-2021-01-10 10:31:31.837780+0900 TresorMockup4[2507:171268] [LayoutConstraints] Unable to simultaneously satisfy constraints.\
-	Probably at least one of the constraints in the following list is one you don't want. \
-	Try this: \
-		(1) look at each constraint and try to figure out which you don't expect; \
-		(2) find the code that added the unwanted constraint or constraints and fix it. \
-	(Note: If you're seeing NSAutoresizingMaskLayoutConstraints that you don't understand, refer to the documentation for the UIView property translatesAutoresizingMaskIntoConstraints) \
-(\
-    "<NSAutoresizingMaskLayoutConstraint:0x6000011dc820 h=--& v=--& _UIButtonBarButton:0x7fa03673a0a0.height == 0   (active)>",\
-    "<NSLayoutConstraint:0x6000011a01e0 V:|-(6)-[_UIUCBKBSelectionBackground:0x7fa03673a9c0]   (active, names: '|':_UIButtonBarButton:0x7fa03673a0a0 )>",\
-    "<NSLayoutConstraint:0x6000011efd90 _UIUCBKBSelectionBackground:0x7fa03673a9c0.bottom == _UIButtonBarButton:0x7fa03673a0a0.bottom - 6   (active)>"\
-)\
-\
-Will attempt to recover by breaking constraint \
-<NSLayoutConstraint:0x6000011efd90 _UIUCBKBSelectionBackground:0x7fa03673a9c0.bottom == _UIButtonBarButton:0x7fa03673a0a0.bottom - 6   (active)>\
-\
-Make a symbolic breakpoint at UIViewAlertForUnsatisfiableConstraints to catch this in the debugger.\
-The methods in the UIConstraintBasedLayoutDebugging category on UIView listed in <UIKitCore/UIView.h> may also be helpful.\
-2021-01-10 10:31:34.953600+0900 TresorMockup4[2507:171268] [DEBUG] 
+\f0\b  main TresorMockup4/DetailView.body:253 - editMode.isEditing = Optional(false)\
+2021-01-31 23:09:40.814309+0900 TresorMockup4[6572:678184] [DEBUG] 
 \f1\b0 \uc0\u55357 \u56474 
-\f0\b  main TresorMockup4/DetailView.body:187 - onAppear\
-2021-01-10 10:31:35.175778+0900 TresorMockup4[2507:171268] [LayoutConstraints] Unable to simultaneously satisfy constraints.\
-	Probably at least one of the constraints in the following list is one you don't want. \
-	Try this: \
-		(1) look at each constraint and try to figure out which you don't expect; \
-		(2) find the code that added the unwanted constraint or constraints and fix it. \
-	(Note: If you're seeing NSAutoresizingMaskLayoutConstraints that you don't understand, refer to the documentation for the UIView property translatesAutoresizingMaskIntoConstraints) \
-(\
-    "<NSAutoresizingMaskLayoutConstraint:0x600001121fe0 h=--& v=--& _UIButtonBarButton:0x7fa038886150.height == 0   (active)>",\
-    "<NSLayoutConstraint:0x600001139ae0 _UIUCBKBSelectionBackground:0x7fa038887130.bottom == _UIButtonBarButton:0x7fa038886150.bottom - 6   (active)>",\
-    "<NSLayoutConstraint:0x600001139a40 V:|-(6)-[_UIUCBKBSelectionBackground:0x7fa038887130]   (active, names: '|':_UIButtonBarButton:0x7fa038886150 )>"\
-)\
-\
-Will attempt to recover by breaking constraint \
-<NSLayoutConstraint:0x600001139ae0 _UIUCBKBSelectionBackground:0x7fa038887130.bottom == _UIButtonBarButton:0x7fa038886150.bottom - 6   (active)>\
-\
-Make a symbolic breakpoint at UIViewAlertForUnsatisfiableConstraints to catch this in the debugger.\
-The methods in the UIConstraintBasedLayoutDebugging category on UIView listed in <UIKitCore/UIView.h> may also be helpful.\
-2021-01-10 10:31:35.176417+0900 TresorMockup4[2507:171268] [LayoutConstraints] Unable to simultaneously satisfy constraints.\
-	Probably at least one of the constraints in the following list is one you don't want. \
-	Try this: \
-		(1) look at each constraint and try to figure out which you don't expect; \
-		(2) find the code that added the unwanted constraint or constraints and fix it. \
-	(Note: If you're seeing NSAutoresizingMaskLayoutConstraints that you don't understand, refer to the documentation for the UIView property translatesAutoresizingMaskIntoConstraints) \
-(\
-    "<NSAutoresizingMaskLayoutConstraint:0x600001121c70 h=--& v=--& _UIButtonBarButton:0x7fa0388857d0.height == 0   (active)>",\
-    "<NSLayoutConstraint:0x600001139770 V:|-(6)-[_UIUCBKBSelectionBackground:0x7fa038885fd0]   (active, names: '|':_UIButtonBarButton:0x7fa0388857d0 )>",\
-    "<NSLayoutConstraint:0x600001139810 _UIUCBKBSelectionBackground:0x7fa038885fd0.bottom == _UIButtonBarButton:0x7fa0388857d0.bottom - 6   (active)>"\
-)\
-\
-Will attempt to recover by breaking constraint \
-<NSLayoutConstraint:0x600001139810 _UIUCBKBSelectionBackground:0x7fa038885fd0.bottom == _UIButtonBarButton:0x7fa0388857d0.bottom - 6   (active)>\
-\
-Make a symbolic breakpoint at UIViewAlertForUnsatisfiableConstraints to catch this in the debugger.\
-The methods in the UIConstraintBasedLayoutDebugging category on UIView listed in <UIKitCore/UIView.h> may also be helpful.\
-2021-01-10 10:31:35.185054+0900 TresorMockup4[2507:171268] [LayoutConstraints] Unable to simultaneously satisfy constraints.\
-	Probably at least one of the constraints in the following list is one you don't want. \
-	Try this: \
-		(1) look at each constraint and try to figure out which you don't expect; \
-		(2) find the code that added the unwanted constraint or constraints and fix it. \
-	(Note: If you're seeing NSAutoresizingMaskLayoutConstraints that you don't understand, refer to the documentation for the UIView property translatesAutoresizingMaskIntoConstraints) \
-(\
-    "<NSAutoresizingMaskLayoutConstraint:0x600001122710 h=--& v=--& _UIButtonBarButton:0x7fa0364ac410.height == 0   (active)>",\
-    "<NSLayoutConstraint:0x600001124b40 V:|-(6)-[_UIUCBKBSelectionBackground:0x7fa0364acc10]   (active, names: '|':_UIButtonBarButton:0x7fa0364ac410 )>",\
-    "<NSLayoutConstraint:0x600001124be0 _UIUCBKBSelectionBackground:0x7fa0364acc10.bottom == _UIButtonBarButton:0x7fa0364ac410.bottom - 6   (active)>"\
-)\
-\
-Will attempt to recover by breaking constraint \
-<NSLayoutConstraint:0x600001124be0 _UIUCBKBSelectionBackground:0x7fa0364acc10.bottom == _UIButtonBarButton:0x7fa0364ac410.bottom - 6   (active)>\
-\
-Make a symbolic breakpoint at UIViewAlertForUnsatisfiableConstraints to catch this in the debugger.\
-The methods in the UIConstraintBasedLayoutDebugging category on UIView listed in <UIKitCore/UIView.h> may also be helpful.\
-2021-01-10 10:31:35.185616+0900 TresorMockup4[2507:171268] [LayoutConstraints] Unable to simultaneously satisfy constraints.\
-	Probably at least one of the constraints in the following list is one you don't want. \
-	Try this: \
-		(1) look at each constraint and try to figure out which you don't expect; \
-		(2) find the code that added the unwanted constraint or constraints and fix it. \
-	(Note: If you're seeing NSAutoresizingMaskLayoutConstraints that you don't understand, refer to the documentation for the UIView property translatesAutoresizingMaskIntoConstraints) \
-(\
-    "<NSAutoresizingMaskLayoutConstraint:0x600001122350 h=--& v=--& _UIButtonBarButton:0x7fa0388872b0.height == 0   (active)>",\
-    "<NSLayoutConstraint:0x600001139d10 V:|-(6)-[_UIUCBKBSelectionBackground:0x7fa038888bd0]   (active, names: '|':_UIButtonBarButton:0x7fa0388872b0 )>",\
-    "<NSLayoutConstraint:0x600001139db0 _UIUCBKBSelectionBackground:0x7fa038888bd0.bottom == _UIButtonBarButton:0x7fa0388872b0.bottom - 6   (active)>"\
-)\
-\
-Will attempt to recover by breaking constraint \
-<NSLayoutConstraint:0x600001139db0 _UIUCBKBSelectionBackground:0x7fa038888bd0.bottom == _UIButtonBarButton:0x7fa0388872b0.bottom - 6   (active)>\
-\
-Make a symbolic breakpoint at UIViewAlertForUnsatisfiableConstraints to catch this in the debugger.\
-The methods in the UIConstraintBasedLayoutDebugging category on UIView listed in <UIKitCore/UIView.h> may also be helpful.\
-2021-01-10 10:31:35.187221+0900 TresorMockup4[2507:171268] [LayoutConstraints] Unable to simultaneously satisfy constraints.\
-	Probably at least one of the constraints in the following list is one you don't want. \
-	Try this: \
-		(1) look at each constraint and try to figure out which you don't expect; \
-		(2) find the code that added the unwanted constraint or constraints and fix it. \
-	(Note: If you're seeing NSAutoresizingMaskLayoutConstraints that you don't understand, refer to the documentation for the UIView property translatesAutoresizingMaskIntoConstraints) \
-(\
-    "<NSAutoresizingMaskLayoutConstraint:0x600001123070 h=--& v=--& _UIButtonBarButton:0x7fa03676a9e0.height == 0   (active)>",\
-    "<NSLayoutConstraint:0x600001122df0 V:|-(6)-[_UIUCBKBSelectionBackground:0x7fa03676b680]   (active, names: '|':_UIButtonBarButton:0x7fa03676a9e0 )>",\
-    "<NSLayoutConstraint:0x600001122e90 _UIUCBKBSelectionBackground:0x7fa03676b680.bottom == _UIButtonBarButton:0x7fa03676a9e0.bottom - 6   (active)>"\
-)\
-\
-Will attempt to recover by breaking constraint \
-<NSLayoutConstraint:0x600001122e90 _UIUCBKBSelectionBackground:0x7fa03676b680.bottom == _UIButtonBarButton:0x7fa03676a9e0.bottom - 6   (active)>\
-\
-Make a symbolic breakpoint at UIViewAlertForUnsatisfiableConstraints to catch this in the debugger.\
-The methods in the UIConstraintBasedLayoutDebugging category on UIView listed in <UIKitCore/UIView.h> may also be helpful.\
-2021-01-10 10:31:35.190344+0900 TresorMockup4[2507:171268] [LayoutConstraints] Unable to simultaneously satisfy constraints.\
-	Probably at least one of the constraints in the following list is one you don't want. \
-	Try this: \
-		(1) look at each constraint and try to figure out which you don't expect; \
-		(2) find the code that added the unwanted constraint or constraints and fix it. \
-	(Note: If you're seeing NSAutoresizingMaskLayoutConstraints that you don't understand, refer to the documentation for the UIView property translatesAutoresizingMaskIntoConstraints) \
-(\
-    "<NSAutoresizingMaskLayoutConstraint:0x60000112ec60 h=--& v=--& _UIButtonBarButton:0x7fa0365e3780.height == 0   (active)>",\
-    "<NSLayoutConstraint:0x60000112e440 _UIUCBKBSelectionBackground:0x7fa0365e40a0.bottom == _UIButtonBarButton:0x7fa0365e3780.bottom - 6   (active)>",\
-    "<NSLayoutConstraint:0x60000112e3a0 V:|-(6)-[_UIUCBKBSelectionBackground:0x7fa0365e40a0]   (active, names: '|':_UIButtonBarButton:0x7fa0365e3780 )>"\
-)\
-\
-Will attempt to recover by breaking constraint \
-<NSLayoutConstraint:0x60000112e440 _UIUCBKBSelectionBackground:0x7fa0365e40a0.bottom == _UIButtonBarButton:0x7fa0365e3780.bottom - 6   (active)>\
-\
-Make a symbolic breakpoint at UIViewAlertForUnsatisfiableConstraints to catch this in the debugger.\
-The methods in the UIConstraintBasedLayoutDebugging category on UIView listed in <UIKitCore/UIView.h> may also be helpful.\
-2021-01-10 10:31:35.190802+0900 TresorMockup4[2507:171268] [LayoutConstraints] Unable to simultaneously satisfy constraints.\
-	Probably at least one of the constraints in the following list is one you don't want. \
-	Try this: \
-		(1) look at each constraint and try to figure out which you don't expect; \
-		(2) find the code that added the unwanted constraint or constraints and fix it. \
-	(Note: If you're seeing NSAutoresizingMaskLayoutConstraints that you don't understand, refer to the documentation for the UIView property translatesAutoresizingMaskIntoConstraints) \
-(\
-    "<NSAutoresizingMaskLayoutConstraint:0x60000112efd0 h=--& v=--& _UIButtonBarButton:0x7fa0365e4220.height == 0   (active)>",\
-    "<NSLayoutConstraint:0x60000112e710 _UIUCBKBSelectionBackground:0x7fa0365e6a80.bottom == _UIButtonBarButton:0x7fa0365e4220.bottom - 6   (active)>",\
-    "<NSLayoutConstraint:0x60000112e670 V:|-(6)-[_UIUCBKBSelectionBackground:0x7fa0365e6a80]   (active, names: '|':_UIButtonBarButton:0x7fa0365e4220 )>"\
-)\
-\
-Will attempt to recover by breaking constraint \
-<NSLayoutConstraint:0x60000112e710 _UIUCBKBSelectionBackground:0x7fa0365e6a80.bottom == _UIButtonBarButton:0x7fa0365e4220.bottom - 6   (active)>\
-\
-Make a symbolic breakpoint at UIViewAlertForUnsatisfiableConstraints to catch this in the debugger.\
-The methods in the UIConstraintBasedLayoutDebugging category on UIView listed in <UIKitCore/UIView.h> may also be helpful.\
-2021-01-10 10:31:35.191411+0900 TresorMockup4[2507:171268] [LayoutConstraints] Unable to simultaneously satisfy constraints.\
-	Probably at least one of the constraints in the following list is one you don't want. \
-	Try this: \
-		(1) look at each constraint and try to figure out which you don't expect; \
-		(2) find the code that added the unwanted constraint or constraints and fix it. \
-	(Note: If you're seeing NSAutoresizingMaskLayoutConstraints that you don't understand, refer to the documentation for the UIView property translatesAutoresizingMaskIntoConstraints) \
-(\
-    "<NSAutoresizingMaskLayoutConstraint:0x60000112e8f0 h=--& v=--& _UIButtonBarButton:0x7fa0365e2920.height == 0   (active)>",\
-    "<NSLayoutConstraint:0x60000112e0d0 V:|-(6)-[_UIUCBKBSelectionBackground:0x7fa0365e3600]   (active, names: '|':_UIButtonBarButton:0x7fa0365e2920 )>",\
-    "<NSLayoutConstraint:0x60000112e170 _UIUCBKBSelectionBackground:0x7fa0365e3600.bottom == _UIButtonBarButton:0x7fa0365e2920.bottom - 6   (active)>"\
-)\
-\
-Will attempt to recover by breaking constraint \
-<NSLayoutConstraint:0x60000112e170 _UIUCBKBSelectionBackground:0x7fa0365e3600.bottom == _UIButtonBarButton:0x7fa0365e2920.bottom - 6   (active)>\
-\
-Make a symbolic breakpoint at UIViewAlertForUnsatisfiableConstraints to catch this in the debugger.\
-The methods in the UIConstraintBasedLayoutDebugging category on UIView listed in <UIKitCore/UIView.h> may also be helpful.\
-2021-01-10 10:31:37.623595+0900 TresorMockup4[2507:171268] [DEBUG] 
+\f0\b  main TresorMockup4/DetailView.body:237 - onAppear\
+2021-01-31 23:09:44.694287+0900 TresorMockup4[6572:678184] [INFO] 
+\f1\b0 \uc0\u55357 \u56473 
+\f0\b  main TresorMockup4/CryptorUI.open(_:):162 - Authentication with Biometrics is not enrolled Error Domain=com.apple.LocalAuthentication Code=-7 "No identities are enrolled." UserInfo=\{NSLocalizedDescription=No identities are enrolled.\}\
+2021-01-31 23:09:51.322288+0900 TresorMockup4[6572:678184] [ERROR] 
+\f1\b0 \uc0\u10084 \u65039 
+\f0\b  main TresorMockup4/CryptorUI.validate():373 - Cryptor.prepare error = authenticationFailure\
+2021-01-31 23:10:06.984448+0900 TresorMockup4[6572:678184] [DEBUG] 
 \f1\b0 \uc0\u55357 \u56474 
-\f0\b  main TresorMockup4/DetailView.body:203 - editMode.isEditing = Optional(true)\
-\cf4 (lldb) \cf2 po self\
-
-\f2\b0 \uc0\u9663  EditView
-\f0\b \
-
-\f2\b0   \uc0\u9663  _item : ObservedObject<Site>
-\f0\b \
-
-\f2\b0     - _seed : 2
-\f0\b \
-
-\f2\b0     - wrappedValue : <TresorMockup4.Site: 0x6000011a12c0> (entity: Site; id: 0x8d0572c91772bb76 <x-coredata://1CA25BB0-BD12-4A60-99D8-ACEADB7AD17D/Site/p31>; data: \{
-\f0\b \
-
-\f2\b0     charSet = 0;
-\f0\b \
-
-\f2\b0     createdAt = "2021-01-10 01:31:25 +0000";
-\f0\b \
-
-\f2\b0     maxLength = 4;
-\f0\b \
-
-\f2\b0     memo = "https://ja.wikipedia.org/wiki/\\U6b53\\U559c\\U306e\\U6b4c\\n\\nAn die Freude\\n   Johann Christoph Friedrich von Schiller\\n\\nO Freunde, nicht diese T\\U00f6ne!\\nSondern la\\U00dft uns angenehmere\\nanstimmen und freudenvollere.\\n\\nFreude, sch\\U00f6ner G";
-\f0\b \
-
-\f2\b0     password = "pass-2";
-\f0\b \
-
-\f2\b0     passwords = "<relationship fault: 0x6000032708e0 'passwords'>";
-\f0\b \
-
-\f2\b0     pinned = 0;
-\f0\b \
-
-\f2\b0     selectAt = "2021-01-10 01:31:25 +0000";
-\f0\b \
-
-\f2\b0     state = 2;
-\f0\b \
-
-\f2\b0     title = T3;
-\f0\b \
-
-\f2\b0     titleSort = T3;
-\f0\b \
-
-\f2\b0     url = URL3;
-\f0\b \
-
-\f2\b0     userid = "user-2";
-\f0\b \
-
-\f2\b0     uuid = "A302D366-ACEC-43A8-9CF0-41E4E3A0052D";
-\f0\b \
-
-\f2\b0 \})
-\f0\b \
-
-\f2\b0   \uc0\u9663  _title : State<String>
-\f0\b \
-
-\f2\b0     - _value : "T3"
-\f0\b \
-
-\f2\b0     \uc0\u9663  _location : Optional<AnyLocation<String>>
-\f0\b \
-
-\f2\b0       \uc0\u9663  some : <StoredLocation<String>: 0x600003db20a0>
-\f0\b \
-
-\f2\b0   \uc0\u9663  _titleSort : State<String>
-\f0\b \
-
-\f2\b0     - _value : "T3"
-\f0\b \
-
-\f2\b0     \uc0\u9663  _location : Optional<AnyLocation<String>>
-\f0\b \
-
-\f2\b0       \uc0\u9663  some : <StoredLocation<String>: 0x600003db2100>
-\f0\b \
-
-\f2\b0   \uc0\u9663  _url : State<String>
-\f0\b \
-
-\f2\b0     - _value : "URL3"
-\f0\b \
-
-\f2\b0     \uc0\u9663  _location : Optional<AnyLocation<String>>
-\f0\b \
-
-\f2\b0       \uc0\u9663  some : <StoredLocation<String>: 0x600003db2160>
-\f0\b \
-
-\f2\b0   \uc0\u9663  _userid : State<String>
-\f0\b \
-
-\f2\b0     - _value : "user-2"
-\f0\b \
-
-\f2\b0     \uc0\u9663  _location : Optional<AnyLocation<String>>
-\f0\b \
-
-\f2\b0       \uc0\u9663  some : <StoredLocation<String>: 0x600003db21c0>
-\f0\b \
-
-\f2\b0   \uc0\u9663  _password : State<String>
-\f0\b \
-
-\f2\b0     - _value : "pass-2"
-\f0\b \
-
-\f2\b0     \uc0\u9663  _location : Optional<AnyLocation<String>>
-\f0\b \
-
-\f2\b0       \uc0\u9663  some : <StoredLocation<String>: 0x600003db2220>
-\f0\b \
-
-\f2\b0   \uc0\u9663  _mlength : State<Float>
-\f0\b \
-
-\f2\b0     - _value : 4.0
-\f0\b \
-
-\f2\b0     \uc0\u9663  _location : Optional<AnyLocation<Float>>
-\f0\b \
-
-\f2\b0       \uc0\u9663  some : <StoredLocation<Float>: 0x600003db2280>
-\f0\b \
-
-\f2\b0   \uc0\u9663  _chars : State<Int>
-\f0\b \
-
-\f2\b0     - _value : 0
-\f0\b \
-
-\f2\b0     \uc0\u9663  _location : Optional<AnyLocation<Int>>
-\f0\b \
-
-\f2\b0       \uc0\u9663  some : <StoredLocation<Int>: 0x600003db22b0>
-\f0\b \
-
-\f2\b0   \uc0\u9663  _showPassowrd : State<Bool>
-\f0\b \
-
-\f2\b0     - _value : false
-\f0\b \
-
-\f2\b0     \uc0\u9663  _location : Optional<AnyLocation<Bool>>
-\f0\b \
-
-\f2\b0       \uc0\u9663  some : <StoredLocation<Bool>: 0x600003db22e0>
-\f0\b \
-
-\f2\b0   \uc0\u9663  _editMode : Environment<Optional<Binding<EditMode>>>
-\f0\b \
-
-\f2\b0     \uc0\u9663  content : Content
-\f0\b \
-
-\f2\b0       \uc0\u9663  value : Optional<Binding<EditMode>>
-\f0\b \
-
-\f2\b0         \uc0\u9663  some : Binding<EditMode>
-\f0\b \
-
-\f2\b0           \uc0\u9663  transaction : Transaction
-\f0\b \
-
-\f2\b0             \uc0\u9663  plist : []
-\f0\b \
-
-\f2\b0               - elements : nil
-\f0\b \
-
-\f2\b0           \uc0\u9663  location : <StoredLocation<EditMode>: 0x600003c7ffc0>
-\f0\b \
-
-\f2\b0           - _value : SwiftUI.EditMode.active
-\f0\b \
-
-\f2\b0   \uc0\u9663  _viewContext : Environment<NSManagedObjectContext>
-\f0\b \
-
-\f2\b0     \uc0\u9663  content : Content
-\f0\b \
-
-\f2\b0       - value : <NSManagedObjectContext: 0x6000009a9450>
-\f0\b \
-
-\f2\b0   \uc0\u9663  charsArray : 7 elements
-\f0\b \
-
-\f2\b0     \uc0\u9663  0 : CypherCharacterSet
-\f0\b \
-
-\f2\b0       - rawValue : 16384
-\f0\b \
-
-\f2\b0     \uc0\u9663  1 : CypherCharacterSet
-\f0\b \
-
-\f2\b0       - rawValue : 2097152
-\f0\b \
-
-\f2\b0     \uc0\u9663  2 : CypherCharacterSet
-\f0\b \
-
-\f2\b0       - rawValue : 2113536
-\f0\b \
-
-\f2\b0     \uc0\u9663  3 : CypherCharacterSet
-\f0\b \
-
-\f2\b0       - rawValue : 136331264
-\f0\b \
-
-\f2\b0     \uc0\u9663  4 : CypherCharacterSet
-\f0\b \
-
-\f2\b0       - rawValue : 136339968
-\f0\b \
-
-\f2\b0     \uc0\u9663  5 : CypherCharacterSet
-\f0\b \
-
-\f2\b0       - rawValue : 136342272
-\f0\b \
-
-\f2\b0     \uc0\u9663  6 : CypherCharacterSet
-\f0\b \
-
-\f2\b0       - rawValue : 1799121725
-\f0\b \
-\
-2021-01-10 10:32:26.852263+0900 TresorMockup4[2507:171480] XPC connection interrupted\
-2021-01-10 10:32:27.808154+0900 TresorMockup4[2507:171268] [DEBUG] 
+\f0\b  main TresorMockup4/CryptorUI.open(_:):91 - already authenticated\
+2021-01-31 23:10:06.988266+0900 TresorMockup4[6572:678184] [DEBUG] 
 \f1\b0 \uc0\u55357 \u56474 
-\f0\b  main TresorMockup4/DetailView.body:245 - Site will save <TresorMockup4.Site: 0x6000011a12c0> (entity: Site; id: 0x8d0572c91772bb76 <x-coredata://1CA25BB0-BD12-4A60-99D8-ACEADB7AD17D/Site/p31>; data: \{\
-    charSet = 0;\
-    createdAt = "2021-01-10 01:31:25 +0000";\
-    maxLength = 4;\
-    memo = "https://ja.wikipedia.org/wiki/\\U6b53\\U559c\\U306e\\U6b4c\\n\\nAn die Freude\\n   Johann Christoph Friedrich von Schiller\\n\\nO Freunde, nicht diese T\\U00f6ne!\\nSondern la\\U00dft uns angenehmere\\nanstimmen und freudenvollere.\\n\\nFreude, sch\\U00f6ner G";\
-    password = "pass-2";\
-    passwords = "<relationship fault: 0x6000032708e0 'passwords'>";\
-    pinned = 0;\
-    selectAt = "2021-01-10 01:31:25 +0000";\
-    state = 2;\
-    title = T3;\
-    titleSort = T3;\
-    url = URL3;\
-    userid = "user-2";\
-    uuid = "A302D366-ACEC-43A8-9CF0-41E4E3A0052D";\
-\})\
-2021-01-10 10:32:28.755191+0900 TresorMockup4[2507:171479] [DEBUG] 
+\f0\b  main TresorMockup4/CryptorUI.authenticated:32 - authenticated timer canceled\
+2021-01-31 23:10:09.874388+0900 TresorMockup4[6572:678184] [DEBUG] 
 \f1\b0 \uc0\u55357 \u56474 
-\f0\b   TresorMockup4/AuthenticationManager.authenticated:54 - authenticated time out=seconds(30)\
-Fatal error: Attempted to read an unowned reference but the object was already deallocated2021-01-10 10:32:28.758368+0900 TresorMockup4[2507:171268] Fatal error: Attempted to read an unowned reference but the object was already deallocated\
-
-\f2\b0 Fatal error: Attempted to read an unowned reference but the object was already deallocated
-\f0\b \
-
-\f2\b0 CoreSimulator 732.18.6 - Device: iPad Pro (9.7-inch) (8F9D2DCD-6F1F-4508-98E6-DFB738AD8B22) - Runtime: iOS 14.3 (18C61) - DeviceType: iPad Pro (9.7-inch)
-\f0\b \
-
-\f2\b0 Fatal error: Attempted to read an unowned reference but the object was already deallocated
-\f0\b \
-
-\f2\b0 CoreSimulator 732.18.6 - Device: iPad Pro (9.7-inch) (8F9D2DCD-6F1F-4508-98E6-DFB738AD8B22) - Runtime: iOS 14.3 (18C61) - DeviceType: iPad Pro (9.7-inch)
-\f0\b \
-\cf4 (lldb) \
-\
-\
-
-\fs22 \ul -----------\
-StateObject item
-\fs20 \ulnone \
-\
-\cf2 2021-01-10 11:24:26.478550+0900 TresorMockup4[2860:209229] [DEBUG] 
+\f0\b  main TresorMockup4/CryptorUI.open(_:):91 - already authenticated\
+2021-01-31 23:10:09.879338+0900 TresorMockup4[6572:678184] [DEBUG] 
 \f1\b0 \uc0\u55357 \u56474 
-\f0\b  main TresorMockup4/SecureStore.doseExist(label:iCloud:):67 - label=CryptorSeed query=[r_Data:1, class:genp, sync:1, r_Attributes:1, m_Limit:m_LimitOne, acct:CryptorSeed, svce:com.gmail.jun1ro1.TresorMockup4] SecItemCopyMatching=0:No error.\
-2021-01-10 11:24:26.479615+0900 TresorMockup4[2860:209229] [DEBUG] 
+\f0\b  main TresorMockup4/CryptorUI.authenticated:32 - authenticated timer canceled\
+2021-01-31 23:10:15.082903+0900 TresorMockup4[6572:678184] [DEBUG] 
 \f1\b0 \uc0\u55357 \u56474 
-\f0\b  main TresorMockup4/SecureStore.read(label:iCloud:):98 - label=Password query=[acct:Password, r_Data:1, class:genp, sync:0, svce:com.gmail.jun1ro1.TresorMockup4, m_Limit:m_LimitOne, r_Attributes:1] SecItemCopyMatching=0:No error.\
-2021-01-10 11:24:28.293486+0900 TresorMockup4[2860:209229] [DEBUG] 
+\f0\b  main TresorMockup4/CryptorUI.open(_:):91 - already authenticated\
+2021-01-31 23:10:15.087382+0900 TresorMockup4[6572:678184] [DEBUG] 
 \f1\b0 \uc0\u55357 \u56474 
-\f0\b  main TresorMockup4/AuthenticationManager.authenticate(authenticatedBlock:):119 - evaluatePolicy=success\
-2021-01-10 11:24:28.295679+0900 TresorMockup4[2860:209229] [DEBUG] 
+\f0\b  main TresorMockup4/CryptorUI.authenticated:32 - authenticated timer canceled\
+2021-01-31 23:10:45.089087+0900 TresorMockup4[6572:678184] [DEBUG] 
 \f1\b0 \uc0\u55357 \u56474 
-\f0\b  main TresorMockup4/SecureStore.read(label:iCloud:):98 - label=Password query=[acct:Password, sync:0, r_Data:1, svce:com.gmail.jun1ro1.TresorMockup4, class:genp, m_Limit:m_LimitOne, r_Attributes:1] SecItemCopyMatching=0:No error.\
-2021-01-10 11:24:28.297853+0900 TresorMockup4[2860:209229] [DEBUG] 
+\f0\b  main TresorMockup4/CryptorUI.authenticated:42 - authenticated time out=30\
+2021-01-31 23:10:45.089300+0900 TresorMockup4[6572:678184] [DEBUG] 
 \f1\b0 \uc0\u55357 \u56474 
-\f0\b  main TresorMockup4/SecureStore.doseExist(label:iCloud:):67 - label=CryptorSeed query=[acct:CryptorSeed, sync:1, r_Data:1, svce:com.gmail.jun1ro1.TresorMockup4, class:genp, m_Limit:m_LimitOne, r_Attributes:1] SecItemCopyMatching=0:No error.\
-2021-01-10 11:24:28.299797+0900 TresorMockup4[2860:209229] [DEBUG] 
+\f0\b  main TresorMockup4/CryptorUI.authenticated:32 - authenticated timer canceled\
+2021-01-31 23:10:58.556464+0900 TresorMockup4[6572:678184] [DEBUG] 
 \f1\b0 \uc0\u55357 \u56474 
-\f0\b  main TresorMockup4/SecureStore.read(label:iCloud:):98 - label=CryptorSeed query=[class:genp, acct:CryptorSeed, svce:com.gmail.jun1ro1.TresorMockup4, sync:1, r_Attributes:1, r_Data:1, m_Limit:m_LimitOne] SecItemCopyMatching=0:No error.\
-2021-01-10 11:24:28.303669+0900 TresorMockup4[2860:209229] [DEBUG] 
+\f0\b  main TresorMockup4/CryptorUI.open(_:):133 - evaluatePolicy=success\
+2021-01-31 23:10:58.564326+0900 TresorMockup4[6572:678184] [DEBUG] 
 \f1\b0 \uc0\u55357 \u56474 
-\f0\b  main TresorMockup4/SecureStore.read(label:iCloud:):98 - label=Validator query=[r_Data:1, sync:1, class:genp, acct:Validator, m_Limit:m_LimitOne, svce:com.gmail.jun1ro1.TresorMockup4, r_Attributes:1] SecItemCopyMatching=0:No error.\
-2021-01-10 11:24:28.312013+0900 TresorMockup4[2860:209229] [DEBUG] 
+\f0\b  main TresorMockup4/CryptorUI.open(_:):155 - authenticated by biometrics\
+2021-01-31 23:11:10.802888+0900 TresorMockup4[6572:678184] [DEBUG] 
 \f1\b0 \uc0\u55357 \u56474 
-\f0\b  main TresorMockup4/CryptorCore.getKEK(password:seed:):365 - KEK=\{length = 32, bytes = 0x4ba9ce7e 3a723c4d fe6b3642 44daf325 ... 87bef338 be6bc24c \}\
-2021-01-10 11:24:28.335886+0900 TresorMockup4[2860:209229] [DEBUG] 
+\f0\b  main TresorMockup4/CryptorUI.open(_:):91 - already authenticated\
+2021-01-31 23:11:10.808144+0900 TresorMockup4[6572:678184] [DEBUG] 
 \f1\b0 \uc0\u55357 \u56474 
-\f0\b  main TresorMockup4/CryptorCore.validate(key:):262 - hashedMark=\{length = 32, bytes = 0xbd4e8767 308214bc 67e9edf1 ae130903 ... dbe3ede7 44b0e403 \}\
-2021-01-10 11:24:28.336328+0900 TresorMockup4[2860:209229] [DEBUG] 
+\f0\b  main TresorMockup4/CryptorUI.authenticated:32 - authenticated timer canceled\
+2021-01-31 23:11:14.062943+0900 TresorMockup4[6572:678184] [DEBUG] 
 \f1\b0 \uc0\u55357 \u56474 
-\f0\b  main TresorMockup4/CryptorCore.validate(key:):263 - hashedDecryptedMark=\{length = 32, bytes = 0xbd4e8767 308214bc 67e9edf1 ae130903 ... dbe3ede7 44b0e403 \}\
-2021-01-10 11:24:28.337194+0900 TresorMockup4[2860:209229] [DEBUG] 
+\f0\b  main TresorMockup4/CryptorUI.open(_:):91 - already authenticated\
+2021-01-31 23:11:14.068232+0900 TresorMockup4[6572:678184] [DEBUG] 
 \f1\b0 \uc0\u55357 \u56474 
-\f0\b  main TresorMockup4/AuthenticationManager.authenticate(authenticatedBlock:):152 - authenticated by biometrics\
-2021-01-10 11:24:28.362746+0900 TresorMockup4[2860:209229] [LayoutConstraints] Unable to simultaneously satisfy constraints.\
-	Probably at least one of the constraints in the following list is one you don't want. \
-	Try this: \
-		(1) look at each constraint and try to figure out which you don't expect; \
-		(2) find the code that added the unwanted constraint or constraints and fix it. \
-(\
-    "<NSLayoutConstraint:0x600000737a70 'BIB_Trailing_CB_Leading' H:[_UIModernBarButton:0x7facf8e21db0]-(6)-[_UIModernBarButton:0x7facf8e215f0'Sites']   (active)>",\
-    "<NSLayoutConstraint:0x600000737ac0 'CB_Trailing_Trailing' _UIModernBarButton:0x7facf8e215f0'Sites'.trailing <= _UIButtonBarButton:0x7facf8e21420.trailing   (active)>",\
-    "<NSLayoutConstraint:0x60000073d810 'UINav_static_button_horiz_position' _UIModernBarButton:0x7facf8e21db0.leading == UILayoutGuide:0x600001d09ce0'UIViewLayoutMarginsGuide'.leading   (active)>",\
-    "<NSLayoutConstraint:0x60000073d860 'UINavItemContentGuide-leading' H:[_UIButtonBarButton:0x7facf8e21420]-(0)-[UILayoutGuide:0x600001d09dc0'UINavigationBarItemContentLayoutGuide']   (active)>",\
-    "<NSLayoutConstraint:0x600000734fa0 'UINavItemContentGuide-trailing' UILayoutGuide:0x600001d09dc0'UINavigationBarItemContentLayoutGuide'.trailing == _UINavigationBarContentView:0x7facf8e13d70.trailing   (active)>",\
-    "<NSLayoutConstraint:0x600000718c80 'UIView-Encapsulated-Layout-Width' _UINavigationBarContentView:0x7facf8e13d70.width == 0   (active)>",\
-    "<NSLayoutConstraint:0x600000734dc0 'UIView-leftMargin-guide-constraint' H:|-(0)-[UILayoutGuide:0x600001d09ce0'UIViewLayoutMarginsGuide'](LTR)   (active, names: '|':_UINavigationBarContentView:0x7facf8e13d70 )>"\
-)\
-\
-Will attempt to recover by breaking constraint \
-<NSLayoutConstraint:0x600000737a70 'BIB_Trailing_CB_Leading' H:[_UIModernBarButton:0x7facf8e21db0]-(6)-[_UIModernBarButton:0x7facf8e215f0'Sites']   (active)>\
-\
-Make a symbolic breakpoint at UIViewAlertForUnsatisfiableConstraints to catch this in the debugger.\
-The methods in the UIConstraintBasedLayoutDebugging category on UIView listed in <UIKitCore/UIView.h> may also be helpful.\
-2021-01-10 11:24:30.614458+0900 TresorMockup4[2860:209229] [LayoutConstraints] Unable to simultaneously satisfy constraints.\
-	Probably at least one of the constraints in the following list is one you don't want. \
-	Try this: \
-		(1) look at each constraint and try to figure out which you don't expect; \
-		(2) find the code that added the unwanted constraint or constraints and fix it. \
-	(Note: If you're seeing NSAutoresizingMaskLayoutConstraints that you don't understand, refer to the documentation for the UIView property translatesAutoresizingMaskIntoConstraints) \
-(\
-    "<NSAutoresizingMaskLayoutConstraint:0x60000076ebc0 h=--& v=--& _UIButtonBarButton:0x7facf8e40df0.height == 0   (active)>",\
-    "<NSLayoutConstraint:0x6000007565d0 _UIUCBKBSelectionBackground:0x7facf8e41710.bottom == _UIButtonBarButton:0x7facf8e40df0.bottom - 6   (active)>",\
-    "<NSLayoutConstraint:0x600000756530 V:|-(6)-[_UIUCBKBSelectionBackground:0x7facf8e41710]   (active, names: '|':_UIButtonBarButton:0x7facf8e40df0 )>"\
-)\
-\
-Will attempt to recover by breaking constraint \
-<NSLayoutConstraint:0x6000007565d0 _UIUCBKBSelectionBackground:0x7facf8e41710.bottom == _UIButtonBarButton:0x7facf8e40df0.bottom - 6   (active)>\
-\
-Make a symbolic breakpoint at UIViewAlertForUnsatisfiableConstraints to catch this in the debugger.\
-The methods in the UIConstraintBasedLayoutDebugging category on UIView listed in <UIKitCore/UIView.h> may also be helpful.\
-2021-01-10 11:24:30.614849+0900 TresorMockup4[2860:209229] [LayoutConstraints] Unable to simultaneously satisfy constraints.\
-	Probably at least one of the constraints in the following list is one you don't want. \
-	Try this: \
-		(1) look at each constraint and try to figure out which you don't expect; \
-		(2) find the code that added the unwanted constraint or constraints and fix it. \
-	(Note: If you're seeing NSAutoresizingMaskLayoutConstraints that you don't understand, refer to the documentation for the UIView property translatesAutoresizingMaskIntoConstraints) \
-(\
-    "<NSAutoresizingMaskLayoutConstraint:0x60000076e850 h=--& v=--& _UIButtonBarButton:0x7facf8e40150.height == 0   (active)>",\
-    "<NSLayoutConstraint:0x600000756260 V:|-(6)-[_UIUCBKBSelectionBackground:0x7facf8e40c70]   (active, names: '|':_UIButtonBarButton:0x7facf8e40150 )>",\
-    "<NSLayoutConstraint:0x600000756300 _UIUCBKBSelectionBackground:0x7facf8e40c70.bottom == _UIButtonBarButton:0x7facf8e40150.bottom - 6   (active)>"\
-)\
-\
-Will attempt to recover by breaking constraint \
-<NSLayoutConstraint:0x600000756300 _UIUCBKBSelectionBackground:0x7facf8e40c70.bottom == _UIButtonBarButton:0x7facf8e40150.bottom - 6   (active)>\
-\
-Make a symbolic breakpoint at UIViewAlertForUnsatisfiableConstraints to catch this in the debugger.\
-The methods in the UIConstraintBasedLayoutDebugging category on UIView listed in <UIKitCore/UIView.h> may also be helpful.\
-2021-01-10 11:24:30.615237+0900 TresorMockup4[2860:209229] [LayoutConstraints] Unable to simultaneously satisfy constraints.\
-	Probably at least one of the constraints in the following list is one you don't want. \
-	Try this: \
-		(1) look at each constraint and try to figure out which you don't expect; \
-		(2) find the code that added the unwanted constraint or constraints and fix it. \
-	(Note: If you're seeing NSAutoresizingMaskLayoutConstraints that you don't understand, refer to the documentation for the UIView property translatesAutoresizingMaskIntoConstraints) \
-(\
-    "<NSAutoresizingMaskLayoutConstraint:0x60000076e4e0 h=--& v=--& _UIButtonBarButton:0x7facf8e36e90.height == 0   (active)>",\
-    "<NSLayoutConstraint:0x600000755d10 V:|-(6)-[_UIUCBKBSelectionBackground:0x7facf8e3fcb0]   (active, names: '|':_UIButtonBarButton:0x7facf8e36e90 )>",\
-    "<NSLayoutConstraint:0x600000756030 _UIUCBKBSelectionBackground:0x7facf8e3fcb0.bottom == _UIButtonBarButton:0x7facf8e36e90.bottom - 6   (active)>"\
-)\
-\
-Will attempt to recover by breaking constraint \
-<NSLayoutConstraint:0x600000756030 _UIUCBKBSelectionBackground:0x7facf8e3fcb0.bottom == _UIButtonBarButton:0x7facf8e36e90.bottom - 6   (active)>\
-\
-Make a symbolic breakpoint at UIViewAlertForUnsatisfiableConstraints to catch this in the debugger.\
-The methods in the UIConstraintBasedLayoutDebugging category on UIView listed in <UIKitCore/UIView.h> may also be helpful.\
-2021-01-10 11:24:30.633306+0900 TresorMockup4[2860:209229] [LayoutConstraints] Unable to simultaneously satisfy constraints.\
-	Probably at least one of the constraints in the following list is one you don't want. \
-	Try this: \
-		(1) look at each constraint and try to figure out which you don't expect; \
-		(2) find the code that added the unwanted constraint or constraints and fix it. \
-	(Note: If you're seeing NSAutoresizingMaskLayoutConstraints that you don't understand, refer to the documentation for the UIView property translatesAutoresizingMaskIntoConstraints) \
-(\
-    "<NSAutoresizingMaskLayoutConstraint:0x60000076ef80 h=--& v=--& _UIButtonBarButton:0x7facfd005630.height == 0   (active)>",\
-    "<NSLayoutConstraint:0x600000775810 V:|-(6)-[_UIUCBKBSelectionBackground:0x7facf8dde1d0]   (active, names: '|':_UIButtonBarButton:0x7facfd005630 )>",\
-    "<NSLayoutConstraint:0x6000007758b0 _UIUCBKBSelectionBackground:0x7facf8dde1d0.bottom == _UIButtonBarButton:0x7facfd005630.bottom - 6   (active)>"\
-)\
-\
-Will attempt to recover by breaking constraint \
-<NSLayoutConstraint:0x6000007758b0 _UIUCBKBSelectionBackground:0x7facf8dde1d0.bottom == _UIButtonBarButton:0x7facfd005630.bottom - 6   (active)>\
-\
-Make a symbolic breakpoint at UIViewAlertForUnsatisfiableConstraints to catch this in the debugger.\
-The methods in the UIConstraintBasedLayoutDebugging category on UIView listed in <UIKitCore/UIView.h> may also be helpful.\
-2021-01-10 11:24:30.635082+0900 TresorMockup4[2860:209229] [LayoutConstraints] Unable to simultaneously satisfy constraints.\
-	Probably at least one of the constraints in the following list is one you don't want. \
-	Try this: \
-		(1) look at each constraint and try to figure out which you don't expect; \
-		(2) find the code that added the unwanted constraint or constraints and fix it. \
-	(Note: If you're seeing NSAutoresizingMaskLayoutConstraints that you don't understand, refer to the documentation for the UIView property translatesAutoresizingMaskIntoConstraints) \
-(\
-    "<NSAutoresizingMaskLayoutConstraint:0x600000756e40 h=--& v=--& _UIButtonBarButton:0x7facf8e630b0.height == 0   (active)>",\
-    "<NSLayoutConstraint:0x600000756bc0 V:|-(6)-[_UIUCBKBSelectionBackground:0x7facf8e63e40]   (active, names: '|':_UIButtonBarButton:0x7facf8e630b0 )>",\
-    "<NSLayoutConstraint:0x600000756c60 _UIUCBKBSelectionBackground:0x7facf8e63e40.bottom == _UIButtonBarButton:0x7facf8e630b0.bottom - 6   (active)>"\
-)\
-\
-Will attempt to recover by breaking constraint \
-<NSLayoutConstraint:0x600000756c60 _UIUCBKBSelectionBackground:0x7facf8e63e40.bottom == _UIButtonBarButton:0x7facf8e630b0.bottom - 6   (active)>\
-\
-Make a symbolic breakpoint at UIViewAlertForUnsatisfiableConstraints to catch this in the debugger.\
-The methods in the UIConstraintBasedLayoutDebugging category on UIView listed in <UIKitCore/UIView.h> may also be helpful.\
-2021-01-10 11:24:30.639149+0900 TresorMockup4[2860:209229] [LayoutConstraints] Unable to simultaneously satisfy constraints.\
-	Probably at least one of the constraints in the following list is one you don't want. \
-	Try this: \
-		(1) look at each constraint and try to figure out which you don't expect; \
-		(2) find the code that added the unwanted constraint or constraints and fix it. \
-	(Note: If you're seeing NSAutoresizingMaskLayoutConstraints that you don't understand, refer to the documentation for the UIView property translatesAutoresizingMaskIntoConstraints) \
-(\
-    "<NSAutoresizingMaskLayoutConstraint:0x600000776b20 h=--& v=--& _UIButtonBarButton:0x7facf8de11b0.height == 0   (active)>",\
-    "<NSLayoutConstraint:0x600000776260 _UIUCBKBSelectionBackground:0x7facf8de1ad0.bottom == _UIButtonBarButton:0x7facf8de11b0.bottom - 6   (active)>",\
-    "<NSLayoutConstraint:0x6000007761c0 V:|-(6)-[_UIUCBKBSelectionBackground:0x7facf8de1ad0]   (active, names: '|':_UIButtonBarButton:0x7facf8de11b0 )>"\
-)\
-\
-Will attempt to recover by breaking constraint \
-<NSLayoutConstraint:0x600000776260 _UIUCBKBSelectionBackground:0x7facf8de1ad0.bottom == _UIButtonBarButton:0x7facf8de11b0.bottom - 6   (active)>\
-\
-Make a symbolic breakpoint at UIViewAlertForUnsatisfiableConstraints to catch this in the debugger.\
-The methods in the UIConstraintBasedLayoutDebugging category on UIView listed in <UIKitCore/UIView.h> may also be helpful.\
-2021-01-10 11:24:30.639864+0900 TresorMockup4[2860:209229] [LayoutConstraints] Unable to simultaneously satisfy constraints.\
-	Probably at least one of the constraints in the following list is one you don't want. \
-	Try this: \
-		(1) look at each constraint and try to figure out which you don't expect; \
-		(2) find the code that added the unwanted constraint or constraints and fix it. \
-	(Note: If you're seeing NSAutoresizingMaskLayoutConstraints that you don't understand, refer to the documentation for the UIView property translatesAutoresizingMaskIntoConstraints) \
-(\
-    "<NSAutoresizingMaskLayoutConstraint:0x600000776440 h=--& v=--& _UIButtonBarButton:0x7facf8dd19e0.height == 0   (active)>",\
-    "<NSLayoutConstraint:0x600000775c20 V:|-(6)-[_UIUCBKBSelectionBackground:0x7facf8dbb6d0]   (active, names: '|':_UIButtonBarButton:0x7facf8dd19e0 )>",\
-    "<NSLayoutConstraint:0x600000775cc0 _UIUCBKBSelectionBackground:0x7facf8dbb6d0.bottom == _UIButtonBarButton:0x7facf8dd19e0.bottom - 6   (active)>"\
-)\
-\
-Will attempt to recover by breaking constraint \
-<NSLayoutConstraint:0x600000775cc0 _UIUCBKBSelectionBackground:0x7facf8dbb6d0.bottom == _UIButtonBarButton:0x7facf8dd19e0.bottom - 6   (active)>\
-\
-Make a symbolic breakpoint at UIViewAlertForUnsatisfiableConstraints to catch this in the debugger.\
-The methods in the UIConstraintBasedLayoutDebugging category on UIView listed in <UIKitCore/UIView.h> may also be helpful.\
-2021-01-10 11:24:30.640561+0900 TresorMockup4[2860:209229] [LayoutConstraints] Unable to simultaneously satisfy constraints.\
-	Probably at least one of the constraints in the following list is one you don't want. \
-	Try this: \
-		(1) look at each constraint and try to figure out which you don't expect; \
-		(2) find the code that added the unwanted constraint or constraints and fix it. \
-	(Note: If you're seeing NSAutoresizingMaskLayoutConstraints that you don't understand, refer to the documentation for the UIView property translatesAutoresizingMaskIntoConstraints) \
-(\
-    "<NSAutoresizingMaskLayoutConstraint:0x6000007767b0 h=--& v=--& _UIButtonBarButton:0x7facf8de0710.height == 0   (active)>",\
-    "<NSLayoutConstraint:0x600000775ef0 V:|-(6)-[_UIUCBKBSelectionBackground:0x7facf8de1030]   (active, names: '|':_UIButtonBarButton:0x7facf8de0710 )>",\
-    "<NSLayoutConstraint:0x600000775f90 _UIUCBKBSelectionBackground:0x7facf8de1030.bottom == _UIButtonBarButton:0x7facf8de0710.bottom - 6   (active)>"\
-)\
-\
-Will attempt to recover by breaking constraint \
-<NSLayoutConstraint:0x600000775f90 _UIUCBKBSelectionBackground:0x7facf8de1030.bottom == _UIButtonBarButton:0x7facf8de0710.bottom - 6   (active)>\
-\
-Make a symbolic breakpoint at UIViewAlertForUnsatisfiableConstraints to catch this in the debugger.\
-The methods in the UIConstraintBasedLayoutDebugging category on UIView listed in <UIKitCore/UIView.h> may also be helpful.\
-2021-01-10 11:24:44.038105+0900 TresorMockup4[2860:209229] [DEBUG] 
+\f0\b  main TresorMockup4/CryptorUI.authenticated:32 - authenticated timer canceled\
+2021-01-31 23:11:23.978104+0900 TresorMockup4[6572:678184] [DEBUG] 
 \f1\b0 \uc0\u55357 \u56474 
-\f0\b  main TresorMockup4/DetailView.body:187 - onAppear\
-2021-01-10 11:24:44.235346+0900 TresorMockup4[2860:209229] [LayoutConstraints] Unable to simultaneously satisfy constraints.\
-	Probably at least one of the constraints in the following list is one you don't want. \
-	Try this: \
-		(1) look at each constraint and try to figure out which you don't expect; \
-		(2) find the code that added the unwanted constraint or constraints and fix it. \
-	(Note: If you're seeing NSAutoresizingMaskLayoutConstraints that you don't understand, refer to the documentation for the UIView property translatesAutoresizingMaskIntoConstraints) \
-(\
-    "<NSAutoresizingMaskLayoutConstraint:0x60000078f4d0 h=--& v=--& _UIButtonBarButton:0x7facf8e81730.height == 0   (active)>",\
-    "<NSLayoutConstraint:0x600000794b40 _UIUCBKBSelectionBackground:0x7facf8ea5090.bottom == _UIButtonBarButton:0x7facf8e81730.bottom - 6   (active)>",\
-    "<NSLayoutConstraint:0x600000794aa0 V:|-(6)-[_UIUCBKBSelectionBackground:0x7facf8ea5090]   (active, names: '|':_UIButtonBarButton:0x7facf8e81730 )>"\
-)\
-\
-Will attempt to recover by breaking constraint \
-<NSLayoutConstraint:0x600000794b40 _UIUCBKBSelectionBackground:0x7facf8ea5090.bottom == _UIButtonBarButton:0x7facf8e81730.bottom - 6   (active)>\
-\
-Make a symbolic breakpoint at UIViewAlertForUnsatisfiableConstraints to catch this in the debugger.\
-The methods in the UIConstraintBasedLayoutDebugging category on UIView listed in <UIKitCore/UIView.h> may also be helpful.\
-2021-01-10 11:24:44.235850+0900 TresorMockup4[2860:209229] [LayoutConstraints] Unable to simultaneously satisfy constraints.\
-	Probably at least one of the constraints in the following list is one you don't want. \
-	Try this: \
-		(1) look at each constraint and try to figure out which you don't expect; \
-		(2) find the code that added the unwanted constraint or constraints and fix it. \
-	(Note: If you're seeing NSAutoresizingMaskLayoutConstraints that you don't understand, refer to the documentation for the UIView property translatesAutoresizingMaskIntoConstraints) \
-(\
-    "<NSAutoresizingMaskLayoutConstraint:0x60000078f160 h=--& v=--& _UIButtonBarButton:0x7facf8e90020.height == 0   (active)>",\
-    "<NSLayoutConstraint:0x6000007947d0 V:|-(6)-[_UIUCBKBSelectionBackground:0x7facf8ea77d0]   (active, names: '|':_UIButtonBarButton:0x7facf8e90020 )>",\
-    "<NSLayoutConstraint:0x600000794870 _UIUCBKBSelectionBackground:0x7facf8ea77d0.bottom == _UIButtonBarButton:0x7facf8e90020.bottom - 6   (active)>"\
-)\
-\
-Will attempt to recover by breaking constraint \
-<NSLayoutConstraint:0x600000794870 _UIUCBKBSelectionBackground:0x7facf8ea77d0.bottom == _UIButtonBarButton:0x7facf8e90020.bottom - 6   (active)>\
-\
-Make a symbolic breakpoint at UIViewAlertForUnsatisfiableConstraints to catch this in the debugger.\
-The methods in the UIConstraintBasedLayoutDebugging category on UIView listed in <UIKitCore/UIView.h> may also be helpful.\
-2021-01-10 11:24:44.253725+0900 TresorMockup4[2860:209229] [LayoutConstraints] Unable to simultaneously satisfy constraints.\
-	Probably at least one of the constraints in the following list is one you don't want. \
-	Try this: \
-		(1) look at each constraint and try to figure out which you don't expect; \
-		(2) find the code that added the unwanted constraint or constraints and fix it. \
-	(Note: If you're seeing NSAutoresizingMaskLayoutConstraints that you don't understand, refer to the documentation for the UIView property translatesAutoresizingMaskIntoConstraints) \
-(\
-    "<NSAutoresizingMaskLayoutConstraint:0x60000078edf0 h=--& v=--& _UIButtonBarButton:0x7facf8e09180.height == 0   (active)>",\
-    "<NSLayoutConstraint:0x600000794500 V:|-(6)-[_UIUCBKBSelectionBackground:0x7facf8eaaa20]   (active, names: '|':_UIButtonBarButton:0x7facf8e09180 )>",\
-    "<NSLayoutConstraint:0x6000007945a0 _UIUCBKBSelectionBackground:0x7facf8eaaa20.bottom == _UIButtonBarButton:0x7facf8e09180.bottom - 6   (active)>"\
-)\
-\
-Will attempt to recover by breaking constraint \
-<NSLayoutConstraint:0x6000007945a0 _UIUCBKBSelectionBackground:0x7facf8eaaa20.bottom == _UIButtonBarButton:0x7facf8e09180.bottom - 6   (active)>\
-\
-Make a symbolic breakpoint at UIViewAlertForUnsatisfiableConstraints to catch this in the debugger.\
-The methods in the UIConstraintBasedLayoutDebugging category on UIView listed in <UIKitCore/UIView.h> may also be helpful.\
-2021-01-10 11:24:44.254250+0900 TresorMockup4[2860:209229] [LayoutConstraints] Unable to simultaneously satisfy constraints.\
-	Probably at least one of the constraints in the following list is one you don't want. \
-	Try this: \
-		(1) look at each constraint and try to figure out which you don't expect; \
-		(2) find the code that added the unwanted constraint or constraints and fix it. \
-	(Note: If you're seeing NSAutoresizingMaskLayoutConstraints that you don't understand, refer to the documentation for the UIView property translatesAutoresizingMaskIntoConstraints) \
-(\
-    "<NSAutoresizingMaskLayoutConstraint:0x60000078f890 h=--& v=--& _UIButtonBarButton:0x7facf8cc9be0.height == 0   (active)>",\
-    "<NSLayoutConstraint:0x60000078ead0 V:|-(6)-[_UIUCBKBSelectionBackground:0x7facf8cca3e0]   (active, names: '|':_UIButtonBarButton:0x7facf8cc9be0 )>",\
-    "<NSLayoutConstraint:0x60000078eb70 _UIUCBKBSelectionBackground:0x7facf8cca3e0.bottom == _UIButtonBarButton:0x7facf8cc9be0.bottom - 6   (active)>"\
-)\
-\
-Will attempt to recover by breaking constraint \
-<NSLayoutConstraint:0x60000078eb70 _UIUCBKBSelectionBackground:0x7facf8cca3e0.bottom == _UIButtonBarButton:0x7facf8cc9be0.bottom - 6   (active)>\
-\
-Make a symbolic breakpoint at UIViewAlertForUnsatisfiableConstraints to catch this in the debugger.\
-The methods in the UIConstraintBasedLayoutDebugging category on UIView listed in <UIKitCore/UIView.h> may also be helpful.\
-2021-01-10 11:24:44.256147+0900 TresorMockup4[2860:209229] [LayoutConstraints] Unable to simultaneously satisfy constraints.\
-	Probably at least one of the constraints in the following list is one you don't want. \
-	Try this: \
-		(1) look at each constraint and try to figure out which you don't expect; \
-		(2) find the code that added the unwanted constraint or constraints and fix it. \
-	(Note: If you're seeing NSAutoresizingMaskLayoutConstraints that you don't understand, refer to the documentation for the UIView property translatesAutoresizingMaskIntoConstraints) \
-(\
-    "<NSAutoresizingMaskLayoutConstraint:0x6000007980f0 h=--& v=--& _UIButtonBarButton:0x7facf8cce5a0.height == 0   (active)>",\
-    "<NSLayoutConstraint:0x60000078fe30 V:|-(6)-[_UIUCBKBSelectionBackground:0x7facf8cd3520]   (active, names: '|':_UIButtonBarButton:0x7facf8cce5a0 )>",\
-    "<NSLayoutConstraint:0x60000078fed0 _UIUCBKBSelectionBackground:0x7facf8cd3520.bottom == _UIButtonBarButton:0x7facf8cce5a0.bottom - 6   (active)>"\
-)\
-\
-Will attempt to recover by breaking constraint \
-<NSLayoutConstraint:0x60000078fed0 _UIUCBKBSelectionBackground:0x7facf8cd3520.bottom == _UIButtonBarButton:0x7facf8cce5a0.bottom - 6   (active)>\
-\
-Make a symbolic breakpoint at UIViewAlertForUnsatisfiableConstraints to catch this in the debugger.\
-The methods in the UIConstraintBasedLayoutDebugging category on UIView listed in <UIKitCore/UIView.h> may also be helpful.\
-2021-01-10 11:24:44.260541+0900 TresorMockup4[2860:209229] [LayoutConstraints] Unable to simultaneously satisfy constraints.\
-	Probably at least one of the constraints in the following list is one you don't want. \
-	Try this: \
-		(1) look at each constraint and try to figure out which you don't expect; \
-		(2) find the code that added the unwanted constraint or constraints and fix it. \
-	(Note: If you're seeing NSAutoresizingMaskLayoutConstraints that you don't understand, refer to the documentation for the UIView property translatesAutoresizingMaskIntoConstraints) \
-(\
-    "<NSAutoresizingMaskLayoutConstraint:0x6000007987d0 h=--& v=--& _UIButtonBarButton:0x7facf8cd3bf0.height == 0   (active)>",\
-    "<NSLayoutConstraint:0x600000725130 V:|-(6)-[_UIUCBKBSelectionBackground:0x7facfd007ab0]   (active, names: '|':_UIButtonBarButton:0x7facf8cd3bf0 )>",\
-    "<NSLayoutConstraint:0x600000725400 _UIUCBKBSelectionBackground:0x7facfd007ab0.bottom == _UIButtonBarButton:0x7facf8cd3bf0.bottom - 6   (active)>"\
-)\
-\
-Will attempt to recover by breaking constraint \
-<NSLayoutConstraint:0x600000725400 _UIUCBKBSelectionBackground:0x7facfd007ab0.bottom == _UIButtonBarButton:0x7facf8cd3bf0.bottom - 6   (active)>\
-\
-Make a symbolic breakpoint at UIViewAlertForUnsatisfiableConstraints to catch this in the debugger.\
-The methods in the UIConstraintBasedLayoutDebugging category on UIView listed in <UIKitCore/UIView.h> may also be helpful.\
-2021-01-10 11:24:44.261070+0900 TresorMockup4[2860:209229] [LayoutConstraints] Unable to simultaneously satisfy constraints.\
-	Probably at least one of the constraints in the following list is one you don't want. \
-	Try this: \
-		(1) look at each constraint and try to figure out which you don't expect; \
-		(2) find the code that added the unwanted constraint or constraints and fix it. \
-	(Note: If you're seeing NSAutoresizingMaskLayoutConstraints that you don't understand, refer to the documentation for the UIView property translatesAutoresizingMaskIntoConstraints) \
-(\
-    "<NSAutoresizingMaskLayoutConstraint:0x600000791310 h=--& v=--& _UIButtonBarButton:0x7facfd007c30.height == 0   (active)>",\
-    "<NSLayoutConstraint:0x600000724820 V:|-(6)-[_UIUCBKBSelectionBackground:0x7facfd008430]   (active, names: '|':_UIButtonBarButton:0x7facfd007c30 )>",\
-    "<NSLayoutConstraint:0x600000724780 _UIUCBKBSelectionBackground:0x7facfd008430.bottom == _UIButtonBarButton:0x7facfd007c30.bottom - 6   (active)>"\
-)\
-\
-Will attempt to recover by breaking constraint \
-<NSLayoutConstraint:0x600000724780 _UIUCBKBSelectionBackground:0x7facfd008430.bottom == _UIButtonBarButton:0x7facfd007c30.bottom - 6   (active)>\
-\
-Make a symbolic breakpoint at UIViewAlertForUnsatisfiableConstraints to catch this in the debugger.\
-The methods in the UIConstraintBasedLayoutDebugging category on UIView listed in <UIKitCore/UIView.h> may also be helpful.\
-2021-01-10 11:24:44.261849+0900 TresorMockup4[2860:209229] [LayoutConstraints] Unable to simultaneously satisfy constraints.\
-	Probably at least one of the constraints in the following list is one you don't want. \
-	Try this: \
-		(1) look at each constraint and try to figure out which you don't expect; \
-		(2) find the code that added the unwanted constraint or constraints and fix it. \
-	(Note: If you're seeing NSAutoresizingMaskLayoutConstraints that you don't understand, refer to the documentation for the UIView property translatesAutoresizingMaskIntoConstraints) \
-(\
-    "<NSAutoresizingMaskLayoutConstraint:0x600000791680 h=--& v=--& _UIButtonBarButton:0x7facfd0085b0.height == 0   (active)>",\
-    "<NSLayoutConstraint:0x6000007910e0 V:|-(6)-[_UIUCBKBSelectionBackground:0x7facfd0092c0]   (active, names: '|':_UIButtonBarButton:0x7facfd0085b0 )>",\
-    "<NSLayoutConstraint:0x6000007911d0 _UIUCBKBSelectionBackground:0x7facfd0092c0.bottom == _UIButtonBarButton:0x7facfd0085b0.bottom - 6   (active)>"\
-)\
-\
-Will attempt to recover by breaking constraint \
-<NSLayoutConstraint:0x6000007911d0 _UIUCBKBSelectionBackground:0x7facfd0092c0.bottom == _UIButtonBarButton:0x7facfd0085b0.bottom - 6   (active)>\
-\
-Make a symbolic breakpoint at UIViewAlertForUnsatisfiableConstraints to catch this in the debugger.\
-The methods in the UIConstraintBasedLayoutDebugging category on UIView listed in <UIKitCore/UIView.h> may also be helpful.\
-2021-01-10 11:24:46.895332+0900 TresorMockup4[2860:209229] [DEBUG] 
+\f0\b  main TresorMockup4/CryptorUI.open(_:):91 - already authenticated\
+2021-01-31 23:11:23.982800+0900 TresorMockup4[6572:678184] [DEBUG] 
 \f1\b0 \uc0\u55357 \u56474 
-\f0\b  main TresorMockup4/DetailView.body:203 - editMode.isEditing = Optional(true)\
-2021-01-10 11:24:50.018128+0900 TresorMockup4[2860:209229] [DEBUG] 
+\f0\b  main TresorMockup4/CryptorUI.authenticated:32 - authenticated timer canceled\
+2021-01-31 23:11:30.750115+0900 TresorMockup4[6572:678184] [ERROR] 
+\f1\b0 \uc0\u10084 \u65039 
+\f0\b  main TresorMockup4/DetailView.section_account:146 - encrypt failed error=notOpened\
+2021-01-31 23:11:31.067762+0900 TresorMockup4[6572:678184] [DEBUG] 
 \f1\b0 \uc0\u55357 \u56474 
-\f0\b  main TresorMockup4/DetailView.body:244 - Site will save <TresorMockup4.Site: 0x60000073e620> (entity: Site; id: 0x90cd9c7f43eecd3d <x-coredata://CE502525-3DA5-4065-9ADF-9D2F7BB28E9B/Site/p26>; data: \{\
-    charSet = 0;\
-    createdAt = "2021-01-10 02:24:26 +0000";\
-    maxLength = 4;\
-    memo = "https://ja.wikipedia.org/wiki/\\U6b53\\U559c\\U306e\\U6b4c\\n\\n\\U300c\\U6b53\\U559c\\U306b\\U5bc4\\U305b\\U3066\\U300d\\n   \\U30e8\\U30fc\\U30cf\\U30f3\\U30fb\\U30af\\U30ea\\U30b9\\U30c8\\U30d5\\U30fb\\U30d5\\U30ea\\U30fc\\U30c9\\U30ea\\U30d2\\U30fb\\U30d5\\U30a9\\U30f3\\U30fb\\U30b7\\U30e9\\U30fc\\n\\n\\U304a\\U304a\\U53cb\\U3088\\U3001\\U3053\\U306e\\U3088\\U3046\\U306a\\U97f3\\U3067\\U306f\\U306a\\U3044\\Uff01\\n\\U6211\\U3005\\U306f\\U3082\\U3063\\U3068\\U5fc3\\U5730\\U3088\\U3044\\n\\U3082\\U3063\\U3068\\U6b53\\U559c\\U306b\\U6e80\\U3061\\U6ea2\\U308c\\U308b\\U6b4c\\U3092\\U6b4c\\U304a\\U3046\\U3067\\U306f\\U306a\\U3044\\U304b\\n\\n\\U6b53\\U559c\\U3088\\U3001\\U795e\\U3005\\U306e\\U9e97\\U3057\\U304d\\U970a\\U611f\\U3088\\n\\U5929\\U4e0a\\U306e\\U697d\\U5712\\U306e\\U4e59\\U5973\\U3088\\n\\U6211\\U3005\\U306f\\U706b\\U306e\\U3088\\U3046\\U306b\\U9154\\U3044\\U3057\\U308c\\U3066\\n\\U5d07\\U9ad8\\U306a\\U6c5d\\Uff08\\U6b53\\U559c\\Uff09\\U306e\\U8056\\U6240\\U306b\\U5165\\U308b\\n\\n\\U6c5d\\U304c\\U9b54\\U529b\\U306f\\U518d\\U3073\\U7d50\\U3073\\U5408\\U308f\\U305b\\U308b\\n\\U6642\\U6d41\\U304c\\U5f37\\U304f\\U5207";\
-    password = "pass-15";\
-    passwords = "<relationship fault: 0x6000024e0500 'passwords'>";\
-    pinned = 0;\
-    selectAt = "2021-01-10 02:24:26 +0000";\
-    state = 2;\
-    title = isoantibody;\
-    titleSort = isoantibody;\
-    url = "https://auth.isoantibody.ed.mo";\
-    userid = "user-15";\
-    uuid = "2AE1D210-D7C4-4B1C-92AD-5238C8830A63";\
-\})\
-Fatal error: Attempted to read an unowned reference but the object was already deallocated2021-01-10 11:24:50.021542+0900 TresorMockup4[2860:209229] Fatal error: Attempted to read an unowned reference but the object was already deallocated\
-
-\f2\b0 Fatal error: Attempted to read an unowned reference but the object was already deallocated
-\f0\b \
-
-\f2\b0 CoreSimulator 732.18.6 - Device: iPad Pro (9.7-inch) (8F9D2DCD-6F1F-4508-98E6-DFB738AD8B22) - Runtime: iOS 14.3 (18C61) - DeviceType: iPad Pro (9.7-inch)
-\f0\b \
-\cf4 (lldb) \cf2 self\
-
-\f2\b0 error: 'self' is not a valid command.
-\f0\b \
-\cf4 (lldb) \cf2 po self\
-
-\f2\b0 \uc0\u9663  EditView
-\f0\b \
-
-\f2\b0   \uc0\u9663  _item : StateObject<Site>
-\f0\b \
-
-\f2\b0     \uc0\u9663  storage : Storage
-\f0\b \
-
-\f2\b0       \uc0\u9663  object : ObservedObject<Site>
-\f0\b \
-
-\f2\b0         - _seed : 2
-\f0\b \
-
-\f2\b0         - wrappedValue : <TresorMockup4.Site: 0x60000073e620> (entity: Site; id: 0x90cd9c7f43eecd3d <x-coredata://CE502525-3DA5-4065-9ADF-9D2F7BB28E9B/Site/p26>; data: \{
-\f0\b \
-
-\f2\b0     charSet = 0;
-\f0\b \
-
-\f2\b0     createdAt = "2021-01-10 02:24:26 +0000";
-\f0\b \
-
-\f2\b0     maxLength = 4;
-\f0\b \
-
-\f2\b0     memo = "https://ja.wikipedia.org/wiki/\\U6b53\\U559c\\U306e\\U6b4c\\n\\n\\U300c\\U6b53\\U559c\\U306b\\U5bc4\\U305b\\U3066\\U300d\\n   \\U30e8\\U30fc\\U30cf\\U30f3\\U30fb\\U30af\\U30ea\\U30b9\\U30c8\\U30d5\\U30fb\\U30d5\\U30ea\\U30fc\\U30c9\\U30ea\\U30d2\\U30fb\\U30d5\\U30a9\\U30f3\\U30fb\\U30b7\\U30e9\\U30fc\\n\\n\\U304a\\U304a\\U53cb\\U3088\\U3001\\U3053\\U306e\\U3088\\U3046\\U306a\\U97f3\\U3067\\U306f\\U306a\\U3044\\Uff01\\n\\U6211\\U3005\\U306f\\U3082\\U3063\\U3068\\U5fc3\\U5730\\U3088\\U3044\\n\\U3082\\U3063\\U3068\\U6b53\\U559c\\U306b\\U6e80\\U3061\\U6ea2\\U308c\\U308b\\U6b4c\\U3092\\U6b4c\\U304a\\U3046\\U3067\\U306f\\U306a\\U3044\\U304b\\n\\n\\U6b53\\U559c\\U3088\\U3001\\U795e\\U3005\\U306e\\U9e97\\U3057\\U304d\\U970a\\U611f\\U3088\\n\\U5929\\U4e0a\\U306e\\U697d\\U5712\\U306e\\U4e59\\U5973\\U3088\\n\\U6211\\U3005\\U306f\\U706b\\U306e\\U3088\\U3046\\U306b\\U9154\\U3044\\U3057\\U308c\\U3066\\n\\U5d07\\U9ad8\\U306a\\U6c5d\\Uff08\\U6b53\\U559c\\Uff09\\U306e\\U8056\\U6240\\U306b\\U5165\\U308b\\n\\n\\U6c5d\\U304c\\U9b54\\U529b\\U306f\\U518d\\U3073\\U7d50\\U3073\\U5408\\U308f\\U305b\\U308b\\n\\U6642\\U6d41\\U304c\\U5f37\\U304f\\U5207";
-\f0\b \
-
-\f2\b0     password = "pass-15";
-\f0\b \
-
-\f2\b0     passwords = "<relationship fault: 0x6000024e0500 'passwords'>";
-\f0\b \
-
-\f2\b0     pinned = 0;
-\f0\b \
-
-\f2\b0     selectAt = "2021-01-10 02:24:26 +0000";
-\f0\b \
-
-\f2\b0     state = 2;
-\f0\b \
-
-\f2\b0     title = isoantibody;
-\f0\b \
-
-\f2\b0     titleSort = isoantibody;
-\f0\b \
-
-\f2\b0     url = "https://auth.isoantibody.ed.mo";
-\f0\b \
-
-\f2\b0     userid = "user-15";
-\f0\b \
-
-\f2\b0     uuid = "2AE1D210-D7C4-4B1C-92AD-5238C8830A63";
-\f0\b \
-
-\f2\b0 \})
-\f0\b \
-
-\f2\b0   \uc0\u9663  _title : State<String>
-\f0\b \
-
-\f2\b0     - _value : "isoantibody"
-\f0\b \
-
-\f2\b0     \uc0\u9663  _location : Optional<AnyLocation<String>>
-\f0\b \
-
-\f2\b0       \uc0\u9663  some : <StoredLocation<String>: 0x600002afebb0>
-\f0\b \
-
-\f2\b0   \uc0\u9663  _titleSort : State<String>
-\f0\b \
-
-\f2\b0     - _value : "isoantibody"
-\f0\b \
-
-\f2\b0     \uc0\u9663  _location : Optional<AnyLocation<String>>
-\f0\b \
-
-\f2\b0       \uc0\u9663  some : <StoredLocation<String>: 0x600002afed00>
-\f0\b \
-
-\f2\b0   \uc0\u9663  _url : State<String>
-\f0\b \
-
-\f2\b0     - _value : "https://auth.isoantibody.ed.mo"
-\f0\b \
-
-\f2\b0     \uc0\u9663  _location : Optional<AnyLocation<String>>
-\f0\b \
-
-\f2\b0       \uc0\u9663  some : <StoredLocation<String>: 0x600002aff180>
-\f0\b \
-
-\f2\b0   \uc0\u9663  _userid : State<String>
-\f0\b \
-
-\f2\b0     - _value : "user-15"
-\f0\b \
-
-\f2\b0     \uc0\u9663  _location : Optional<AnyLocation<String>>
-\f0\b \
-
-\f2\b0       \uc0\u9663  some : <StoredLocation<String>: 0x600002aff360>
-\f0\b \
-
-\f2\b0   \uc0\u9663  _password : State<String>
-\f0\b \
-
-\f2\b0     - _value : "pass-15"
-\f0\b \
-
-\f2\b0     \uc0\u9663  _location : Optional<AnyLocation<String>>
-\f0\b \
-
-\f2\b0       \uc0\u9663  some : <StoredLocation<String>: 0x600002aff3c0>
-\f0\b \
-
-\f2\b0   \uc0\u9663  _mlength : State<Float>
-\f0\b \
-
-\f2\b0     - _value : 4.0
-\f0\b \
-
-\f2\b0     \uc0\u9663  _location : Optional<AnyLocation<Float>>
-\f0\b \
-
-\f2\b0       \uc0\u9663  some : <StoredLocation<Float>: 0x600002aff480>
-\f0\b \
-
-\f2\b0   \uc0\u9663  _chars : State<Int>
-\f0\b \
-
-\f2\b0     - _value : 0
-\f0\b \
-
-\f2\b0     \uc0\u9663  _location : Optional<AnyLocation<Int>>
-\f0\b \
-
-\f2\b0       \uc0\u9663  some : <StoredLocation<Int>: 0x600002aff4e0>
-\f0\b \
-
-\f2\b0   \uc0\u9663  _showPassowrd : State<Bool>
-\f0\b \
-
-\f2\b0     - _value : false
-\f0\b \
-
-\f2\b0     \uc0\u9663  _location : Optional<AnyLocation<Bool>>
-\f0\b \
-
-\f2\b0       \uc0\u9663  some : <StoredLocation<Bool>: 0x600002aff510>
-\f0\b \
-
-\f2\b0   \uc0\u9663  _editMode : Environment<Optional<Binding<EditMode>>>
-\f0\b \
-
-\f2\b0     \uc0\u9663  content : Content
-\f0\b \
-
-\f2\b0       \uc0\u9663  value : Optional<Binding<EditMode>>
-\f0\b \
-
-\f2\b0         \uc0\u9663  some : Binding<EditMode>
-\f0\b \
-
-\f2\b0           \uc0\u9663  transaction : Transaction
-\f0\b \
-
-\f2\b0             \uc0\u9663  plist : []
-\f0\b \
-
-\f2\b0               - elements : nil
-\f0\b \
-
-\f2\b0           \uc0\u9663  location : <StoredLocation<EditMode>: 0x600002afd920>
-\f0\b \
-
-\f2\b0           - _value : SwiftUI.EditMode.active
-\f0\b \
-
-\f2\b0   \uc0\u9663  _viewContext : Environment<NSManagedObjectContext>
-\f0\b \
-
-\f2\b0     \uc0\u9663  content : Content
-\f0\b \
-
-\f2\b0       - value : <NSManagedObjectContext: 0x600001f580d0>
-\f0\b \
-
-\f2\b0   \uc0\u9663  charsArray : 7 elements
-\f0\b \
-
-\f2\b0     \uc0\u9663  0 : CypherCharacterSet
-\f0\b \
-
-\f2\b0       - rawValue : 16384
-\f0\b \
-
-\f2\b0     \uc0\u9663  1 : CypherCharacterSet
-\f0\b \
-
-\f2\b0       - rawValue : 2097152
-\f0\b \
-
-\f2\b0     \uc0\u9663  2 : CypherCharacterSet
-\f0\b \
-
-\f2\b0       - rawValue : 2113536
-\f0\b \
-
-\f2\b0     \uc0\u9663  3 : CypherCharacterSet
-\f0\b \
-
-\f2\b0       - rawValue : 136331264
-\f0\b \
-
-\f2\b0     \uc0\u9663  4 : CypherCharacterSet
-\f0\b \
-
-\f2\b0       - rawValue : 136339968
-\f0\b \
-
-\f2\b0     \uc0\u9663  5 : CypherCharacterSet
-\f0\b \
-
-\f2\b0       - rawValue : 136342272
-\f0\b \
-
-\f2\b0     \uc0\u9663  6 : CypherCharacterSet
-\f0\b \
-
-\f2\b0       - rawValue : 1799121725
-\f0\b \
-\
-\cf4 (lldb) \
-}
+\f0\b  main TresorMockup4/DetailView.body:253 - editMode.isEditing = Optional(false)\
+2021-01-31 23:11:34.748956+0900 TresorMockup4[6572:678184] [DEBUG] 
+\f1\b0 \uc0\u55357 \u56474 
+\f0\b  main TresorMockup4/CryptorUI.open(_:):133 - evaluatePolicy=success\
+2021-01-31 23:11:34.756204+0900 TresorMockup4[6572:678184] [DEBUG] 
+\f1\b0 \uc0\u55357 \u56474 
+\f0\b  main TresorMockup4/CryptorUI.open(_:):155 - authenticated by biometrics\
+2021-01-31 23:11:38.305252+0900 TresorMockup4[6572:678184] [DEBUG] 
+\f1\b0 \uc0\u55357 \u56474 
+\f0\b  main TresorMockup4/DetailView.body:237 - onAppear\
+2021-01-31 23:11:43.650217+0900 TresorMockup4[6572:678184] [DEBUG] 
+\f1\b0 \uc0\u55357 \u56474 
+\f0\b  main TresorMockup4/CryptorUI.open(_:):133 - evaluatePolicy=success\
+2021-01-31 23:11:43.658055+0900 TresorMockup4[6572:678184] [DEBUG] 
+\f1\b0 \uc0\u55357 \u56474 
+\f0\b  main TresorMockup4/CryptorUI.open(_:):155 - authenticated by biometrics\
+2021-01-31 23:11:50.269285+0900 TresorMockup4[6572:678184] [DEBUG] 
+\f1\b0 \uc0\u55357 \u56474 
+\f0\b  main TresorMockup4/CryptorUI.open(_:):91 - already authenticated\
+2021-01-31 23:11:50.274225+0900 TresorMockup4[6572:678184] [DEBUG] 
+\f1\b0 \uc0\u55357 \u56474 
+\f0\b  main TresorMockup4/CryptorUI.authenticated:32 - authenticated timer canceled\
+2021-01-31 23:11:53.984619+0900 TresorMockup4[6572:678184] [DEBUG] 
+\f1\b0 \uc0\u55357 \u56474 
+\f0\b  main TresorMockup4/CryptorUI.authenticated:42 - authenticated time out=30\
+2021-01-31 23:11:53.984976+0900 TresorMockup4[6572:678184] [DEBUG] 
+\f1\b0 \uc0\u55357 \u56474 
+\f0\b  main TresorMockup4/CryptorUI.authenticated:32 - authenticated timer canceled\
+Fatal error: Attempted to read an unowned reference but object 0x6000008cc660 was already deallocated2021-01-31 23:12:04.758946+0900 TresorMockup4[6572:678184] Fatal error: Attempted to read an unowned reference but object 0x6000008cc660 was already deallocated\
+
+\f2\b0 Fatal error: Attempted to read an unowned reference but object 0x6000008cc660 was already deallocated
+\f0\b \
+
+\f2\b0 CoreSimulator 732.18.6 - Device: iPhone SE (2nd generation) (D60F24AC-1D80-4DEC-B798-D02A1201E65D) - Runtime: iOS 14.4 (18D46) - DeviceType: iPhone SE (2nd generation)
+\f0\b \
+\cf4 (lldb) }

@@ -70,9 +70,7 @@ struct EditView: View {
     @State private var plainPass:   String = ""
     @State private var mlength:     Float  = 4.0
     @State private var chars:       Int    = 0
-    
-    @State private var state:       Bool?  = nil
-    
+        
     @Environment(\.editMode) var editMode
     @Environment(\.managedObjectContext) private var viewContext
     
@@ -136,47 +134,46 @@ struct EditView: View {
             
             HStack {
                 Group {
-                    if self.state == nil {
-                        Text("********")
+                    if self.cryptor.opened {
+                        TextField("", text: self.$plainPass)
+                            .disableAutocorrection(true)
+                            .autocapitalization(.none)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
                     } else {
-                        TextField("", text: self.$plainPass) { _ in
-                            do {
-                                try self.cipherPass = cryptor.encrypt(plain: self.plainPass)
-                            } catch let error {
-                                J1Logger.shared.error("encrypt failed error=\(error)")
-                            }
-                        } onCommit: {
-                            do {
-                                try self.cipherPass = cryptor.encrypt(plain: self.plainPass)
-                            } catch let error {
-                                J1Logger.shared.error("encrypt failed error=\(error)")
-                            }
-                        }
-                        .disableAutocorrection(true)
-                        .autocapitalization(.none)
-                    } // else
+                        Text("********")
+                    } //
                 } // Group
                 Spacer()
                 Button {
                     withAnimation {
                         self.cryptor.toggle {
-                            guard $0 != nil else { return }
-                            guard $0! else { return }
-                            self.state = {
-                                guard self.cryptor.opened else { return nil }
+                            switch $0 {
+                            case nil:   // authentication failed, nothing to do
+                                return
+                            case false: // when closed, encrypt plainPass and store it to cipherPasss
+                                guard !self.plainPass.isEmpty else {
+                                    self.cipherPass = "" // clear password
+                                    return
+                                }
+                                do {
+                                    self.cipherPass = try cryptor.encrypt(plain: self.plainPass)
+                                } catch let error {
+                                    J1Logger.shared.error("encrypt failed error=\(error)")
+                                }
+                            case true:  // when opened, decrypt cipherPass and sotre it to plainPass
                                 guard !self.cipherPass.isEmpty else {
-                                    self.plainPass = ""
-                                    return false
+                                    self.plainPass = "" // no password
+                                    return
                                 }
                                 do {
                                     self.plainPass = try cryptor.decrypt(cipher: self.cipherPass)
                                 } catch let error {
                                     J1Logger.shared.error("decrypt failed: \(self.cipherPass) error=\(error)")
-                                    return false
                                 }
-                                return true
-                            }()
-                        } // toggle
+                            default:    // unknown status
+                                break
+                            }
+                         } // toggle
                     }
                 } label: {
                     Image(systemName: self.cryptor.opened ? "eye.slash.fill" : "eye.fill")
