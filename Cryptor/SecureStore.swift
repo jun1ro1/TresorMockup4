@@ -63,7 +63,7 @@ internal class SecureStore {
         }
         result = nil
         
-        #if DEBUG
+        #if DEBUG && DEBUG_CRYPTOR_UT
         J1Logger.shared.debug("label=\(label) query=[\(self.queryString)]" +
             " SecItemCopyMatching=\(self.errorString(status))")
         #endif
@@ -94,7 +94,8 @@ internal class SecureStore {
         let status = withUnsafeMutablePointer(to: &result) {
             SecItemCopyMatching(self.query as CFDictionary, UnsafeMutablePointer($0))
         }
-        #if DEBUG
+        
+        #if DEBUG && DEBUG_CRYPTOR_UT
         J1Logger.shared.debug("label=\(label) query=[\(self.queryString)]" +
             " SecItemCopyMatching=\(self.errorString(status))")
         #endif
@@ -112,8 +113,8 @@ internal class SecureStore {
             throw CryptorError.SecItemBroken
         }
 
-        #if DEBUG
-//        SwiftyBeaver.debug("label=\(label) kSecValueData=\(data as NSData)")
+        #if DEBUG && DEBUG_CRYPTOR_UT
+        J1Logger.shared.debug("label=\(label) kSecValueData=\(data as NSData)")
         #endif
 
         self.dateCreated  = items[kSecAttrCreationDate     as String] as? Date
@@ -131,7 +132,7 @@ internal class SecureStore {
         let status = SecItemAdd(self.query as CFDictionary, nil)
         self.mutex.unlock()
 
-        #if DEBUG
+        #if DEBUG && DEBUG_CRYPTOR_UT
         J1Logger.shared.debug("label=\(label) query=[\(self.queryString)]" +
             " SecItemAdd=\(self.errorString(status))")
         #endif
@@ -150,7 +151,7 @@ internal class SecureStore {
         let status = SecItemUpdate(self.query as CFDictionary, attr as CFDictionary)
         self.mutex.unlock()
 
-        #if DEBUG
+        #if DEBUG && DEBUG_CRYPTOR_UT
         J1Logger.shared.debug("label=\(label) query=[\(self.queryString)]" +
             " SecItemUpdate=\(self.errorString(status))")
         #endif
@@ -169,7 +170,7 @@ internal class SecureStore {
         let status = SecItemDelete(self.query as NSDictionary)
         self.mutex.unlock()
 
-        #if DEBUG
+        #if DEBUG && DEBUG_CRYPTOR_UT
         J1Logger.shared.debug("label=\(label) query=[\(self.queryString)]" +
             " SecItemDelete=\(self.errorString(status))")
         #endif

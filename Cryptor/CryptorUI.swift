@@ -10,31 +10,71 @@ import LocalAuthentication
 import SwiftUI
 
 public class CryptorUI: Cryptor, ObservableObject {
-    /// A class variable for a singleton pattern
-    static var shared: CryptorUI = CryptorUI()
-        
+    
     @Published var view:          AnyView  = AnyView(EmptyView())
     @Published var shouldShow:    Bool     = false
-    @Published var authenticated: Bool     = false
-
-    private  var timer:  Timer?       = nil
-
-    func open(_ block: ((Bool) -> Void)? = nil) {
+    @Published var opened:        Bool     = false
+    
+    private var authenticated_private: Bool   = false
+    private var timer:                 Timer? = nil
+    private var duration: Int                 = 0
+        
+    init(duration: Int = 0) {
+        self.duration = duration
+    }
+    
+    fileprivate var authenticated: Bool {
+        get {
+            return self.authenticated_private
+        }
+    }
+    
+    fileprivate func authenticate(_ authenticated: Bool) {
+        if authenticated {
+            self.authenticated_private = true
+            self.opened = true
+            if let t = self.timer, t.isValid {
+                J1Logger.shared.debug("authenticated timer canceled")
+                t.invalidate()
+            }
+            
+            if self.duration > 0 {
+                self.timer = Timer.scheduledTimer(withTimeInterval: TimeInterval(self.duration),
+                                                  repeats: false) { timer in
+                    J1Logger.shared.debug("authenticated time out=\(self.duration)")
+                    if let t = self.timer, t.isValid {
+                        J1Logger.shared.debug("authenticated timer canceled")
+                        t.invalidate()
+                    }
+                    self.authenticated_private = false
+                    self.opened = false
+                }
+            }
+        }
+        else {
+            self.authenticated_private = false
+            self.opened = false
+            if self.duration == 0 {
+                self.authenticate(false)
+            }
+        }
+    }
+    
+    private func enterLocalPassword(_ block: ((Bool?) -> Void)?) throws -> Bool {
+        let localPass: LocalPassword? = try LocalPassword.read()
+        guard localPass != nil else { return false }
+        try self.open(password: localPass!.password!, block)
+//        try Cryptor.core.prepare(cryptor: self, password: localPass!.password!)
+        return true
+    }
+    
+    func open(_ block: ((Bool?) -> Void)? = nil) {
         guard Cryptor.core.isPrepared else {
             J1Logger.shared.debug("Cryptor is not prepared")
             self.view = AnyView(
                 PasswordRegistrationView(message: "Register a master password for this App to secure your data.",
                                          block: block, cryptorUI: self))
             self.shouldShow = true
-            return
-        }
-        
-        // It has been already authenticated in 30 seconds
-        let authenticated = self.authenticated
-        if authenticated {
-            J1Logger.shared.debug("already authenticated")
-            self.authenticated = true
-            block?(true)
             return
         }
         
@@ -47,8 +87,7 @@ public class CryptorUI: Cryptor, ObservableObject {
                 self.shouldShow = true
                 return
             }
-        }
-        catch let error {
+        } catch let error {
             J1Logger.shared.debug("LocalPssword.doesExist=\(error)")
             self.view = AnyView(
                 PasswordRegistrationView(
@@ -58,6 +97,33 @@ public class CryptorUI: Cryptor, ObservableObject {
             return
         }
         
+        // It has been already authenticated in 30 seconds
+        let authenticated = self.authenticated
+        if authenticated {
+            J1Logger.shared.debug("already authenticated")
+            do {
+                guard try self.enterLocalPassword(block) else {
+                    J1Logger.shared.error("SecureStore read password failed")
+                    self.view = AnyView(
+                        PasswordEntryView(
+                            message: "A local password is nil, please enter a master password.",
+                            block: block, cryptorUI: self))
+                    self.shouldShow = true
+                    return
+                }
+            } catch let error {
+                J1Logger.shared.error("enterLocalPassowrd Error \(error)")
+                self.view = AnyView(
+                    PasswordEntryView(
+                        message: "A local password is incorrect, please enter a master password.",
+                        block: block, cryptorUI: self))
+                self.shouldShow = true
+                return
+            }
+            self.authenticate(true)
+            return
+        }
+    
         let context = LAContext()
         let reason  = "This app uses Touch ID / Facd ID to secure your data."
         var authError: NSError? = nil
@@ -76,34 +142,19 @@ public class CryptorUI: Cryptor, ObservableObject {
                         return
                     }
                     J1Logger.shared.debug("evaluatePolicy=success")
-                    
-                    var localPass: LocalPassword? = nil
+
                     do {
-                        localPass = try LocalPassword.read()
-                    }
-                    catch let error {
-                        J1Logger.shared.error("SecureStore read password Error \(error)")
-                        self.view = AnyView(
-                            PasswordEntryView(
-                                message: "Cannot read a local password, please enter a master password.",
-                                block: block, cryptorUI: self))
-                        self.shouldShow = true
-                        return
-                    }
-                    guard localPass != nil else {
-                        J1Logger.shared.error("SecureStore read password failed")
-                        self.view = AnyView(
-                            PasswordEntryView(
-                                message: "A local password is nil, please enter a master password.",
-                                block: block, cryptorUI: self))
-                        self.shouldShow = true
-                        return
-                    }
-                    do {
-                        try Cryptor.core.prepare(cryptor: self, password: localPass!.password!)
-                    }
-                    catch let error {
-                        J1Logger.shared.error("Cryptor.prepare error = \(error)")
+                        guard try self.enterLocalPassword(block) else {
+                            J1Logger.shared.error("SecureStore read password failed")
+                            self.view = AnyView(
+                                PasswordEntryView(
+                                    message: "A local password is nil, please enter a master password.",
+                                    block: block, cryptorUI: self))
+                            self.shouldShow = true
+                            return
+                        }
+                    } catch let error {
+                        J1Logger.shared.error("enterLocalPassowrd Error \(error)")
                         self.view = AnyView(
                             PasswordEntryView(
                                 message: "A local password is incorrect, please enter a master password.",
@@ -111,9 +162,10 @@ public class CryptorUI: Cryptor, ObservableObject {
                         self.shouldShow = true
                         return
                     }
+                    
                     J1Logger.shared.debug("authenticated by biometrics")
-                    self.authenticated = true
-                    block?(true)
+                    self.authenticate(true)
+                    self.opened = true
                 }
             }
         }
@@ -126,22 +178,18 @@ public class CryptorUI: Cryptor, ObservableObject {
         }
     } // open
     
-//    func timeOut(_ duration: Double = 30.0,
-//                 _ block: @escaping () -> Void = {}) {
-//        if let t = self.timer, t.isValid {
-//            t.invalidate()
-//        }
-//        self.timer = Timer.scheduledTimer(withTimeInterval: TimeInterval( duration ),
-//                                          repeats: false) { _ in
-//            J1Logger.shared.debug("authenticated time out=\(duration)")
-//            block()
-//            try? self.close()
-//        }
-//    }
-
-    override func close() throws {
-        self.authenticated = false
-        try super.close()
+    override func close(_ block: ((Bool) -> Void)? = nil) {
+        self.opened = false
+        try? super.close()
+    }
+    
+    func toggle(_ block: ((Bool?) -> Void)? = nil) {
+        if self.opened {
+            self.close()
+        }
+        else {
+            self.open(block)
+        }
     }
 }
 
@@ -179,11 +227,12 @@ struct PasswordRegistrationView: View {
         
         do {
             try Cryptor.core.register(cryptor: self.cryptorUI, password: self.password1)
+            self.cryptorUI.opened = true
         }
         catch let error {
             J1Logger.shared.error("Cryptor.prepare error = \(error)")
             self.cryptorUI.shouldShow    = false
-            self.cryptorUI.authenticated = false
+            self.cryptorUI.authenticate(false)
             self.block?(false)
             return
         }
@@ -195,13 +244,13 @@ struct PasswordRegistrationView: View {
         catch let error {
             J1Logger.shared.error("SecureStore write pass Error \(error)")
             self.cryptorUI.shouldShow    = false
-            self.cryptorUI.authenticated = false
+            self.cryptorUI.authenticate(false)
             self.block?(false)
             return
         }
         
         self.cryptorUI.shouldShow    = false
-        self.cryptorUI.authenticated = true
+        self.cryptorUI.authenticate(true)
         self.block?(true)
     }
     
@@ -270,7 +319,7 @@ struct PasswordEntryView: View {
     @State var message:   String
     var block: ((Bool) -> Void)?
     var cryptorUI: CryptorUI
-
+    
     @State private var showPassword = false
     @State private var password1 = ""
     
@@ -303,7 +352,7 @@ struct PasswordEntryView: View {
         guard self.retries <= MAX_RETRIES else {
             J1Logger.shared.error("retry count over = \(retries)")
             self.cryptorUI.shouldShow    = false
-            self.cryptorUI.authenticated = false
+            self.cryptorUI.authenticate(false)
             self.block?(false)
             return
         }
@@ -327,6 +376,7 @@ struct PasswordEntryView: View {
         
         do {
             try Cryptor.core.prepare(cryptor: self.cryptorUI, password: self.password1)
+            self.cryptorUI.opened = true
         }
         catch let error {
             J1Logger.shared.error("Cryptor.prepare error = \(error)")
@@ -337,7 +387,7 @@ struct PasswordEntryView: View {
         }
         
         self.cryptorUI.shouldShow    = false
-        self.cryptorUI.authenticated = true
+        self.cryptorUI.authenticate(true)
         self.block?(true)
     }
     
@@ -421,8 +471,8 @@ struct PasswordView_Previews: PreviewProvider {
     
     static var previews: some View {
         Group {
-            PasswordRegistrationView(message: "Registration View", cryptorUI: CryptorUI.shared)
-            PasswordEntryView(message: "Password Entry View", cryptorUI: CryptorUI.shared)
+            PasswordRegistrationView(message: "Registration View", cryptorUI: CryptorUI())
+            PasswordEntryView(message: "Password Entry View", cryptorUI: CryptorUI())
         }
     }
 }

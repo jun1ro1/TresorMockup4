@@ -4,13 +4,14 @@
 //
 //  Created by OKU Junichirou on 2020/11/14.
 //
+// https://stackoverflow.com/questions/57730074/transition-animation-not-working-in-swiftui
 
 import SwiftUI
 
 @main
 struct TresorMockup4App: App {
     let persistenceController   = PersistenceController.shared
-    @ObservedObject var ui = CryptorUI.shared
+    @ObservedObject var cryptor = CryptorUI()
     @State          var success: Bool? = nil
     
     var body: some Scene {
@@ -23,28 +24,21 @@ struct TresorMockup4App: App {
                 .environment(\.managedObjectContext, self.persistenceController.container.viewContext)
                 .onAppear {
                     #if DEBUG
-                    TestData.shared.saveDummyData()
+                    TestData.shared.saveDummyData(cryptor: self.cryptor)
                     #endif
                 }
             case false:
                 HaltView()
             default:
-                NavigationView {
-                    OpeningView()
-                        .onAppear {
-//                            DispatchQueue.global(qos: .background)
-//                                .asyncAfter(deadline: .now() + Cryptor.DURATION) {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                                self.ui.open { self.success = $0 }
-                            }
-//                            #if DEBUG
-//                            TestData.shared.saveDummyData()
-//                            #endif
+                OpeningView()
+                    .onAppear {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
+                            self.cryptor.open { self.success = $0 }
                         }
-                        .sheet(isPresented: self.$ui.shouldShow) {
-                            self.ui.view
-                        }
-                }
+                    }
+                    .sheet(isPresented: self.$cryptor.shouldShow) {
+                        self.cryptor.view
+                    }
             }
         }
     }
@@ -59,6 +53,7 @@ struct OpeningView: View {
             .font(.largeTitle)
             .multilineTextAlignment(.center)
             .padding()
+            .transition(AnyTransition.opacity.animation(.easeInOut(duration: 0.7)))
     }
 }
 

@@ -20,9 +20,9 @@ struct DetailView: View {
     
     var body: some View {
         Group {
-//            if self.item == nil {
-//                NotSelectedView()
-//            }
+            //            if self.item == nil {
+            //                NotSelectedView()
+            //            }
             if self.editMode?.wrappedValue.isEditing == true {
                 EditView(item: self.item)
             }
@@ -30,7 +30,7 @@ struct DetailView: View {
                 PresentView(item: self.item)
             }
         }
-//        .navigationTitle(self.item.title ?? "")
+        //        .navigationTitle(self.item.title ?? "")
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 EditButton()
@@ -60,17 +60,18 @@ struct NewItemView: View {
 
 struct EditView: View {
     @ObservedObject var item:  Site
-    @ObservedObject var ui = CryptorUI.shared
+    @ObservedObject var cryptor = CryptorUI(duration: 30)
     
     @State private var title:       String = ""
     @State private var titleSort:   String = ""
     @State private var url:         String = ""
     @State private var userid:      String = ""
-    @State private var password:    String = "PASSWORD"
+    @State private var cipherPass:  String = ""
+    @State private var plainPass:   String = ""
     @State private var mlength:     Float  = 4.0
     @State private var chars:       Int    = 0
     
-    @State private var showPassword: Bool = false
+    @State private var state:       Bool?  = nil
     
     @Environment(\.editMode) var editMode
     @Environment(\.managedObjectContext) private var viewContext
@@ -134,49 +135,90 @@ struct EditView: View {
                 .disableAutocorrection(true)
             
             HStack {
-                PasswordTextField(title: "Password",
-                                  text: self.$password,
-                                  showPassword: self.$showPassword)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                Group {
+                    if self.state == nil {
+                        Text("********")
+                    } else {
+                        TextField("", text: self.$plainPass) { _ in
+                            do {
+                                try self.cipherPass = cryptor.encrypt(plain: self.plainPass)
+                            } catch let error {
+                                J1Logger.shared.error("encrypt failed error=\(error)")
+                            }
+                        } onCommit: {
+                            do {
+                                try self.cipherPass = cryptor.encrypt(plain: self.plainPass)
+                            } catch let error {
+                                J1Logger.shared.error("encrypt failed error=\(error)")
+                            }
+                        }
+                        .disableAutocorrection(true)
+                        .autocapitalization(.none)
+                    } // else
+                } // Group
                 Spacer()
                 Button {
-                    if !self.showPassword {
-                        self.ui.open()
-                    }
-                    else {
-                        self.showPassword.toggle()
+                    withAnimation {
+                        self.cryptor.toggle {
+                            guard $0 != nil else { return }
+                            guard $0! else { return }
+                            self.state = {
+                                guard self.cryptor.opened else { return nil }
+                                guard !self.cipherPass.isEmpty else {
+                                    self.plainPass = ""
+                                    return false
+                                }
+                                do {
+                                    self.plainPass = try cryptor.decrypt(cipher: self.cipherPass)
+                                } catch let error {
+                                    J1Logger.shared.error("decrypt failed: \(self.cipherPass) error=\(error)")
+                                    return false
+                                }
+                                return true
+                            }()
+                        } // toggle
                     }
                 } label: {
-                    Image(systemName: self.showPassword ? "eye.slash.fill" : "eye.fill")
+                    Image(systemName: self.cryptor.opened ? "eye.slash.fill" : "eye.fill")
                         .foregroundColor(.secondary)
-                }
+                } // Button label
                 .buttonStyle(PlainButtonStyle())
-            }
-            HStack {
-                Text("\(Int(self.mlength))")   // String(format: "%3d", self.mlength))
-                Spacer()
-                Slider(value: self.$mlength, in: 4...32)
-            }
-            Stepper(self.charsArray[self.chars].description,
-                    value: self.$chars,
-                    in: 0...self.charsArray.count - 1)
-            Button {
-                if let val = try? RandomData.shared.get(count: Int(self.mlength),
-                                                        in: self.charsArray[self.chars]) {
-                    // self.detailItem?.passwordCurrent = val as NSString  // ***ENCRYPT***
-                    self.password = val
-                }
-            } label: {
-                Text("Generate Password")
-                    .frame(minWidth : 0, maxWidth: .infinity,
-                           minHeight: 0, maxHeight: .infinity,
-                           alignment: .center)
-                    .foregroundColor(.accentColor)
-            }
-            .buttonStyle(PlainButtonStyle())
-        }
-    }
-
+            } // HStack
+            if self.cryptor.opened {
+                Group {
+                    HStack {
+                        Text("\(Int(self.mlength))")   // String(format: "%3d", self.mlength))
+                        Spacer()
+                        Slider(value: self.$mlength, in: 4...32)
+                    }
+                    Stepper(self.charsArray[self.chars].description,
+                            value: self.$chars,
+                            in: 0...self.charsArray.count - 1)
+                    Button {
+                        if let val = try? RandomData.shared.get(count: Int(self.mlength),
+                                                                in: self.charsArray[self.chars]) {
+                            // self.detailItem?.passwordCurrent = val as NSString  // ***ENCRYPT***
+                            self.plainPass  = val
+                            do {
+                                try self.cipherPass = cryptor.encrypt(plain: self.plainPass)
+                            } catch let error {
+                                J1Logger.shared.error("encrypt failed error=\(error)")
+                            }
+                        }
+                    } label: {
+                        Text("Generate Password")
+                            .frame(minWidth : 0, maxWidth: .infinity,
+                                   minHeight: 0, maxHeight: .infinity,
+                                   alignment: .center)
+                            .foregroundColor(.accentColor)
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                } // Group
+                .transition(.slide)
+            } // if opened
+        } // Section Account
+    } // View section_account
+    
     var section_memo: some View {
         Section(header: Text("Memo")) {
             Text(self.item.memo ?? "")
@@ -197,13 +239,13 @@ struct EditView: View {
             _ = state.insert(.editing)
             self.item.state = state.rawValue
             
-            self.title     = self.item.title ?? ""
-            self.titleSort = self.item.titleSort ?? ""
-            self.url       = self.item.url   ?? ""
-            self.userid    = self.item.userid ?? ""
-            self.password  = self.item.password ?? ""
-            self.mlength   = max(Float(self.item.maxLength), 4.0)
-            self.chars     = (self.charsArray.firstIndex {
+            self.title      = self.item.title ?? ""
+            self.titleSort  = self.item.titleSort ?? ""
+            self.url        = self.item.url   ?? ""
+            self.userid     = self.item.userid ?? ""
+            self.cipherPass = self.item.password ?? ""
+            self.mlength    = max(Float(self.item.maxLength), 4.0)
+            self.chars      = (self.charsArray.firstIndex {
                                 $0.rawValue >= self.item.charSet}) ?? 0
         }
         .onDisappear { () -> Void in
@@ -218,7 +260,7 @@ struct EditView: View {
             update(&self.item.titleSort, with: self.titleSort)
             update(&self.item.url      , with: self.url)
             update(&self.item.userid   , with: self.userid)
-            update(&self.item.password , with: self.password)
+            update(&self.item.password , with: self.cipherPass)
             let i = Int16(self.mlength)
             if self.item.maxLength != i {
                 self.item.maxLength = i
@@ -229,10 +271,10 @@ struct EditView: View {
             
             if self.editMode?.wrappedValue.isEditing == true &&
                 state.isEmpty &&
-                self.title    == "" &&
-                self.url      == "" &&
-                self.userid   == "" &&
-                self.password == "" {
+                self.title      == "" &&
+                self.url        == "" &&
+                self.userid     == "" &&
+                self.cipherPass == "" {
                 // new item is cancelled
                 J1Logger.shared.debug("Site will delete \(self.item.description)")
                 withAnimation {
@@ -250,16 +292,16 @@ struct EditView: View {
             // otherwise the app crashes at "self.viewContext.save()"
             // as "Fatal error: Attempted to read an unowned reference but the object was already deallocated".
         }
-        .sheet(isPresented: self.$ui.shouldShow) {
-            self.ui.view
+        .sheet(isPresented: self.$cryptor.shouldShow) {
+            self.cryptor.view
         }
     }
 }
 
 struct PresentView: View {
     @ObservedObject var item: Site
-    @ObservedObject var ui = CryptorUI()
-
+    @ObservedObject var cryptor = CryptorUI(duration: 30)
+    
     var body: some View {
         Form {
             Section(header: Text("URL")) {
@@ -274,26 +316,26 @@ struct PresentView: View {
                 Text(self.item.userid ?? "")
                 HStack {
                     Group {
-                        if self.ui.authenticated {
-                            Text(self.item.password ?? "")
-                        }
-                        else {
-                            Text("*******")
-                        }
+                        let str: String = {
+                            guard self.cryptor.opened else {
+                                return "********"
+                            }
+                            guard let cipher = self.item.password else {
+                                return ""
+                            }
+                            guard let plain = try? cryptor.decrypt(cipher: cipher) else {
+                                J1Logger.shared.error("decrypt failed: \(cipher)")
+                                return ""
+                            }
+                            return plain
+                        }()
+                        Text(str)
                     }
                     Spacer()
                     Button {
-                        if !self.ui.authenticated {
-                            self.ui.open {
-                                guard $0 else { return }
-                                self.ui.timeOut()
-                            }
-                        }
-                        else {
-                            try? self.ui.close()
-                        }
+                        self.cryptor.toggle()
                     } label: {
-                        Image(systemName: self.ui.authenticated ? "eye.slash.fill" : "eye.fill")
+                        Image(systemName: self.cryptor.opened ? "eye.slash.fill" : "eye.fill")
                             .foregroundColor(.secondary)
                     }
                     .buttonStyle(PlainButtonStyle())
@@ -309,9 +351,10 @@ struct PresentView: View {
                 Text(self.item.memo ?? "")
             }
         }
-        .navigationTitle(self.item.title ?? "")
-        .sheet(isPresented: self.$ui.shouldShow) {
-            self.ui.view
+        //        .navigationBarItems(trailing: Image(systemName: self.ui.opened ? "lock.open" : "lock"))
+        .navigationBarTitle(self.item.title ?? "", displayMode: .automatic)
+        .sheet(isPresented: self.$cryptor.shouldShow) {
+            self.cryptor.view
         }
     }
 }

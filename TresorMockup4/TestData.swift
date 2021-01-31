@@ -17,7 +17,7 @@ class TestData {
         return manager!
     }()
     
-    func saveDummyData() {
+    func saveDummyData(cryptor: Cryptor) {
         let titles = [
             "T1",
             "T2",
@@ -228,12 +228,13 @@ class TestData {
         let formatter = ISO8601DateFormatter()
         var sites: [Dictionary<String, String>] = []
         for i in 0..<titles.count {
+            let pass = "pass-\(String(i))"
             var site =
                 [ "title": titles[i],
                   "titleSort": titles[i],
                   "url":   urls[i],
                   "userid":  "user-\(String(i))",
-                  "password": "pass-\(String(i))",
+                  "password": (try? cryptor.encrypt(plain: pass)) ?? pass,
                   "selectAt": formatter.string(from: Date())
                 ]
             

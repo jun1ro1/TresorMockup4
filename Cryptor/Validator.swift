@@ -33,7 +33,7 @@ internal class Validator {
         // get a hashed mark
         self.hashedMark = mark.hash()
 
-        #if DEBUG
+        #if DEBUG && DEBUG_CRYPTOR_UT
         J1Logger.shared.debug("mark=\(mark as NSData)")
         J1Logger.shared.debug("hashedMark=\(self.hashedMark! as NSData)")
         #endif
@@ -43,7 +43,7 @@ internal class Validator {
             return nil
         }
 
-        #if DEBUG
+        #if DEBUG && DEBUG_CRYPTOR_UT
         J1Logger.shared.debug("encryptedMark=\(self.encryptedMark! as NSData)")
         #endif
     }
@@ -73,7 +73,7 @@ internal class Validator {
             var hashedDecryptedMark: Data = decryptedMark.hash()
             defer { hashedDecryptedMark.reset() }
 
-            #if DEBUG
+            #if DEBUG && DEBUG_CRYPTOR_UT
             J1Logger.shared.debug("hashedMark=\(hashedMark! as NSData)")
             J1Logger.shared.debug("hashedDecryptedMark=\(hashedDecryptedMark as NSData)")
             #endif

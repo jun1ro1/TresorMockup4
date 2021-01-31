@@ -32,16 +32,19 @@ struct PasswordTextField: View {
     var onCommit: () -> Void = {}
     
     var body: some View {
-        if self.showPassword {
-            TextField(self.title,
-                      text: self.$text,
-                      onCommit: self.onCommit)
+        Group {
+            if self.showPassword {
+                TextField(self.title,
+                          text: self.$text,
+                          onCommit: self.onCommit)
+            }
+            else {
+                SecureField(self.title,
+                            text: self.$text,
+                            onCommit: self.onCommit)
+            }
         }
-        else {
-            SecureField(self.title,
-                        text: self.$text,
-                        onCommit: self.onCommit)
-        }
-        
+        .disableAutocorrection(true)
+        .autocapitalization(.none)        
     }
 }

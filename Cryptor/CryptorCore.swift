@@ -114,13 +114,14 @@ internal class CryptorCore {
         }
         let kek = HKDF<SHA256>.deriveKey(inputKeyMaterial: prk, salt: salt, outputByteCount: 32)                
         self.mutex.unlock()
-        #if DEBUG
+        
+        #if DEBUG && DEBUG_CRYPTOR_UT
         J1Logger.shared.debug("KEK=\(kek.data as NSData)")
         #endif
         return kek
     }
     
-    private func engage(cryptor: Cryptor, _ kek: KeyEncryptionKey) throws {
+    func engage(cryptor: Cryptor, _ kek: KeyEncryptionKey) throws {
         var sek: SessionKey = SymmetricKey(size: .bits256)
         defer { sek.reset() }
         
@@ -174,7 +175,7 @@ internal class CryptorCore {
         try CryptorSeed.write(seed)
         try Validator.write(validator)
         
-        #if DEBUG
+        #if DEBUG && DEBUG_CRYPTOR_UT
         J1Logger.shared.debug("salt=\(salt as NSData)")
         J1Logger.shared.debug("kek=\(kek.data as NSData)")
         J1Logger.shared.debug("cek=\(cek.data as NSData)")
@@ -279,7 +280,7 @@ internal class CryptorCore {
         seed.key = newcekEnc
         try CryptorSeed.update(seed)
         
-        #if DEBUG
+        #if DEBUG && DEBUG_CRYPTOR_UT
         J1Logger.shared.debug("newkek   =\(newkek.data)")
         J1Logger.shared.debug("cek      =\(cek.data)")
         J1Logger.shared.debug("newkekEnc=\(newcekEnc.data)")
@@ -293,7 +294,7 @@ internal class CryptorCore {
         
         let session = self.sessions.get(cryptor: cryptor)
         
-        #if DEBUG
+        #if DEBUG && DEBUG_CRYPTOR_UT
         J1Logger.shared.debug("session.itk=\(String(describing: session?.itk.data))")
         #endif
         guard var itk = session?.itk else {
