@@ -9,6 +9,23 @@ import Foundation
 import LocalAuthentication
 import SwiftUI
 
+struct CryptorUIKey: EnvironmentKey {
+    typealias Value = CryptorUI
+    
+    static var defaultValue: Value = CryptorUI()
+}
+
+extension EnvironmentValues {
+    var cryptor: CryptorUI {
+        get {
+            return self[CryptorUIKey.self]
+        }
+        set {
+            self[CryptorUIKey.self] = newValue
+        }
+    }
+}
+
 public class CryptorUI: Cryptor, ObservableObject {
     
     @Published var view:          AnyView  = AnyView(EmptyView())
@@ -19,7 +36,8 @@ public class CryptorUI: Cryptor, ObservableObject {
     private var timer:                 Timer? = nil
     private var duration: Int                 = 0
     
-    init(duration: Int = 0) {
+    init(name: String = "", duration: Int = 0) {
+        super.init(name: name)
         self.duration = min(max(duration, 0), 60 * 60) // max 60 minutes
     }
     
@@ -29,7 +47,7 @@ public class CryptorUI: Cryptor, ObservableObject {
         }
         set {
             if let t = self.timer, t.isValid {
-                J1Logger.shared.debug("authenticated timer canceled")
+                J1Logger.shared.debug("[\(name)] authenticated timer canceled")
                 t.invalidate()
             }
             self.authenticated_private = newValue
@@ -39,7 +57,7 @@ public class CryptorUI: Cryptor, ObservableObject {
                 if self.duration > 0 {
                     self.timer = Timer.scheduledTimer(withTimeInterval: TimeInterval(self.duration),
                                                       repeats: false) { _ in
-                        J1Logger.shared.debug("authenticated time out=\(self.duration)")
+                        J1Logger.shared.debug("[\(self.name)] authenticated time out=\(self.duration)")
                         self.authenticated = false // recursive call
                     }
                 }

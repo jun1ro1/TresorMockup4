@@ -17,8 +17,14 @@ public class Cryptor {
     internal static var core: CryptorCore = CryptorCore.shared
     
     /// The instance variable to store a session key
+    public  var name                  = ""
     internal var key:    SessionKey?  = nil
 
+    // constructor
+    public init(name: String = "") {
+        self.name = name
+    }
+    
     func open(password: String) throws {
         if Cryptor.core.isPrepared {
             try Cryptor.core.prepare(cryptor: self, password: password) // excep

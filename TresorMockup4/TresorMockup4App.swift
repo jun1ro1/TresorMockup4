@@ -11,7 +11,7 @@ import SwiftUI
 @main
 struct TresorMockup4App: App {
     let persistenceController   = PersistenceController.shared
-    @ObservedObject var cryptor = CryptorUI()
+    @ObservedObject var cryptorOpening = CryptorUI(name: "opening")
     @State          var success: Bool? = nil
     
     var body: some Scene {
@@ -22,9 +22,10 @@ struct TresorMockup4App: App {
                     ContentView()
                 }
                 .environment(\.managedObjectContext, self.persistenceController.container.viewContext)
+                .environmentObject(CryptorUI(name: "main", duration: 30))
                 .onAppear {
                     #if DEBUG
-                    TestData.shared.saveDummyData(cryptor: self.cryptor)
+                    TestData.shared.saveDummyData(cryptor: self.cryptorOpening)
                     #endif
                 }
             case false:
@@ -33,11 +34,11 @@ struct TresorMockup4App: App {
                 OpeningView()
                     .onAppear {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
-                            self.cryptor.open { self.success = $0 }
+                            self.cryptorOpening.open { self.success = $0 }
                         }
                     }
-                    .sheet(isPresented: self.$cryptor.shouldShow) {
-                        self.cryptor.view
+                    .sheet(isPresented: self.$cryptorOpening.shouldShow) {
+                        self.cryptorOpening.view
                     }
             }
         }

@@ -60,8 +60,8 @@ struct NewItemView: View {
 
 struct EditView: View {
     @ObservedObject var item:  Site
-    @ObservedObject var cryptor = CryptorUI(duration: 30)
-    
+    @ObservedObject var cryptor: CryptorUI = CryptorUI(name: "edit_password", duration: 30)
+
     @State private var title:       String = ""
     @State private var titleSort:   String = ""
     @State private var url:         String = ""
@@ -135,10 +135,22 @@ struct EditView: View {
             HStack {
                 Group {
                     if self.cryptor.opened {
-                        TextField("", text: self.$plainPass)
-                            .disableAutocorrection(true)
-                            .autocapitalization(.none)
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                        TextField("", text: self.$plainPass) {_ in
+                            do {
+                                try self.cipherPass = cryptor.encrypt(plain: self.plainPass)
+                            } catch let error {
+                                J1Logger.shared.error("encrypt failed error=\(error)")
+                            }
+                        } onCommit: {
+                            do {
+                                try self.cipherPass = cryptor.encrypt(plain: self.plainPass)
+                            } catch let error {
+                                J1Logger.shared.error("encrypt failed error=\(error)")
+                            }
+                        }
+                        .disableAutocorrection(true)
+                        .autocapitalization(.none)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
                     } else {
                         Text("********")
                     } //
@@ -211,7 +223,7 @@ struct EditView: View {
                     }
                     .buttonStyle(PlainButtonStyle())
                 } // Group
-                .transition(.slide)
+                .transition(.move(edge: .top))
             } // if opened
         } // Section Account
     } // View section_account
@@ -227,6 +239,7 @@ struct EditView: View {
             section_site
             section_title
             section_account
+                .transition(.slide)
             section_memo
         }
         .navigationTitle(self.title)
@@ -297,8 +310,8 @@ struct EditView: View {
 
 struct PresentView: View {
     @ObservedObject var item: Site
-    @ObservedObject var cryptor = CryptorUI(duration: 30)
-    
+    @EnvironmentObject var cryptor: CryptorUI
+
     var body: some View {
         Form {
             Section(header: Text("URL")) {
@@ -311,6 +324,14 @@ struct PresentView: View {
             }
             Section(header: Text("Account")) {
                 Text(self.item.userid ?? "")
+                    .contextMenu {
+                        Button(action: {
+                            UIPasteboard.general.string = self.item.userid ?? ""
+                        }) {
+                            Text("Copy")
+                            Image(systemName: "doc.on.doc")
+                        }
+                    }
                 HStack {
                     Group {
                         let str: String = {
@@ -327,6 +348,26 @@ struct PresentView: View {
                             return plain
                         }()
                         Text(str)
+                            .contextMenu {
+                                Button(action: {
+                                    self.cryptor.open {
+                                        if ($0 != nil) && $0! {
+                                            guard let cipher = self.item.password else {
+                                                return
+                                            }
+                                            guard let plain = try? cryptor.decrypt(cipher: cipher) else {
+                                                J1Logger.shared.error("decrypt failed: \(cipher)")
+                                                return
+                                                
+                                            }
+                                            UIPasteboard.general.string = plain
+                                        }
+                                    }
+                                }) {
+                                    Text("Copy")
+                                    Image(systemName: "doc.on.doc")
+                                }
+                            }
                     }
                     Spacer()
                     Button {
