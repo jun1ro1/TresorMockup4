@@ -27,6 +27,7 @@ extension Password {
         let now = Date()
         self.selectedAt = now
         site.selectAt   = now
+        site.password   = self.password
         (site.passwords?.allObjects as? [Password])?.forEach { pass in
             if pass.current {
                 pass.current = false

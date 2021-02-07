@@ -13,6 +13,7 @@ extension Site {
         self.setPrimitiveValue(Date(), forKey: "createdAt")
         self.setPrimitiveValue(UUID().uuidString, forKey: "uuid")
         self.setPrimitiveValue(8, forKey: "maxLength")
+        self.setPrimitiveValue(CypherCharacterSet.AlphaNumericsSet.rawValue, forKey: "charSet")
     }
 
     public override func willSave() {

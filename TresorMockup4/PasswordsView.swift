@@ -15,14 +15,15 @@ struct PasswordsView: View {
 
     var body: some View {
         List {
-            PasswordItemsView(items: FetchRequest<Password>(
+            PasswordItemsView(site: self.site,
+                              items: FetchRequest<Password>(
                                 entity: Password.entity(),
                                 sortDescriptors: [NSSortDescriptor(keyPath: \Password.selectedAt, ascending: false)],
                                 predicate: NSPredicate(format: "site == %@", self.site),
                                 animation: .default),
                               cryptor: self.cryptor)
         }
-        .navigationTitle("Passwords history")
+        .navigationTitle("Passwords History")
         .navigationBarItems(trailing:
                                 Button {
                                     self.cryptor.toggle()
@@ -40,6 +41,7 @@ struct PasswordsView: View {
 
 struct PasswordItemsView: View {
     @Environment(\.managedObjectContext) private var viewContext
+    @StateObject    var site: Site
     @FetchRequest   var items: FetchedResults<Password>
     @ObservedObject var cryptor: CryptorUI
     
@@ -78,6 +80,12 @@ struct PasswordItemsView: View {
                         }) {
                             Text("Copy")
                             Image(systemName: "doc.on.doc")
+                        }
+                        Button(action: {
+                            item.select(site: self.site)
+                        }) {
+                            Text("Select")
+                            Image(systemName: "checkmark.circle")
                         }
                     } // contextMenu
                 Text(pass.selectedAt == nil ?

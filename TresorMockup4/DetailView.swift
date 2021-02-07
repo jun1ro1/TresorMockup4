@@ -272,11 +272,11 @@ struct EditView: View {
                 }
                 return Float(val)
             }()
-            self.chars      =
+            self.chars =
                 self.charsArray.firstIndex {
-                    $0.rawValue >= self.site.charSet } ??
+                    CypherCharacterSet(rawValue: UInt32(self.site.charSet)).isSubset(of: $0) } ??
                 self.charsArray.firstIndex {
-                    $0.rawValue == CypherCharacterSet.AlphaNumericsSet.rawValue } ??
+                    $0 == CypherCharacterSet.AlphaNumericsSet } ??
                 0
         }
         .onDisappear { () -> Void in
