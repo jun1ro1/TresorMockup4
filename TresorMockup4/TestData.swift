@@ -226,15 +226,18 @@ class TestData {
         
         assert(titles.count == urls.count)
         let formatter = ISO8601DateFormatter()
-        var sites: [Dictionary<String, String>] = []
+
+        var collection: [(Dictionary<String, String>, Dictionary<String, String>)] = []
         for i in 0..<titles.count {
-            let pass = "pass-\(String(i))"
+            let passstr = {
+                (try? cryptor.encrypt(plain: $0)) ?? $0
+            }("pass-\(String(i))")
             var site =
                 [ "title": titles[i],
                   "titleSort": titles[i],
                   "url":   urls[i],
                   "userid":  "user-\(String(i))",
-                  "password": (try? cryptor.encrypt(plain: pass)) ?? pass,
+                  "password": passstr,
                   "selectAt": formatter.string(from: Date())
                 ]
             
@@ -246,11 +249,17 @@ class TestData {
             default:
                 break
             }
-            sites.append(site)
+            
+            let pass = [ "password": passstr,
+                         "current":  "true",
+            ]
+            collection.append( (site, pass) )
         }
         let viewContext = PersistenceController.shared.container.viewContext
-        sites.forEach {
-            let _ = Site(from: $0, context: viewContext)
+        collection.forEach {
+            let site     = Site(from: $0.0, context: viewContext)
+            let password = Password(from: $0.1, context: viewContext)
+            password.site = site
         }
         
         do {

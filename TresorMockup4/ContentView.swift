@@ -44,6 +44,7 @@ struct ContentView: View {
                         animation: .default))
         }
         .navigationTitle("Sites")
+        .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 NavigationLink(destination: NewItemView()) {
@@ -54,14 +55,13 @@ struct ContentView: View {
                 EditButton()
             }
         }
-        .navigationBarBackButtonHidden(true)
         .onAppear {
             let text = self.$searchText.wrappedValue
             self.predicate =
                 (text == "") ?
                 nil : NSPredicate(format: "title CONTAINS[cd] %@ OR url CONTAINS[cd] %@", text, text)
         }
-    }
+    } // body
 }
 
 struct ItemsView: View {
@@ -70,7 +70,7 @@ struct ItemsView: View {
     
     var body: some View {
         ForEach(self.items, id: \.self) { item in
-            NavigationLink(destination: DetailView(item: item)) {
+            NavigationLink(destination: DetailView(site: item)) {
                 VStack(alignment: .leading) {
                     Text(item.title ?? "")
                     Text(item.url ?? "")

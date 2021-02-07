@@ -15,7 +15,7 @@ import SwiftUI
 import Introspect
 
 struct DetailView: View {
-    @StateObject var item: Site
+    @StateObject var site: Site
     @Environment(\.editMode) var editMode
     
     var body: some View {
@@ -24,10 +24,10 @@ struct DetailView: View {
             //                NotSelectedView()
             //            }
             if self.editMode?.wrappedValue.isEditing == true {
-                EditView(item: self.item)
+                EditView(site: self.site)
             }
             else {
-                PresentView(item: self.item)
+                PresentView(site: self.site)
             }
         }
         //        .navigationTitle(self.item.title ?? "")
@@ -52,16 +52,16 @@ struct NewItemView: View {
     @State var editMode: EditMode = .active
     
     var body: some View {
-        DetailView(item: Site(context: self.viewContext))
+        DetailView(site: Site(context: self.viewContext))
             .environment(\.editMode, $editMode)
     }
 }
 
 
 struct EditView: View {
-    @ObservedObject var item:  Site
+    @ObservedObject var site:  Site
     @ObservedObject var cryptor: CryptorUI = CryptorUI(name: "edit_password", duration: 30)
-
+    
     @State private var title:       String = ""
     @State private var titleSort:   String = ""
     @State private var url:         String = ""
@@ -70,9 +70,13 @@ struct EditView: View {
     @State private var plainPass:   String = ""
     @State private var mlength:     Float  = 4.0
     @State private var chars:       Int    = 0
-        
+    
     @Environment(\.editMode) var editMode
     @Environment(\.managedObjectContext) private var viewContext
+    
+    let lengthMin     =  4
+    let lengthDefault =  8
+    let lengthMax     = 32
     
     private let charsArray: [CypherCharacterSet] = [
         CypherCharacterSet.DecimalDigits,
@@ -185,7 +189,7 @@ struct EditView: View {
                             default:    // unknown status
                                 break
                             }
-                         } // toggle
+                        } // toggle
                     }
                 } label: {
                     Image(systemName: self.cryptor.opened ? "eye.slash.fill" : "eye.fill")
@@ -198,7 +202,8 @@ struct EditView: View {
                     HStack {
                         Text("\(Int(self.mlength))")   // String(format: "%3d", self.mlength))
                         Spacer()
-                        Slider(value: self.$mlength, in: 4...32)
+                        Slider(value: self.$mlength,
+                               in: Float(self.lengthMin)...Float(self.lengthMax))
                     }
                     Stepper(self.charsArray[self.chars].description,
                             value: self.$chars,
@@ -230,7 +235,7 @@ struct EditView: View {
     
     var section_memo: some View {
         Section(header: Text("Memo")) {
-            Text(self.item.memo ?? "")
+            Text(self.site.memo ?? "")
         }
     }
     
@@ -245,56 +250,73 @@ struct EditView: View {
         .navigationTitle(self.title)
         .onAppear {
             J1Logger.shared.debug("onAppear")
-            var state = SiteState(rawValue: self.item.state)
-            _ = state.insert(.editing)
-            self.item.state = state.rawValue
+            self.site.on(state: .editing)
             
-            self.title      = self.item.title ?? ""
-            self.titleSort  = self.item.titleSort ?? ""
-            self.url        = self.item.url   ?? ""
-            self.userid     = self.item.userid ?? ""
-            self.cipherPass = self.item.password ?? ""
-            self.mlength    = max(Float(self.item.maxLength), 4.0)
-            self.chars      = (self.charsArray.firstIndex {
-                                $0.rawValue >= self.item.charSet}) ?? 0
+            self.title      = self.site.title ?? ""
+            self.titleSort  = self.site.titleSort ?? ""
+            self.url        = self.site.url   ?? ""
+            self.userid     = self.site.userid ?? ""
+            self.cipherPass = self.site.password ?? ""
+            self.mlength = {
+                let len = Int(self.site.maxLength)
+                var val = 0
+                switch len {
+                case ..<self.lengthMin:
+                    val = self.lengthDefault
+                case self.lengthMin...self.lengthMax:
+                    val = len
+                case (self.lengthMax + 1)...:
+                    val = self.lengthMax
+                default:
+                    val = self.lengthDefault
+                }
+                return Float(val)
+            }()
+            self.chars      =
+                self.charsArray.firstIndex {
+                    $0.rawValue >= self.site.charSet } ??
+                self.charsArray.firstIndex {
+                    $0.rawValue == CypherCharacterSet.AlphaNumericsSet.rawValue } ??
+                0
         }
         .onDisappear { () -> Void in
             let editing = self.editMode?.wrappedValue.isEditing
             J1Logger.shared.debug("editMode.isEditing = \(String(describing: editing))")
             
-            var state = SiteState(rawValue: self.item.state)
-            state.remove(.editing)
-            self.item.state = state.rawValue
+            self.site.off(state: .editing)
             
-            update(&self.item.title    , with: self.title)
-            update(&self.item.titleSort, with: self.titleSort)
-            update(&self.item.url      , with: self.url)
-            update(&self.item.userid   , with: self.userid)
-            update(&self.item.password , with: self.cipherPass)
+            update(&self.site.title    , with: self.title)
+            update(&self.site.titleSort, with: self.titleSort)
+            update(&self.site.url      , with: self.url)
+            update(&self.site.userid   , with: self.userid)
             let i = Int16(self.mlength)
-            if self.item.maxLength != i {
-                self.item.maxLength = i
+            if self.site.maxLength != i {
+                self.site.maxLength = i
             }
-            if self.item.charSet != self.chars {
-                self.item.charSet = Int32(self.chars)
+            let c = self.charsArray[self.chars].rawValue
+            if self.site.charSet != c {
+                self.site.charSet = Int32(c)
             }
             
             if self.editMode?.wrappedValue.isEditing == true &&
-                state.isEmpty &&
+                self.site.isEmptyState() &&
                 self.title      == "" &&
                 self.url        == "" &&
                 self.userid     == "" &&
                 self.cipherPass == "" {
                 // new item is cancelled
-                J1Logger.shared.debug("Site will delete \(self.item.description)")
+                J1Logger.shared.debug("Site will delete \(self.site.description)")
                 withAnimation {
-                    self.viewContext.delete(self.item)
+                    self.viewContext.delete(self.site)
                 }
             }
             else {
-                var state = SiteState(rawValue: self.item.state)
-                _ = state.insert(.saved)
-                self.item.state = state.rawValue
+                if self.site.password != self.cipherPass {
+                    self.site.password = self.cipherPass
+                    let password = Password(context: self.viewContext)
+                    password.password   = self.site.password
+                    password.select(site: self.site)
+                }
             }
             
             // NOTICE
@@ -305,92 +327,92 @@ struct EditView: View {
         .sheet(isPresented: self.$cryptor.shouldShow) {
             self.cryptor.view
         }
-    }
-}
+    } // body
+} // EditView
 
 struct PresentView: View {
-    @ObservedObject var item: Site
+    @ObservedObject var site: Site
     @EnvironmentObject var cryptor: CryptorUI
-
+    
     var body: some View {
         Form {
             Section(header: Text("URL")) {
-                if let url = URL(string: self.item.url ?? "") {
+                if let url = URL(string: self.site.url ?? "") {
                     Link(url.absoluteString, destination: url)
                 }
                 else {
-                    Text(self.item.url ?? "")
+                    Text(self.site.url ?? "")
                 }
             }
             Section(header: Text("Account")) {
-                Text(self.item.userid ?? "")
+                Text(self.site.userid ?? "")
                     .contextMenu {
                         Button(action: {
-                            UIPasteboard.general.string = self.item.userid ?? ""
+                            UIPasteboard.general.string = self.site.userid ?? ""
                         }) {
                             Text("Copy")
                             Image(systemName: "doc.on.doc")
                         }
                     }
                 HStack {
-                    Group {
-                        let str: String = {
-                            guard self.cryptor.opened else {
-                                return "********"
-                            }
-                            guard let cipher = self.item.password else {
-                                return ""
-                            }
-                            guard let plain = try? cryptor.decrypt(cipher: cipher) else {
-                                J1Logger.shared.error("decrypt failed: \(cipher)")
-                                return ""
-                            }
-                            return plain
-                        }()
-                        Text(str)
-                            .contextMenu {
-                                Button(action: {
-                                    self.cryptor.open {
-                                        if ($0 != nil) && $0! {
-                                            guard let cipher = self.item.password else {
-                                                return
-                                            }
-                                            guard let plain = try? cryptor.decrypt(cipher: cipher) else {
-                                                J1Logger.shared.error("decrypt failed: \(cipher)")
-                                                return
-                                                
-                                            }
-                                            UIPasteboard.general.string = plain
-                                        }
-                                    }
-                                }) {
-                                    Text("Copy")
-                                    Image(systemName: "doc.on.doc")
+                    NavigationLink(destination: PasswordsView(site: self.site)) {
+                        Group {
+                            let str: String = {
+                                guard self.cryptor.opened else {
+                                    return "********"
                                 }
-                            }
-                    }
-                    Spacer()
-                    Button {
-                        self.cryptor.toggle()
-                    } label: {
-                        Image(systemName: self.cryptor.opened ? "eye.slash.fill" : "eye.fill")
-                            .foregroundColor(.secondary)
-                    }
-                    .buttonStyle(PlainButtonStyle())
-                }
-                
-                Text(self.item.selectAt == nil ?
+                                guard let cipher = self.site.password else {
+                                    return ""
+                                }
+                                guard let plain = try? cryptor.decrypt(cipher: cipher) else {
+                                    J1Logger.shared.error("decrypt failed: \(cipher)")
+                                    return ""
+                                }
+                                return plain
+                            }()
+                            Text(str)
+                                .contextMenu {
+                                    Button(action: {
+                                        self.cryptor.open {
+                                            if ($0 != nil) && $0! {
+                                                guard let cipher = self.site.password else {
+                                                    return
+                                                }
+                                                guard let plain = try? cryptor.decrypt(cipher: cipher) else {
+                                                    J1Logger.shared.error("decrypt failed: \(cipher)")
+                                                    return
+                                                }
+                                                UIPasteboard.general.string = plain
+                                            }
+                                        }
+                                    }) {
+                                        Text("Copy")
+                                        Image(systemName: "doc.on.doc")
+                                    }
+                                } // contextMenu
+                        } // Group
+                        Spacer()
+                        Button {
+                            self.cryptor.toggle()
+                        } label: {
+                            Image(systemName: self.cryptor.opened ? "eye.slash.fill" : "eye.fill")
+                                .foregroundColor(.secondary)
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                    } // Navigation Link
+                } // Hstack                
+                Text(self.site.selectAt == nil ?
                         "" :
-                        DateFormatter.localizedString(from: self.item.selectAt!,
+                        DateFormatter.localizedString(from: self.site.selectAt!,
                                                       dateStyle: .medium,
                                                       timeStyle: .medium))
             }
             Section(header: Text("Memo")) {
-                Text(self.item.memo ?? "")
+                Text(self.site.memo ?? "")
             }
         }
         //        .navigationBarItems(trailing: Image(systemName: self.ui.opened ? "lock.open" : "lock"))
-        .navigationBarTitle(self.item.title ?? "", displayMode: .automatic)
+        .navigationBarTitle(self.site.title ?? "", displayMode: .automatic)
         .sheet(isPresented: self.$cryptor.shouldShow) {
             self.cryptor.view
         }
@@ -402,7 +424,7 @@ struct DetailView_Previews: PreviewProvider {
     @State static var item: Site = Site()
     
     static var previews: some View {
-        DetailView(item: item)
+        DetailView(site: item)
             .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
             .onAppear {
                 item.title = "title"

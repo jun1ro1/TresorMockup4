@@ -41,6 +41,10 @@ public class CryptorUI: Cryptor, ObservableObject {
         self.duration = min(max(duration, 0), 60 * 60) // max 60 minutes
     }
     
+    deinit {
+        J1Logger.shared.debug("[\(self.name)]")
+    }
+    
     fileprivate var authenticated: Bool {
         get {
             return self.authenticated_private
@@ -56,7 +60,8 @@ public class CryptorUI: Cryptor, ObservableObject {
             if newValue {
                 if self.duration > 0 {
                     self.timer = Timer.scheduledTimer(withTimeInterval: TimeInterval(self.duration),
-                                                      repeats: false) { _ in
+                                                      repeats: false) { [weak self] _ in
+                        guard let self = self else { return }
                         J1Logger.shared.debug("[\(self.name)] authenticated time out=\(self.duration)")
                         self.authenticated = false // recursive call
                     }
