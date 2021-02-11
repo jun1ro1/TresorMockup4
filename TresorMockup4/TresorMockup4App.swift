@@ -9,25 +9,14 @@
 
 import SwiftUI
 
-enum AppState {
+enum AppStateType {
+    case none
     case startup
     case normal
 }
 
-struct AppStateKey: EnvironmentKey {
-    typealias Value = Binding<AppState?>
-    static var defaultValue: Value = .constant(nil)
-}
-
-extension EnvironmentValues {
-    var appState: AppStateKey.Value {
-        get {
-            return self[AppStateKey.self]
-        }
-        set {
-            self[AppStateKey.self] = newValue
-        }
-    }
+class AppState: ObservableObject {
+    @Published var state: AppStateType = .none
 }
 
 @main
@@ -35,7 +24,7 @@ struct TresorMockup4App: App {
     let persistenceController   = PersistenceController.shared
     @ObservedObject var cryptorOpening = CryptorUI(name: "opening")
     @State          var success:  Bool?     = nil
-    @State          var appState: AppState? = nil
+    @StateObject    var appState: AppState  = AppState()
     
     var body: some Scene {
         WindowGroup {
@@ -45,7 +34,7 @@ struct TresorMockup4App: App {
                     CategoryView()
                 }
                 .environment(\.managedObjectContext, self.persistenceController.container.viewContext)
-                .environment(\.appState, self.$appState)
+                .environmentObject(self.appState)
                 .environmentObject(CryptorUI(name: "main", duration: 30))
                 .onAppear {
                     #if DEBUG
@@ -57,6 +46,7 @@ struct TresorMockup4App: App {
             default:
                 SplashView()
                     .onAppear {
+                        self.appState.state = .startup
                         let _ = CategoryManager.shared // initialize Category Manager
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
                             self.cryptorOpening.open { self.success = $0 }

@@ -20,7 +20,7 @@ import CoreData
 
 struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
-    @Environment(\.appState) var appState
+    @EnvironmentObject var appState: AppState
     @State private var predicate: NSPredicate? = nil
     @State private var searchText: String = ""
        
@@ -55,7 +55,7 @@ struct ContentView: View {
 //            }
         }
         .onAppear {
-            self.appState.wrappedValue = AppState.normal
+            self.appState.state = .normal
             let text = self.$searchText.wrappedValue
             self.predicate =
                 (text == "") ?

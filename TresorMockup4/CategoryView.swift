@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 struct CategoryView: View {
-    @Environment(\.appState) var appState
+    @EnvironmentObject var appState: AppState
     @Environment(\.managedObjectContext) private var viewContext
     @FetchRequest(entity: Category.entity(),
                   sortDescriptors: [NSSortDescriptor(keyPath: \Category.kind, ascending: false)],
@@ -30,9 +30,9 @@ struct CategoryView: View {
         }
         .navigationTitle("Categories")
         .onAppear {
-            switch self.appState.wrappedValue {
+            switch self.appState.state {
             case .startup:
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
                     self.select = .all
                 }
             default:
