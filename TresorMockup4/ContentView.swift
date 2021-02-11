@@ -14,6 +14,7 @@
 // https://stackoverflow.com/questions/57871088/swiftui-view-and-fetchrequest-predicate-with-variable-that-can-change
 // https://www.hackingwithswift.com/books/ios-swiftui/dynamically-filtering-fetchrequest-with-swiftui
 //https://stackoverflow.com/questions/65126986/swiftui-bottombar-toolbar-disappears-when-going-back
+// https://developer.apple.com/forums/thread/668299
 
 import SwiftUI
 import Introspect
@@ -63,7 +64,7 @@ struct ContentView: View {
                             }
                         }(),
                         animation: .default),
-                        delete: CategoryKind(rawValue: self.category.kind) == .trash)
+                      delete: CategoryKind(rawValue: self.category.kind) == .trash)
         }
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
@@ -152,17 +153,19 @@ struct ItemsView: View {
     
     private func deleteItems(offsets: IndexSet) {
         withAnimation {
-            offsets.map { self.items[$0] }.forEach { site in
-                site.passwords?.allObjects.forEach { self.viewContext.delete($0 as! NSManagedObject) }
-                self.viewContext.delete(site)
-            }
-            do {
-                try viewContext.save()
-            } catch {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                let nsError = error as NSError
-                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+            self.viewContext.perform {
+                offsets.map { self.items[$0] }.forEach { site in
+                    site.passwords?.allObjects.forEach { self.viewContext.delete($0 as! NSManagedObject) }
+                    self.viewContext.delete(site)
+                }
+                do {
+                    try viewContext.save()
+                } catch {
+                    // Replace this implementation with code to handle the error appropriately.
+                    // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+                    let nsError = error as NSError
+                    fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+                }
             }
         }
     }}
