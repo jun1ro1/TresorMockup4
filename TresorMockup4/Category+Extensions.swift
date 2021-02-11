@@ -23,6 +23,9 @@ extension Category {
         _ = state.insert(ObjectState.saved)
         self.setPrimitiveValue(state.rawValue, forKey: "state")
     }
+
+    static var CategoryAll:   Category? = nil
+    static var CategoryTrash: Category? = nil
 }
 
 
@@ -43,9 +46,6 @@ class CategoryManager {
         }
         return Self.shared_private!
     }
-    
-    static var CategoryAll:   Category? = nil
-    static var CategoryTrash: Category? = nil
     
     @FetchRequest(
         entity: Category.entity(),
@@ -90,7 +90,7 @@ class CategoryManager {
     }
     
     private func setup() {
-        Self.CategoryAll   = self.singleton(kind: .all,   name: "All")
-        Self.CategoryTrash = self.singleton(kind: .trash, name: "Trash")
+        Category.CategoryAll   = self.singleton(kind: .all,   name: "All")
+        Category.CategoryTrash = self.singleton(kind: .trash, name: "Trash")
     }
 }

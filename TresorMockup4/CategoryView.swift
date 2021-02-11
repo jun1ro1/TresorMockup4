@@ -20,11 +20,11 @@ struct CategoryView: View {
     var body: some View {
         List {
             ForEach(self.fetchedResults, id: \.self) {
-                let entity = $0 as Category
-                NavigationLink(destination: ContentView(),
-                               tag: CategoryKind(rawValue: entity.kind)!,
+                let category = $0 as Category
+                NavigationLink(destination: ContentView(category: category),
+                               tag: CategoryKind(rawValue: category.kind)!,
                                selection: self.$select) {
-                    Text(entity.name ?? "")
+                    Text(category.name ?? "")
                 }
             }
         }
