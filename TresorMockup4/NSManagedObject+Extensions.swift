@@ -8,6 +8,8 @@
 import Foundation
 import CoreData
 
+let ManagedObjectVersion = 1
+
 extension NSManagedObject {
     convenience init<Value>(from properties: [String: Value],
                             context: NSManagedObjectContext)
@@ -67,7 +69,7 @@ extension NSManagedObject {
         }
         ObjectState.shared.mutex.unlock()
     }
-    
+
     func off(state: ObjectState) {
         ObjectState.shared.mutex.lock()
         if let val = self.value(forKey: "state") as? Int16 {

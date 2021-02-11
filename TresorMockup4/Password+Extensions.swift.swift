@@ -10,9 +10,11 @@ import Foundation
 
 extension Password {
     override public func awakeFromInsert() {
-        self.setPrimitiveValue(Date(), forKey: "createdAt")
-        self.setPrimitiveValue(Date(), forKey: "selectedAt")
+        let now = Date()
+        self.setPrimitiveValue(now, forKey: "createdAt")
+        self.setPrimitiveValue(now, forKey: "selectedAt")
         self.setPrimitiveValue(UUID().uuidString, forKey: "uuid")
+        self.setPrimitiveValue(ManagedObjectVersion, forKey: "version")
     }
 
     public override func willSave() {

@@ -10,8 +10,11 @@ import CoreData
 
 extension Site {
     override public func awakeFromInsert() {
-        self.setPrimitiveValue(Date(), forKey: "createdAt")
+        let now = Date()
+        self.setPrimitiveValue(now, forKey: "createdAt")        
         self.setPrimitiveValue(UUID().uuidString, forKey: "uuid")
+        self.setPrimitiveValue(ManagedObjectVersion, forKey: "version")
+        
         self.setPrimitiveValue(8, forKey: "maxLength")
         self.setPrimitiveValue(CypherCharacterSet.AlphaNumericsSet.rawValue, forKey: "charSet")
     }

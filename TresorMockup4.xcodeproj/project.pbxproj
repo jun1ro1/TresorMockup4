@@ -44,6 +44,12 @@
 		F9AE18B725B33336007373E0 /* CryptorError.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9AE18B425B33336007373E0 /* CryptorError.swift */; };
 		F9C91A4325974D8300918D07 /* ViewUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C91A4225974D8300918D07 /* ViewUtilities.swift */; };
 		F9C91A4D2597676400918D07 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C91A4C2597676400918D07 /* Utilities.swift */; };
+		F9CDBA1425D1775200780803 /* Category+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9CDBA1325D1775200780803 /* Category+Extensions.swift */; };
+		F9CDBA1525D1775200780803 /* Category+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9CDBA1325D1775200780803 /* Category+Extensions.swift */; };
+		F9CDBA1625D1775200780803 /* Category+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9CDBA1325D1775200780803 /* Category+Extensions.swift */; };
+		F9CDBA1B25D19AC200780803 /* CategoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9CDBA1A25D19AC200780803 /* CategoryView.swift */; };
+		F9CDBA1C25D19AC200780803 /* CategoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9CDBA1A25D19AC200780803 /* CategoryView.swift */; };
+		F9CDBA1D25D19AC200780803 /* CategoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9CDBA1A25D19AC200780803 /* CategoryView.swift */; };
 		F9CEC7DE25CE264600A14B61 /* Password+Extensions.swift.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9CEC7DD25CE264600A14B61 /* Password+Extensions.swift.swift */; };
 		F9CEC7DF25CE264600A14B61 /* Password+Extensions.swift.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9CEC7DD25CE264600A14B61 /* Password+Extensions.swift.swift */; };
 		F9CEC7E025CE264600A14B61 /* Password+Extensions.swift.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9CEC7DD25CE264600A14B61 /* Password+Extensions.swift.swift */; };
@@ -117,6 +123,8 @@
 		F9C91A4225974D8300918D07 /* ViewUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewUtilities.swift; sourceTree = "<group>"; };
 		F9C91A4C2597676400918D07 /* Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
 		F9C91A672597828A00918D07 /* Simulator Screen Shot - iPhone SE (2nd generation) - 2020-12-25 at 23.36.19.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Simulator Screen Shot - iPhone SE (2nd generation) - 2020-12-25 at 23.36.19.png"; sourceTree = "<group>"; };
+		F9CDBA1325D1775200780803 /* Category+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Category+Extensions.swift"; sourceTree = "<group>"; };
+		F9CDBA1A25D19AC200780803 /* CategoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryView.swift; sourceTree = "<group>"; };
 		F9CEC7DD25CE264600A14B61 /* Password+Extensions.swift.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Password+Extensions.swift.swift"; sourceTree = "<group>"; };
 		F9CEC7EF25CEBE3A00A14B61 /* PasswordsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordsView.swift; sourceTree = "<group>"; };
 		F9ECF1D92568B7AA00936DAF /* Site+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Site+Extensions.swift"; sourceTree = "<group>"; };
@@ -259,8 +267,10 @@
 				F954C09025CD8EE600F88AE8 /* NSManagedObject+Extensions.swift */,
 				F9ECF1D92568B7AA00936DAF /* Site+Extensions.swift */,
 				F9CEC7DD25CE264600A14B61 /* Password+Extensions.swift.swift */,
+				F9CDBA1325D1775200780803 /* Category+Extensions.swift */,
 				F9730A6325600E75007109F7 /* J1Logger.swift */,
 				F97309FA25600D05007109F7 /* TresorMockup4App.swift */,
+				F9CDBA1A25D19AC200780803 /* CategoryView.swift */,
 				F97309FC25600D05007109F7 /* ContentView.swift */,
 				F9CEC7EF25CEBE3A00A14B61 /* PasswordsView.swift */,
 				F9851EC9256BEEA800784485 /* DetailView.swift */,
@@ -519,6 +529,7 @@
 				F9851ECA256BEEA800784485 /* DetailView.swift in Sources */,
 				F9AE18B525B33336007373E0 /* CryptorError.swift in Sources */,
 				F9ECF1F625695C7600936DAF /* SearchBar.swift in Sources */,
+				F9CDBA1425D1775200780803 /* Category+Extensions.swift in Sources */,
 				F965519225AB5F0E00FFD4E8 /* Validator.swift in Sources */,
 				F9ECF1E52568CBF700936DAF /* TresorMockup4.xcdatamodeld in Sources */,
 				F954C09125CD8EE600F88AE8 /* NSManagedObject+Extensions.swift in Sources */,
@@ -539,6 +550,7 @@
 				F9C91A4325974D8300918D07 /* ViewUtilities.swift in Sources */,
 				F9C91A4D2597676400918D07 /* Utilities.swift in Sources */,
 				F9730A4825600E18007109F7 /* LocalPassword.swift in Sources */,
+				F9CDBA1B25D19AC200780803 /* CategoryView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -551,6 +563,8 @@
 				F9CEC7DF25CE264600A14B61 /* Password+Extensions.swift.swift in Sources */,
 				F965519325AB5F0E00FFD4E8 /* Validator.swift in Sources */,
 				F9CEC7E725CEB45700A14B61 /* TresorMockup4.xcdatamodeld in Sources */,
+				F9CDBA1C25D19AC200780803 /* CategoryView.swift in Sources */,
+				F9CDBA1525D1775200780803 /* Category+Extensions.swift in Sources */,
 				F9AE18B625B33336007373E0 /* CryptorError.swift in Sources */,
 				F954C09225CD8EE600F88AE8 /* NSManagedObject+Extensions.swift in Sources */,
 				F9730A1225600D05007109F7 /* TresorMockup4Tests.swift in Sources */,
@@ -567,6 +581,8 @@
 				F9CEC7E025CE264600A14B61 /* Password+Extensions.swift.swift in Sources */,
 				F965519425AB5F0E00FFD4E8 /* Validator.swift in Sources */,
 				F9CEC7EB25CEB45800A14B61 /* TresorMockup4.xcdatamodeld in Sources */,
+				F9CDBA1D25D19AC200780803 /* CategoryView.swift in Sources */,
+				F9CDBA1625D1775200780803 /* Category+Extensions.swift in Sources */,
 				F9AE18B725B33336007373E0 /* CryptorError.swift in Sources */,
 				F954C09325CD8EE600F88AE8 /* NSManagedObject+Extensions.swift in Sources */,
 				F9730A1D25600D06007109F7 /* TresorMockup4UITests.swift in Sources */,

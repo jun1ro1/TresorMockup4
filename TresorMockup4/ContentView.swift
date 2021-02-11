@@ -20,8 +20,8 @@ import CoreData
 
 struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
-    @State private var added = false
-    @State private var predicate: NSPredicate? = nil    
+    @Environment(\.appState) var appState
+    @State private var predicate: NSPredicate? = nil
     @State private var searchText: String = ""
        
     var body: some View {
@@ -44,18 +44,18 @@ struct ContentView: View {
                         animation: .default))
         }
         .navigationTitle("Sites")
-        .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 NavigationLink(destination: NewItemView()) {
                     Image(systemName: "plus")
                 }
             }
-            ToolbarItem(placement: .navigationBarLeading) {
-                EditButton()
-            }
+//            ToolbarItem(placement: .navigationBarLeading) {
+//                EditButton()
+//            }
         }
         .onAppear {
+            self.appState.wrappedValue = AppState.normal
             let text = self.$searchText.wrappedValue
             self.predicate =
                 (text == "") ?
