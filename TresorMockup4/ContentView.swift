@@ -140,35 +140,28 @@ struct ItemsView: View {
             offsets.map { self.items[$0] }.forEach { site in
                 site.category = Category.CategoryTrash
             }
-            do {
-                try viewContext.save()
-            } catch {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                let nsError = error as NSError
-                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-            }
+            // NOTICE
+            // Don't save Core Data context in this method,
+            // otherwise the app crashes at "viewContext.save()"
+            // Fatal error: Unresolved error Error Domain=NSCocoaErrorDomain Code=132001 "(null)"
+            // UserInfo={message=attempt to recursively call -save: on the context aborted, stack trace=(
         }
     }
     
     private func deleteItems(offsets: IndexSet) {
         withAnimation {
-            self.viewContext.perform {
-                offsets.map { self.items[$0] }.forEach { site in
-                    site.passwords?.allObjects.forEach { self.viewContext.delete($0 as! NSManagedObject) }
-                    self.viewContext.delete(site)
-                }
-                do {
-                    try viewContext.save()
-                } catch {
-                    // Replace this implementation with code to handle the error appropriately.
-                    // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                    let nsError = error as NSError
-                    fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-                }
+            offsets.map { self.items[$0] }.forEach { site in
+                site.passwords?.allObjects.forEach { self.viewContext.delete($0 as! NSManagedObject) }
+                self.viewContext.delete(site)
             }
+            // NOTICE
+            // Don't save Core Data context in this method,
+            // otherwise the app crashes at "viewContext.save()"
+            // Fatal error: Unresolved error Error Domain=NSCocoaErrorDomain Code=132001 "(null)"
+            // UserInfo={message=attempt to recursively call -save: on the context aborted, stack trace=(
         }
-    }}
+    }
+}
 
 private let itemFormatter: DateFormatter = {
     let formatter = DateFormatter()
