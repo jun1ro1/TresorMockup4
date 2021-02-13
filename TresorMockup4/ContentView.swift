@@ -72,10 +72,9 @@ struct ContentView: View {
                     Image(systemName: "plus")
                 }
             }
-            ToolbarItem(placement: .bottomBar) {
+            ToolbarItemGroup(placement: .bottomBar) {
                 EditButton()
-            }
-            ToolbarItem(placement: .bottomBar) {
+                Spacer()
                 Button {
                     withAnimation() {
                         self.sortDescriptorsIndex += 1

@@ -6,6 +6,7 @@
 //
 // https://stackoverflow.com/questions/57730074/transition-animation-not-working-in-swiftui
 // https://stackoverflow.com/questions/61847041/how-to-set-a-custom-environment-key-in-swiftui
+// https://qiita.com/MaShunzhe/items/40bf67cdd709c17b599f
 
 import SwiftUI
 
@@ -38,9 +39,19 @@ struct TresorMockup4App: App {
                 .environmentObject(CryptorUI(name: "main", duration: 30))
                 .onAppear {
                     #if DEBUG
-                    TestData.shared.saveDummyData(cryptor: self.cryptorOpening)
+//                    TestData.shared.saveDummyData(cryptor: self.cryptorOpening)
                     #endif
                 }
+//                .onReceive(NotificationCenter.default.publisher(for: UIApplication.willTerminateNotification)) { _ in
+//                    let moc = self.persistenceController.container.viewContext
+//                    if moc.hasChanges {
+//                        do {
+//                            try moc.save()
+//                        } catch let error {
+//                            J1Logger.shared.error("save error = \(error)")
+//                        }
+//                    }
+//                }
             case false:
                 HaltView()
             default:

@@ -53,14 +53,20 @@ class CategoryManager {
     ) var categories: FetchedResults<Category>
     
     private func singleton(kind: CategoryKind, name: String) -> Category? {
-        var cat: Category? = nil
-        let prd = NSPredicate(format: "kind = %@", NSNumber(value: kind.rawValue))
-        let req: FetchRequest<Category> =
-            FetchRequest(entity: Category.entity(),
-                         sortDescriptors: [NSSortDescriptor(keyPath: \Category.createdAt, ascending: false)],
-                         predicate: prd)
+        let req: NSFetchRequest<Category> = NSFetchRequest(entityName: Category.entity().name!)
+        req.predicate = NSPredicate(format: "kind = %@", NSNumber(value: kind.rawValue))
+        req.sortDescriptors = [NSSortDescriptor(keyPath: \Category.createdAt, ascending: false)]
+    
+        var result: [Category] = []
+        do {
+            result = try self.viewContext.fetch(req)
+        } catch let error {
+            J1Logger.shared.error("fetch error = \(error)")
+            result = []
+        }
         
-        let count = req.wrappedValue.count
+        var cat: Category? = nil
+        let count = result.count
         switch count {
         case 0:
             cat = Category(context: self.viewContext)
@@ -77,13 +83,13 @@ class CategoryManager {
                 }
             }
         case 1:
-            cat = req.wrappedValue.first
+            cat = result.first
         case 2...:
             J1Logger.shared.error("kind=\(kind) count=\(count)")
-            cat = req.wrappedValue.first
+            cat = result.first
         default:
             J1Logger.shared.error("kind=\(kind) count=\(count)")
-            cat = req.wrappedValue.first
+            cat = result.first
         }
         
         return cat
