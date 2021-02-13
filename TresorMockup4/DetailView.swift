@@ -280,6 +280,7 @@ struct EditView: View {
                 0
         }
         .onDisappear { () -> Void in
+            J1Logger.shared.debug("onDisappear")
             let editing = self.editMode?.wrappedValue.isEditing
             J1Logger.shared.debug("editMode.isEditing = \(String(describing: editing))")
             
@@ -411,10 +412,16 @@ struct PresentView: View {
                 Text(self.site.memo ?? "")
             }
         }
-        //        .navigationBarItems(trailing: Image(systemName: self.ui.opened ? "lock.open" : "lock"))
+//                .navigationBarItems(trailing: Image(systemName: self.ui.opened ? "lock.open" : "lock"))
         .navigationBarTitle(self.site.title ?? "", displayMode: .automatic)
         .sheet(isPresented: self.$cryptor.shouldShow) {
             self.cryptor.view
+        }
+        .onAppear {
+            J1Logger.shared.debug("onAppear")
+        }
+        .onDisappear {
+            J1Logger.shared.debug("onDisappear")
         }
     }
 }

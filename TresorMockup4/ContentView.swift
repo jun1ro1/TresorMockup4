@@ -85,13 +85,23 @@ struct ContentView: View {
                 }
             }
         }.id(self.refresh)
-        .navigationTitle("Sites")
+        .navigationTitle(self.category.name ?? "Sites")
         .onAppear {
-            self.appState.state = .normal
+            J1Logger.shared.debug("onAppear appState.state = \(self.appState.state)")
+            // NOTICE:
+            // Bound variables should not be changed unnecessarily,
+            // else it causes an unexpected view transition.
+            if self.appState.state != .normal {
+                self.appState.state = .normal
+            }
+            J1Logger.shared.debug("onAppear appState.state = \(self.appState.state)")
             let text = self.$searchText.wrappedValue
             self.predicate =
                 (text == "") ?
                 nil : NSPredicate(format: "title CONTAINS[cd] %@ OR url CONTAINS[cd] %@", text, text)
+        }
+        .onDisappear {
+            J1Logger.shared.debug("onDisappear appState.state = \(self.appState.state)")
         }
     } // body
 }
