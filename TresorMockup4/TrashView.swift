@@ -26,7 +26,8 @@ struct TrashView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .introspectTextField { textField in
                     textField.becomeFirstResponder()
-                }.padding()
+                }.padding(.horizontal)
+            Divider()
             TrashItemsView(
                 items: FetchRequest<Site>(
                     entity: Site.entity(),
@@ -190,7 +191,18 @@ struct TrashDetailView: View {
             }
         } // Form
         .navigationBarTitle(self.site.title ?? "", displayMode: .automatic)
+        .navigationBarBackButtonHidden(true) // Workaround
         .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) { // Workaround
+                Button(
+                    action: { self.presentationMode.wrappedValue.dismiss() },
+                    label:  {
+                        HStack {
+                            Image(systemName: "chevron.backward")
+                            Text("Back")
+                        }
+                    })
+            }
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(
                     action: { self.alert.show() },

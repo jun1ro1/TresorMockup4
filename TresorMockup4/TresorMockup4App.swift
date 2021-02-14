@@ -35,7 +35,6 @@ struct TresorMockup4App: App {
                 NavigationView {
                     CategoryView()
                 }
-                .navigationViewStyle(StackNavigationViewStyle())
                 .environment(\.managedObjectContext, self.persistenceController.container.viewContext)
                 .environmentObject(self.appState)
                 .environmentObject(CryptorUI(name: "main", duration: 30))
