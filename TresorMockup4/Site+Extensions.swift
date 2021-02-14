@@ -18,7 +18,7 @@ extension Site {
         self.setPrimitiveValue(8, forKey: "maxLength")
         self.setPrimitiveValue(CypherCharacterSet.AlphaNumericsSet.rawValue, forKey: "charSet")
     }
-
+    
     public override func willSave() {
         var state = ObjectState(rawValue: (self.value(forKey: "state") as? Int16) ?? 0)
         _ = state.insert(ObjectState.saved)
@@ -27,5 +27,12 @@ extension Site {
     
     public var currentPassword: Password? {
         return self.passwords?.first {($0 as! Password).current} as? Password
+    }
+    
+    class func delete(_ site: Site, context: NSManagedObjectContext) {
+        site.passwords?.allObjects.forEach { pass in
+            context.delete(pass as! NSManagedObject)
+        }
+        context.delete(site)
     }
 }

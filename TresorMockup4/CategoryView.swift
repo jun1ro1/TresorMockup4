@@ -22,20 +22,28 @@ struct CategoryView: View {
             List {
                 ForEach(self.fetchedResults, id: \.self) {
                     let category = $0 as Category
-                    NavigationLink(destination: ContentView(category: category)) {
-                        Text(category.name ?? "")
-                    }
+                    Group {
+                        if category.categoryKind == .trash {
+                            NavigationLink(destination: TrashView(category: category)) {
+                                Text(category.name ?? "")
+                            }
+                        } else {
+                            NavigationLink(destination: ContentView(category: category)) {
+                                Text(category.name ?? "")
+                            }
+                        } // if
+                    } // Group
                 }
             }
-            NavigationLink(destination: ContentView(category: Category.CategoryAll!)
-                            .environmentObject(self.appState),  // Workaround
+            NavigationLink(destination: ContentView(category: Category.All!)
+                            .environmentObject(self.appState),  /// Workaround
                            tag: CategoryKind(rawValue: CategoryKind.all.rawValue)!,
                            selection: self.$select) {
                 EmptyView()
             }.hidden()
-//             Workaround for iPad
-//            Fatal error: No ObservableObject of type AppState found.
-//            A View.environmentObject(_:) for AppState may be missing as an ancestor of this view.: file SwiftUI, line 0
+///           Workaround for iPad
+///           Fatal error: No ObservableObject of type AppState found.
+///           A View.environmentObject(_:) for AppState may be missing as an ancestor of this view.: file SwiftUI, line 0
         }
         .navigationTitle("Categories")
         .onAppear {

@@ -10,6 +10,9 @@
 		196CDCE437872432711A8F0B /* Pods_TresorMockup4_TresorMockup4UITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 008E8BCFC330C1A0FE90D86D /* Pods_TresorMockup4_TresorMockup4UITests.framework */; };
 		25295B408841C059C68CE489 /* Pods_TresorMockup4Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 61F424751EAF03444D13E416 /* Pods_TresorMockup4Tests.framework */; };
 		6B73189134093D15E9553AF1 /* Pods_TresorMockup4.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C4D39A50D5D146D022D33BB /* Pods_TresorMockup4.framework */; };
+		F916905825D78BE5003EBCCD /* TrashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F916905725D78BE5003EBCCD /* TrashView.swift */; };
+		F916905925D78BE5003EBCCD /* TrashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F916905725D78BE5003EBCCD /* TrashView.swift */; };
+		F916905A25D78BE5003EBCCD /* TrashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F916905725D78BE5003EBCCD /* TrashView.swift */; };
 		F91D3A112562D0BD0018238B /* FocusableTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = F91D3A102562D0BC0018238B /* FocusableTextField.swift */; };
 		F954C09125CD8EE600F88AE8 /* NSManagedObject+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F954C09025CD8EE600F88AE8 /* NSManagedObject+Extensions.swift */; };
 		F954C09225CD8EE600F88AE8 /* NSManagedObject+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F954C09025CD8EE600F88AE8 /* NSManagedObject+Extensions.swift */; };
@@ -90,6 +93,7 @@
 		A7A45F6B824F7D036A0D5A7B /* Pods-TresorMockup4-TresorMockup4UITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TresorMockup4-TresorMockup4UITests.debug.xcconfig"; path = "Target Support Files/Pods-TresorMockup4-TresorMockup4UITests/Pods-TresorMockup4-TresorMockup4UITests.debug.xcconfig"; sourceTree = "<group>"; };
 		C3AD067B824FB1F6455D330E /* Pods-TresorMockup4Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TresorMockup4Tests.release.xcconfig"; path = "Target Support Files/Pods-TresorMockup4Tests/Pods-TresorMockup4Tests.release.xcconfig"; sourceTree = "<group>"; };
 		D4B70B24BCC867490BDD44CA /* Pods-TresorMockup4.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TresorMockup4.release.xcconfig"; path = "Target Support Files/Pods-TresorMockup4/Pods-TresorMockup4.release.xcconfig"; sourceTree = "<group>"; };
+		F916905725D78BE5003EBCCD /* TrashView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TrashView.swift; sourceTree = "<group>"; };
 		F91D3A102562D0BC0018238B /* FocusableTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FocusableTextField.swift; sourceTree = "<group>"; };
 		F94207AF256579CE008F4883 /* log.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = log.rtf; sourceTree = "<group>"; };
 		F954C09025CD8EE600F88AE8 /* NSManagedObject+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSManagedObject+Extensions.swift"; sourceTree = "<group>"; };
@@ -272,6 +276,7 @@
 				F97309FA25600D05007109F7 /* TresorMockup4App.swift */,
 				F9CDBA1A25D19AC200780803 /* CategoryView.swift */,
 				F97309FC25600D05007109F7 /* ContentView.swift */,
+				F916905725D78BE5003EBCCD /* TrashView.swift */,
 				F9CEC7EF25CEBE3A00A14B61 /* PasswordsView.swift */,
 				F9851EC9256BEEA800784485 /* DetailView.swift */,
 				F9730A0325600D05007109F7 /* Persistence.swift */,
@@ -543,6 +548,7 @@
 				F9730A4B25600E18007109F7 /* CryptorExtensions.swift in Sources */,
 				F9730A4E25600E18007109F7 /* CryptorCore.swift in Sources */,
 				F965518B25AB5EB400FFD4E8 /* CryptorSeed.swift in Sources */,
+				F916905825D78BE5003EBCCD /* TrashView.swift in Sources */,
 				F968B0C425BC59FA00B6296F /* CryptorUI.swift in Sources */,
 				F97309FB25600D05007109F7 /* TresorMockup4App.swift in Sources */,
 				F9ECF1DA2568B7AA00936DAF /* Site+Extensions.swift in Sources */,
@@ -565,6 +571,7 @@
 				F9CEC7E725CEB45700A14B61 /* TresorMockup4.xcdatamodeld in Sources */,
 				F9CDBA1C25D19AC200780803 /* CategoryView.swift in Sources */,
 				F9CDBA1525D1775200780803 /* Category+Extensions.swift in Sources */,
+				F916905925D78BE5003EBCCD /* TrashView.swift in Sources */,
 				F9AE18B625B33336007373E0 /* CryptorError.swift in Sources */,
 				F954C09225CD8EE600F88AE8 /* NSManagedObject+Extensions.swift in Sources */,
 				F9730A1225600D05007109F7 /* TresorMockup4Tests.swift in Sources */,
@@ -583,6 +590,7 @@
 				F9CEC7EB25CEB45800A14B61 /* TresorMockup4.xcdatamodeld in Sources */,
 				F9CDBA1D25D19AC200780803 /* CategoryView.swift in Sources */,
 				F9CDBA1625D1775200780803 /* Category+Extensions.swift in Sources */,
+				F916905A25D78BE5003EBCCD /* TrashView.swift in Sources */,
 				F9AE18B725B33336007373E0 /* CryptorError.swift in Sources */,
 				F954C09325CD8EE600F88AE8 /* NSManagedObject+Extensions.swift in Sources */,
 				F9730A1D25600D06007109F7 /* TresorMockup4UITests.swift in Sources */,

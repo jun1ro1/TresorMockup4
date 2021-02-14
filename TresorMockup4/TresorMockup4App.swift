@@ -7,6 +7,7 @@
 // https://stackoverflow.com/questions/57730074/transition-animation-not-working-in-swiftui
 // https://stackoverflow.com/questions/61847041/how-to-set-a-custom-environment-key-in-swiftui
 // https://qiita.com/MaShunzhe/items/40bf67cdd709c17b599f
+// https://developer.apple.com/forums/thread/662449
 
 import SwiftUI
 
@@ -34,6 +35,7 @@ struct TresorMockup4App: App {
                 NavigationView {
                     CategoryView()
                 }
+                .navigationViewStyle(StackNavigationViewStyle())
                 .environment(\.managedObjectContext, self.persistenceController.container.viewContext)
                 .environmentObject(self.appState)
                 .environmentObject(CryptorUI(name: "main", duration: 30))
@@ -42,16 +44,6 @@ struct TresorMockup4App: App {
 //                    TestData.shared.saveDummyData(cryptor: self.cryptorOpening)
                     #endif
                 }
-//                .onReceive(NotificationCenter.default.publisher(for: UIApplication.willTerminateNotification)) { _ in
-//                    let moc = self.persistenceController.container.viewContext
-//                    if moc.hasChanges {
-//                        do {
-//                            try moc.save()
-//                        } catch let error {
-//                            J1Logger.shared.error("save error = \(error)")
-//                        }
-//                    }
-//                }
             case false:
                 HaltView()
             default:

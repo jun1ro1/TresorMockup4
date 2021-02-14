@@ -4,17 +4,16 @@
 //
 //  Created by OKU Junichirou on 2020/11/14.
 //
-// https://www.appcoda.com/swiftui-search-bar/
-
-// https://note.com/dngri/n/n26e807c880db
-// https://www.raywenderlich.com/9335365-core-data-with-swiftui-tutorial-getting-started
-// https://stackoverflow.com/questions/56533511/how-update-a-swiftui-list-without-animation
-// https://stackoverflow.com/questions/63602263/swiftui-toolbaritem-doesnt-present-a-view-from-a-navigationlink
-// https://stackoverflow.com/questions/57946197/navigationlink-on-swiftui-pushes-view-twice
-// https://stackoverflow.com/questions/57871088/swiftui-view-and-fetchrequest-predicate-with-variable-that-can-change
-// https://www.hackingwithswift.com/books/ios-swiftui/dynamically-filtering-fetchrequest-with-swiftui
-//https://stackoverflow.com/questions/65126986/swiftui-bottombar-toolbar-disappears-when-going-back
-// https://developer.apple.com/forums/thread/668299
+/// https://www.appcoda.com/swiftui-search-bar/
+/// https://note.com/dngri/n/n26e807c880db
+/// https://www.raywenderlich.com/9335365-core-data-with-swiftui-tutorial-getting-started
+/// https://stackoverflow.com/questions/56533511/how-update-a-swiftui-list-without-animation
+/// https://stackoverflow.com/questions/63602263/swiftui-toolbaritem-doesnt-present-a-view-from-a-navigationlink
+/// https://stackoverflow.com/questions/57946197/navigationlink-on-swiftui-pushes-view-twice
+/// https://stackoverflow.com/questions/57871088/swiftui-view-and-fetchrequest-predicate-with-variable-that-can-change
+/// https://www.hackingwithswift.com/books/ios-swiftui/dynamically-filtering-fetchrequest-with-swiftui
+/// https://stackoverflow.com/questions/65126986/swiftui-bottombar-toolbar-disappears-when-going-back
+/// https://developer.apple.com/forums/thread/668299
 
 import SwiftUI
 import Introspect
@@ -24,7 +23,7 @@ struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @EnvironmentObject var appState: AppState
     @StateObject       var category: Category
-    @State private var predicate: NSPredicate? = nil
+//    @State private var predicate: NSPredicate? = nil
     @State private var searchText: String = ""
     @State private var sortDescriptors: [[NSSortDescriptor]] = [
         [ NSSortDescriptor(keyPath: \Site.titleSort, ascending: true),
@@ -48,19 +47,19 @@ struct ContentView: View {
                         entity: Site.entity(),
                         sortDescriptors: self.sortDescriptors[self.sortDescriptorsIndex],
                         predicate: { () -> NSPredicate? in
-                            let text  = self.searchText
+                            let text = self.searchText
+                            let kind = Int(CategoryKind.trash.rawValue)
                             if text == "" {
                                 if CategoryKind(rawValue: self.category.kind) == .all {
-                                    let kind = Int(CategoryKind.trash.rawValue)
                                     return NSPredicate(format: "category == nil OR category.kind !=\(kind)")
                                 }
                                 else {
-                                    let kind: Int = Int(self.category.kind)
                                     return NSPredicate(format: "category != nil AND category.kind ==\(kind)")
                                 }
                             }
                             else {
-                                return NSPredicate(format: "title CONTAINS[cd] %@ OR url CONTAINS[cd] %@", text, text)
+                                return NSPredicate(
+                                    format: "(title CONTAINS[cd] %@ OR url CONTAINS[cd] %@) AND category != nil AND category.kind ==\(kind)", text, text)
                             }
                         }(),
                         animation: .default),
@@ -88,17 +87,17 @@ struct ContentView: View {
         .navigationTitle(self.category.name ?? "Sites")
         .onAppear {
             J1Logger.shared.debug("onAppear appState.state = \(self.appState.state)")
-            // NOTICE:
-            // Bound variables should not be changed unnecessarily,
-            // else it causes an unexpected view transition.
+            /// NOTICE:
+            /// Bound variables should not be changed unnecessarily,
+            /// or it causes an unexpected view transition.
             if self.appState.state != .normal {
                 self.appState.state = .normal
             }
             J1Logger.shared.debug("onAppear appState.state = \(self.appState.state)")
-            let text = self.$searchText.wrappedValue
-            self.predicate =
-                (text == "") ?
-                nil : NSPredicate(format: "title CONTAINS[cd] %@ OR url CONTAINS[cd] %@", text, text)
+//            let text = self.$searchText.wrappedValue
+//            self.predicate =
+//                (text == "") ?
+//                nil : NSPredicate(format: "title CONTAINS[cd] %@ OR url CONTAINS[cd] %@", text, text)
         }
         .onDisappear {
             J1Logger.shared.debug("onDisappear appState.state = \(self.appState.state)")
@@ -147,7 +146,7 @@ struct ItemsView: View {
     private func disposeItems(offsets: IndexSet) {
         withAnimation {
             offsets.map { self.items[$0] }.forEach { site in
-                site.category = Category.CategoryTrash
+                site.category = Category.Trash
             }
             // NOTICE
             // Don't save Core Data context in this method,

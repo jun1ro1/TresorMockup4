@@ -11,7 +11,7 @@ import CoreData
 import SwiftUI
 
 extension Category {
-    override public func awakeFromInsert() {
+    public override func awakeFromInsert() {
         let now = Date()
         self.setPrimitiveValue(now, forKey: "createdAt")
         self.setPrimitiveValue(UUID().uuidString, forKey: "uuid")
@@ -24,8 +24,17 @@ extension Category {
         self.setPrimitiveValue(state.rawValue, forKey: "state")
     }
 
-    static var CategoryAll:   Category? = nil
-    static var CategoryTrash: Category? = nil
+    var categoryKind: CategoryKind {
+        if let val = (self.primitiveValue(forKey: "kind") as? Int16) {
+            return CategoryKind(rawValue: val)!
+        } else {
+            return .none
+        }
+        
+    }
+    
+    static var All:   Category? = nil
+    static var Trash: Category? = nil
 }
 
 
@@ -35,6 +44,7 @@ enum CategoryKind: Int16 {
     case none  = -999
 }
 
+// MARK: -
 class CategoryManager {
     private var viewContext = PersistenceController.shared.container.viewContext
     
@@ -70,8 +80,6 @@ class CategoryManager {
         switch count {
         case 0:
             cat = Category(context: self.viewContext)
-//            cat = NSEntityDescription.insertNewObject(forEntityName: Category.entity().name!,
-//                                                      into: self.viewContext) as? Category
             cat?.kind     = Int16(kind.rawValue)
             cat?.name     = name
             cat?.nameSort = name
@@ -96,7 +104,7 @@ class CategoryManager {
     }
     
     private func setup() {
-        Category.CategoryAll   = self.singleton(kind: .all,   name: "All")
-        Category.CategoryTrash = self.singleton(kind: .trash, name: "Trash")
+        Category.All   = self.singleton(kind: .all,   name: "All")
+        Category.Trash = self.singleton(kind: .trash, name: "Trash")
     }
 }
