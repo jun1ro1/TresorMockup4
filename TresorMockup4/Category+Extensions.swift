@@ -35,6 +35,8 @@ extension Category {
     
     static var All:   Category? = nil
     static var Trash: Category? = nil
+    
+    static let ExcludedAttriutes: [String] = ["sites", "state"]
 }
 
 
@@ -57,10 +59,10 @@ class CategoryManager {
         return Self.shared_private!
     }
     
-    @FetchRequest(
-        entity: Category.entity(),
-        sortDescriptors: []
-    ) var categories: FetchedResults<Category>
+//    @FetchRequest(
+//        entity: Category.entity(),
+//        sortDescriptors: []
+//    ) var categories: FetchedResults<Category>
     
     private func singleton(kind: CategoryKind, name: String) -> Category? {
         let req: NSFetchRequest<Category> = NSFetchRequest(entityName: Category.entity().name!)

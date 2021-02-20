@@ -31,7 +31,7 @@ struct PersistenceController {
         container = NSPersistentCloudKitContainer(name: "TresorMockup4")
         var debugging = false
         #if DEBUG
-//        debugging = true
+        debugging = true
         #endif
         
         if inMemory || debugging {

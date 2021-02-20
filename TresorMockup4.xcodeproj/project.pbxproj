@@ -268,26 +268,26 @@
 		F9ECF0F02568303800936DAF /* TresorMockup4 */ = {
 			isa = PBXGroup;
 			children = (
-				F954C09025CD8EE600F88AE8 /* NSManagedObject+Extensions.swift */,
-				F9ECF1D92568B7AA00936DAF /* Site+Extensions.swift */,
-				F9CEC7DD25CE264600A14B61 /* Password+Extensions.swift.swift */,
+				F9730A0825600D05007109F7 /* Info.plist */,
 				F9CDBA1325D1775200780803 /* Category+Extensions.swift */,
-				F9730A6325600E75007109F7 /* J1Logger.swift */,
-				F97309FA25600D05007109F7 /* TresorMockup4App.swift */,
 				F9CDBA1A25D19AC200780803 /* CategoryView.swift */,
 				F97309FC25600D05007109F7 /* ContentView.swift */,
-				F9730A0325600D05007109F7 /* Persistence.swift */,
-				F916905725D78BE5003EBCCD /* TrashView.swift */,
-				F9CEC7EF25CEBE3A00A14B61 /* PasswordsView.swift */,
 				F9851EC9256BEEA800784485 /* DetailView.swift */,
+				F9730A6325600E75007109F7 /* J1Logger.swift */,
+				F954C09025CD8EE600F88AE8 /* NSManagedObject+Extensions.swift */,
+				F9CEC7DD25CE264600A14B61 /* Password+Extensions.swift.swift */,
+				F9CEC7EF25CEBE3A00A14B61 /* PasswordsView.swift */,
+				F9730A0325600D05007109F7 /* Persistence.swift */,
 				F9ECF1F525695C7600936DAF /* SearchBar.swift */,
+				F9ECF1D92568B7AA00936DAF /* Site+Extensions.swift */,
 				F9851EC1256BEC0500784485 /* TestData.swift */,
+				F916905725D78BE5003EBCCD /* TrashView.swift */,
+				F97309FA25600D05007109F7 /* TresorMockup4App.swift */,
 				F9C91A4C2597676400918D07 /* Utilities.swift */,
 				F9C91A4225974D8300918D07 /* ViewUtilities.swift */,
-				F9730A0825600D05007109F7 /* Info.plist */,
-				F9730A0525600D05007109F7 /* TresorMockup4.xcdatamodeld */,
 				F97309FE25600D05007109F7 /* Assets.xcassets */,
 				F9730A0025600D05007109F7 /* Preview Content */,
+				F9730A0525600D05007109F7 /* TresorMockup4.xcdatamodeld */,
 			);
 			path = TresorMockup4;
 			sourceTree = "<group>";

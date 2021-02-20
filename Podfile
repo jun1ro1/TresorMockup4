@@ -10,6 +10,9 @@ target 'TresorMockup4' do
   # https://github.com/siteline/SwiftUI-Introspect
   pod "Introspect"
 
+  # https://cocoapods.org/pods/CSV.swift
+  pod 'CSV.swift', '~> 2.4.3'
+
   target 'TresorMockup4Tests' do
     inherit! :search_paths
     # Pods for testing

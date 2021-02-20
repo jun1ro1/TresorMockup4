@@ -260,7 +260,7 @@ class TestData {
             let site     = Site(from: $0.0, context: viewContext)
             let password = Password(from: $0.1, context: viewContext)
             password.site = site
-        }
+         }
         
         do {
             try viewContext.save()
@@ -270,5 +270,14 @@ class TestData {
             let nsError = error as NSError
             fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
         }
+        
+        let dir = FileManager.default.urls(
+          for: .documentDirectory,
+          in: .userDomainMask
+        ).first!
+        let fileURL = dir.appendingPathComponent("test.csv")
+        J1Logger.shared.self.info("url=\(fileURL)")
+        Site.exportToCSV(url: fileURL, sortNames: ["title", "url", "userid", "password"])
+
     }
 }
