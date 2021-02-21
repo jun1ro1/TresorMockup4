@@ -14,7 +14,7 @@ extension Category {
     public override func awakeFromInsert() {
         let now = Date()
         self.setPrimitiveValue(now, forKey: "createdAt")
-        self.setPrimitiveValue(UUID().uuidString, forKey: "uuid")
+        self.setPrimitiveValue(UUID(), forKey: "uuid")
         self.setPrimitiveValue(ManagedObjectVersion, forKey: "version")
     }
 

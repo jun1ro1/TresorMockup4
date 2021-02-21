@@ -37,47 +37,48 @@ extension NSManagedObject {
         }
     }
 
-    static var valuedNames: [String] {
-        let props = Self.entity().properties
-        return props.map { prop -> String? in
-            guard let attr = prop as? NSAttributeDescription else {
-                return nil
-            }
-            return attr.name
-        }.compactMap { $0 }
-    }
-    
     func values() -> [String: String] {
-        let names = Self.valuedNames
+        let props = Self.entity().properties
         return Dictionary(
             uniqueKeysWithValues:
-                names.map { name -> (String, String)? in
-                    let prop = Self.entity().propertiesByName[name]
-                    guard let attr = ( prop as? NSAttributeDescription) else {
+                props.map { prop -> (String, String)? in
+                    switch prop {
+                    case let attr as NSAttributeDescription:
+                        let name = attr.name
+                        let ty   = attr.attributeType
+                        let val  = self.value(forKey: name)
+                        var str: String? = nil
+                        switch (ty, val) {
+                        case (.booleanAttributeType, let v as Bool):
+                            str = String(v)
+                        case (.integer16AttributeType, let v as Int),
+                             (.integer32AttributeType, let v as Int),
+                             (.integer64AttributeType, let v as Int):
+                            str = String(v)
+                        case (.dateAttributeType, let v as Date):
+                            str = Self.dateFormatter.string(from: v)
+                        case (.UUIDAttributeType, let v as UUID):
+                            str = v.uuidString
+                        case (.stringAttributeType, let v as String):
+                            str = v
+                        default:
+                            str = nil
+                        }
+                        return (str == nil ? nil : (name, str!))
+                    case let rel as NSRelationshipDescription:
+                        let name   = rel.name
+                        guard !rel.isToMany else { return nil }
+                        guard let entity = rel.destinationEntity else { return nil }
+                                                
+                        let val   = self.value(forKey: name) as? NSManagedObject
+                        let uuid  = val?.value(forKey: "uuid") as? UUID
+
+                        print("\(name) -> \(entity.name ?? "nil") : \(uuid?.uuidString ?? "nil")")
+                        let str = uuid?.uuidString
+                        return (name, str ?? "")
+                    default:
                         return nil
                     }
-                    let t = attr.attributeType
-                    let val = self.value(forKey: name)
-                    var str: String? = nil
-                    switch t {
-                    case .booleanAttributeType:
-                        if let v = val as? Bool {
-                            str = String(v)
-                        }
-                    case .integer16AttributeType, .integer32AttributeType, .integer64AttributeType:
-                        if let v = val as? Int {
-                            str = String(v)
-                        }
-                    case .dateAttributeType:
-                        str = Self.dateFormatter.string(from: val as! Date)
-                    case .stringAttributeType:
-                        str = val as? String
-                    case .UUIDAttributeType:
-                        str = (val as? UUID)?.uuidString
-                    default:
-                        break
-                    }
-                    return (str == nil ? nil : (name, str!))
                 }.compactMap { $0 }
         ) // Dictinoary
     }
@@ -88,7 +89,7 @@ extension NSManagedObject {
         let sorts: [NSSortDescriptor] = sortNames.map {
             NSSortDescriptor(key: $0, ascending: true)
         }
-        request.sortDescriptors = sorts
+        request.sortDescriptors = (sorts == []) ? nil : sorts
         var items: [Self] = []
         do {
             items = try viewContext.fetch(request)

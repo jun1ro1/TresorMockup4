@@ -13,7 +13,7 @@ extension Password {
         let now = Date()
         self.setPrimitiveValue(now, forKey: "createdAt")
         self.setPrimitiveValue(now, forKey: "selectedAt")
-        self.setPrimitiveValue(UUID().uuidString, forKey: "uuid")
+        self.setPrimitiveValue(UUID(), forKey: "uuid")
         self.setPrimitiveValue(ManagedObjectVersion, forKey: "version")
     }
 
