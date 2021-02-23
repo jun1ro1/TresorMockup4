@@ -48,3 +48,51 @@ struct PasswordTextField: View {
         .autocapitalization(.none)        
     }
 }
+
+// MARK: -
+// https://capps.tech/blog/read-files-with-documentpicker-in-swiftui
+class DocumentPickerCoordinator: NSObject, UIDocumentPickerDelegate {
+    @Binding var fileURL: URL?
+    
+    init(fileURL: Binding<URL?>) {
+        self._fileURL = fileURL
+    }
+
+    func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
+        guard let url = urls.first else { return }
+        J1Logger.shared.info("url = \(url)")
+    }
+    
+    func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {
+        guard self.fileURL != nil else { return }
+        do {
+            try FileManager.default.removeItem(at: self.fileURL!)
+        } catch let error {
+            J1Logger.shared.error("removeItem failed error = \(error)")
+        }
+    }
+}
+
+// https://sarunw.com/posts/how-to-save-export-image-in-mac-catalyst/
+struct DocumentPicker: UIViewControllerRepresentable {
+    @Binding var fileURL: URL?
+    
+    typealias UIViewControllerType = UIDocumentPickerViewController
+    
+    func makeCoordinator() -> DocumentPickerCoordinator {
+        return DocumentPickerCoordinator(fileURL: self.$fileURL)
+    }
+    
+    func makeUIViewController(context: Context) -> UIViewControllerType {
+        guard self.fileURL != nil else {
+            return UIDocumentPickerViewController()
+        }
+        let controller = UIDocumentPickerViewController(forExporting: [self.fileURL!])
+        controller.delegate                 = context.coordinator
+        controller.allowsMultipleSelection  = false
+        controller.shouldShowFileExtensions = true
+        return controller
+    }
+    
+    func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {}
+}

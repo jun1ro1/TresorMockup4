@@ -66,14 +66,12 @@ extension NSManagedObject {
                         }
                         return (str == nil ? nil : (name, str!))
                     case let rel as NSRelationshipDescription:
-                        let name   = rel.name
+                        let name  = rel.name
                         guard !rel.isToMany else { return nil }
-                        guard let entity = rel.destinationEntity else { return nil }
                                                 
                         let val   = self.value(forKey: name) as? NSManagedObject
                         let uuid  = val?.value(forKey: "uuid") as? UUID
 
-                        print("\(name) -> \(entity.name ?? "nil") : \(uuid?.uuidString ?? "nil")")
                         let str = uuid?.uuidString
                         return (name, str ?? "")
                     default:

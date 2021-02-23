@@ -59,11 +59,6 @@ class CategoryManager {
         return Self.shared_private!
     }
     
-//    @FetchRequest(
-//        entity: Category.entity(),
-//        sortDescriptors: []
-//    ) var categories: FetchedResults<Category>
-    
     private func singleton(kind: CategoryKind, name: String) -> Category? {
         let req: NSFetchRequest<Category> = NSFetchRequest(entityName: Category.entity().name!)
         req.predicate = NSPredicate(format: "kind = %@", NSNumber(value: kind.rawValue))

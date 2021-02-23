@@ -35,4 +35,18 @@ extension Site {
         }
         context.delete(site)
     }
+    
+    class func export() -> URL? {
+        let url = FileManager.default.temporaryDirectory
+        let fileURL = url
+            .appendingPathComponent("Site", isDirectory: false)
+            .appendingPathExtension(for: .commaSeparatedText)
+        
+        J1Logger.shared.info("fileURL = \(fileURL)")
+
+        Self.exportToCSV(url: fileURL, sortNames: ["title", "titleSort", "url", "userid", "password"])
+        
+        return fileURL
+    }
+
 }

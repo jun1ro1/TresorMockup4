@@ -46,6 +46,13 @@ struct CategoryView: View {
 ///           A View.environmentObject(_:) for AppState may be missing as an ancestor of this view.: file SwiftUI, line 0
         }
         .navigationTitle("Categories")
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                NavigationLink(destination: SettingsView()) {
+                    Image(systemName: "gearshape")
+                }
+            }
+        }
         .onAppear {
             J1Logger.shared.debug("onAppear appState.state = \(self.appState.state)")
             switch self.appState.state {
