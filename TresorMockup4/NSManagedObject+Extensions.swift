@@ -39,46 +39,46 @@ extension NSManagedObject {
 
     func values() -> [String: String] {
         let props = Self.entity().properties
-        return Dictionary(
-            uniqueKeysWithValues:
-                props.map { prop -> (String, String)? in
-                    switch prop {
-                    case let attr as NSAttributeDescription:
-                        let name = attr.name
-                        let ty   = attr.attributeType
-                        let val  = self.value(forKey: name)
-                        var str: String? = nil
-                        switch (ty, val) {
-                        case (.booleanAttributeType, let v as Bool):
-                            str = String(v)
-                        case (.integer16AttributeType, let v as Int),
-                             (.integer32AttributeType, let v as Int),
-                             (.integer64AttributeType, let v as Int):
-                            str = String(v)
-                        case (.dateAttributeType, let v as Date):
-                            str = Self.dateFormatter.string(from: v)
-                        case (.UUIDAttributeType, let v as UUID):
-                            str = v.uuidString
-                        case (.stringAttributeType, let v as String):
-                            str = v
-                        default:
-                            str = nil
-                        }
-                        return (str == nil ? nil : (name, str!))
-                    case let rel as NSRelationshipDescription:
-                        let name  = rel.name
-                        guard !rel.isToMany else { return nil }
-                                                
-                        let val   = self.value(forKey: name) as? NSManagedObject
-                        let uuid  = val?.value(forKey: "uuid") as? UUID
+        
+        let attrs: [(String, String)?] = props.map { prop -> (String, String)? in
+            guard let attr = prop as? NSAttributeDescription else { return nil }
+            let name = attr.name
+            let ty   = attr.attributeType
+            let val  = self.value(forKey: name)
+            var str: String? = nil
+            switch (ty, val) {
+            case (.booleanAttributeType,   let v as Bool):
+                str = String(v)
+            case (.integer16AttributeType, let v as Int),
+                 (.integer32AttributeType, let v as Int),
+                 (.integer64AttributeType, let v as Int):
+                str = String(v)
+            case (.dateAttributeType,      let v as Date):
+                str = Self.dateFormatter.string(from: v)
+            case (.UUIDAttributeType,      let v as UUID):
+                str = v.uuidString
+            case (.stringAttributeType,    let v as String):
+                str = v
+            default:
+                str = nil
+            }
+            return str == nil ? nil : (name, str!)
+        }
+        
+        let rels: [(String, String)?] =  props.map { prop -> (String, String)? in
+            guard let rel = prop as? NSRelationshipDescription else { return nil }
+            let name  = rel.name
+            guard !rel.isToMany else { return nil }
+                                    
+            let val   = self.value(forKey: name) as? NSManagedObject
+            let uuid  = val?.value(forKey: "uuid") as? UUID
 
-                        let str = uuid?.uuidString
-                        return (name, str ?? "")
-                    default:
-                        return nil
-                    }
-                }.compactMap { $0 }
-        ) // Dictinoary
+            let str = uuid?.uuidString
+            return (name, str ?? "")
+
+        }
+        
+        return Dictionary(uniqueKeysWithValues: (attrs + rels).compactMap { $0 } )
     }
 
     class func exportToCSV(url: URL, sortNames: [String] = []) {
@@ -147,6 +147,7 @@ extension NSManagedObject {
     }
 }
 
+// MARK: -
 struct ObjectState: OptionSet, Hashable {
     let rawValue:  Int16
     var hashValue: Int { return Int(self.rawValue) }
