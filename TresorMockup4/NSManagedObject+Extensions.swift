@@ -7,6 +7,7 @@
 
 import Foundation
 import CoreData
+import Combine
 import CSV
 
 let ManagedObjectVersion = 1
@@ -37,7 +38,7 @@ extension NSManagedObject {
         }
     }
 
-    func values() -> [String: String] {
+    func stringProperty() -> [String: String] {
         let props = Self.entity().properties
         
         let attrs: [(String, String)?] = props.map { prop -> (String, String)? in
@@ -80,7 +81,11 @@ extension NSManagedObject {
         
         return Dictionary(uniqueKeysWithValues: (attrs + rels).compactMap { $0 } )
     }
+}
 
+// MARK: -
+
+extension NSManagedObject {
     class func exportToCSV(url: URL, sortNames: [String] = []) {
         let viewContext = PersistenceController.shared.container.viewContext
         let request: NSFetchRequest<Self> = NSFetchRequest(entityName: Self.entity().name!)
@@ -112,7 +117,7 @@ extension NSManagedObject {
         var names:  [String]? = nil
         var snames: [String]  = sortNames
         items.forEach { site in
-            let values = site.values()
+            let values = site.stringProperty()
             if names == nil {
                 names = values.keys.map { $0 }
                 if !Set(sortNames).isSubset(of: names!) {
@@ -145,7 +150,91 @@ extension NSManagedObject {
         }
         csv.stream.close()
     }
+    
+// MARK: -
+
+    class func publisher(sortNames: [String] = [])
+        -> AnyPublisher<Dictionary<String, String>, Error> {
+        let names    = Self.entity().properties.map { $0.name }
+        var snames   = sortNames
+        let unknowns = Set(snames).subtracting(Set(names))
+        if unknowns != [] {
+            J1Logger.shared.error("\(sortNames) have unknown names \(unknowns)")
+            snames.removeAll { unknowns.contains($0) }
+        }
+        
+        let viewContext = PersistenceController.shared.container.viewContext
+        let request: NSFetchRequest<Self> = NSFetchRequest(entityName: Self.entity().name!)
+        let sorts: [NSSortDescriptor] = snames.map {
+            NSSortDescriptor(key: $0, ascending: true)
+        }
+        request.sortDescriptors = (sorts == []) ? nil : sorts
+        
+        var mobjects: [Self] = []
+        do {
+            mobjects = try viewContext.fetch(request)
+        } catch let error {
+            J1Logger.shared.error("fetch error = \(error)")
+            mobjects = []
+            return Fail<Dictionary<String, String>, Error>(error: error).eraseToAnyPublisher()
+        }
+
+        let pub = Publishers.Sequence<[Dictionary<String, String>], Error>(sequence: mobjects.map { $0.stringProperty() } )
+        return pub.eraseToAnyPublisher()
+    }
+
+    class func backup(url: URL, sortNames: [String] = []) {
+        let publisher = Self.publisher(sortNames: sortNames)
+        let headerPublisher: AnyPublisher<[String], Error> =
+            publisher.first().map {
+                var names    = Array($0.keys)
+                var snames   = sortNames
+                let unknowns = Set(snames).subtracting(Set(names))
+                if unknowns != [] {
+                    J1Logger.shared.error("\(sortNames) have unknown names \(unknowns)")
+                    snames.removeAll { unknowns.contains($0) }
+                }
+                let onames  = Set(names).subtracting(snames)
+                names = snames + onames
+                return names
+            }.eraseToAnyPublisher()
+        let contentsPublisher =
+            headerPublisher.combineLatest(publisher).map { (keys , dict) -> [String] in
+                keys.map { dict[$0]! }
+            }.eraseToAnyPublisher()
+        let filePublisher = contentsPublisher.prepend(headerPublisher).eraseToAnyPublisher()
+
+        guard let stream = OutputStream(url: url, append: false) else {
+            J1Logger.shared.error("OutputStream error url=\(url)")
+            return
+        }
+        let csv: CSVWriter
+        do {
+            csv = try CSVWriter(stream: stream)
+        } catch(let error) {
+            J1Logger.shared.error("CSVWriter fails=\(error)")
+            return
+        }
+ 
+        _ = filePublisher.sink { completion in
+            csv.stream.close()
+            switch completion {
+            case .finished:
+                J1Logger.shared.debug("finished")
+            case .failure(let error):
+                J1Logger.shared.error("error = \(error)")
+            }
+        } receiveValue: { values in
+            do {
+                try csv.write(row: values)
+            } catch let error {
+                J1Logger.shared.error("error = \(error)")
+            }
+        }
+    }
+
 }
+
 
 // MARK: -
 struct ObjectState: OptionSet, Hashable {

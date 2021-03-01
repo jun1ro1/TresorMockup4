@@ -15,8 +15,8 @@ struct SettingsView: View {
     var body: some View {
         Form {
             Section(header: Text("Import / Export")) {
-                Button("Export as a CSV file") {
-                    self.fileURL = Site.export()
+                Button("Backup") {
+                    self.fileURL = Site.backup()
                     guard self.fileURL != nil else { return }
                     self.show = true
                 }

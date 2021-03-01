@@ -13,6 +13,11 @@ target 'TresorMockup4' do
   # https://cocoapods.org/pods/CSV.swift
   pod 'CSV.swift', '~> 2.4.3'
 
+  # https://github.com/marmelroy/Zip
+  source 'https://github.com/CocoaPods/Specs.git'
+  pod 'Zip', '~> 2.1'
+  
+  # https://github.com/marmelroy/Zip
   target 'TresorMockup4Tests' do
     inherit! :search_paths
     # Pods for testing
