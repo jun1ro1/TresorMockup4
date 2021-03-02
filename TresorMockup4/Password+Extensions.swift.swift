@@ -39,3 +39,15 @@ extension Password {
         self.site    = site
     }
 }
+
+extension Password {
+    class func backup() -> URL? {
+        let url = FileManager.default.temporaryDirectory
+        let fileURL = url
+            .appendingPathComponent(String(describing: Self.self), isDirectory: false)
+            .appendingPathExtension(for: .commaSeparatedText)
+        
+        Self.backup(url: fileURL, sortNames: ["selectedAt", "password"])
+        return fileURL
+    }
+}

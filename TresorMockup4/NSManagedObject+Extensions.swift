@@ -199,7 +199,7 @@ extension NSManagedObject {
                 return names
             }.eraseToAnyPublisher()
         let contentsPublisher =
-            headerPublisher.combineLatest(publisher).map { (keys , dict) -> [String] in
+            headerPublisher.combineLatest(publisher).map { (keys, dict) -> [String] in
                 keys.map { dict[$0]! }
             }.eraseToAnyPublisher()
         let filePublisher = contentsPublisher.prepend(headerPublisher).eraseToAnyPublisher()

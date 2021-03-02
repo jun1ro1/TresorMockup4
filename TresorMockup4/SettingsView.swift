@@ -16,7 +16,7 @@ struct SettingsView: View {
         Form {
             Section(header: Text("Import / Export")) {
                 Button("Backup") {
-                    self.fileURL = Site.backup()
+                    self.fileURL = self.backup()
                     guard self.fileURL != nil else { return }
                     self.show = true
                 }
@@ -27,6 +27,26 @@ struct SettingsView: View {
         }
         .navigationTitle("Settings")
     } // View
+    
+    func backup() -> URL {
+        let now       = Date()
+        let formatter = ISO8601DateFormatter()
+        formatter.timeZone = .autoupdatingCurrent
+        formatter.formatOptions = [.withFullDate, .withFullTime, .withSpaceBetweenDateAndTime]
+        formatter.formatOptions.remove(
+            [.withDashSeparatorInDate, .withColonSeparatorInTime,
+             .withColonSeparatorInTimeZone, .withSpaceBetweenDateAndTime,
+             .withTimeZone])
+        let timestr = formatter.string(from: now)
+
+        let urlCategory = Category.backup()
+        let urlSite     = Site.backup()
+        let urlPassword = Password.backup()
+        J1Logger.shared.debug("urlCategory = \(String(describing: urlCategory))")
+        J1Logger.shared.debug("urlSite     = \(String(describing: urlSite))")
+        J1Logger.shared.debug("urlPassword = \(String(describing: urlPassword))")
+        return urlSite!
+   }
 }
 
 

@@ -37,26 +37,12 @@ extension Site {
     }
     
     class func backup() -> URL? {
-        let now       = Date()
-        let formatter = ISO8601DateFormatter()
-        formatter.timeZone = .autoupdatingCurrent
-        formatter.formatOptions = [.withFullDate, .withFullTime, .withSpaceBetweenDateAndTime]
-        formatter.formatOptions.remove(
-            [.withDashSeparatorInDate, .withColonSeparatorInTime,
-             .withColonSeparatorInTimeZone, .withSpaceBetweenDateAndTime,
-             .withTimeZone])
-        let timestr = formatter.string(from: now)
-
         let url = FileManager.default.temporaryDirectory
         let fileURL = url
-            .appendingPathComponent(String(describing: Self.self) + "-" + timestr, isDirectory: false)
+            .appendingPathComponent(String(describing: Self.self), isDirectory: false)
             .appendingPathExtension(for: .commaSeparatedText)
-        
-        J1Logger.shared.info("fileURL = \(fileURL)")
 
         Self.backup(url: fileURL, sortNames: ["titleSort", "title", "url", "userid", "password"])
-        
         return fileURL
     }
-
 }

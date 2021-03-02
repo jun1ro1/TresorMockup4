@@ -39,6 +39,17 @@ extension Category {
     static let ExcludedAttriutes: [String] = ["sites", "state"]
 }
 
+extension Category {
+    class func backup() -> URL? {
+        let url = FileManager.default.temporaryDirectory
+        let fileURL = url
+            .appendingPathComponent(String(describing: Self.self), isDirectory: false)
+            .appendingPathExtension(for: .commaSeparatedText)
+        
+        Self.backup(url: fileURL, sortNames: ["kind", "nameSort", "name"])
+        return fileURL
+    }
+}
 
 enum CategoryKind: Int16 {
     case all   =    0
