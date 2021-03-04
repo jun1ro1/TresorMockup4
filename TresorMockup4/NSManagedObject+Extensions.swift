@@ -198,11 +198,15 @@ extension NSManagedObject {
                 names = snames + onames
                 return names
             }.eraseToAnyPublisher()
-        let contentsPublisher =
-            headerPublisher.combineLatest(publisher).map { (keys, dict) -> [String] in
-                keys.map { dict[$0]! }
-            }.eraseToAnyPublisher()
-        let filePublisher = contentsPublisher.prepend(headerPublisher).eraseToAnyPublisher()
+
+        let filePublisher = { header in
+            header.combineLatest(publisher)
+                .map { (keys, dict) -> [String] in
+                    keys.map { dict[$0]! }
+                }
+                .prepend(header)
+        }(headerPublisher)
+        .eraseToAnyPublisher()
 
         guard let stream = OutputStream(url: url, append: false) else {
             J1Logger.shared.error("OutputStream error url=\(url)")
