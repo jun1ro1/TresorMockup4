@@ -199,13 +199,10 @@ extension NSManagedObject {
                 return names
             }.eraseToAnyPublisher()
 
-        let filePublisher = { header in
-            header.combineLatest(publisher)
-                .map { (keys, dict) -> [String] in
-                    keys.map { dict[$0]! }
-                }
-                .prepend(header)
-        }(headerPublisher)
+        let filePublisher = headerPublisher.combineLatest(publisher.prepend([:]))
+            .map { (keys, dict) -> [String] in
+                dict == [:] ? keys : keys.map { dict[$0]! }
+            }
         .eraseToAnyPublisher()
 
         guard let stream = OutputStream(url: url, append: false) else {
