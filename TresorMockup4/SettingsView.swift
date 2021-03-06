@@ -8,6 +8,8 @@
 import Foundation
 import SwiftUI
 
+import Zip
+
 struct SettingsView: View {
     @State var fileURL: URL?
     @State var show:    Bool = false
@@ -45,7 +47,26 @@ struct SettingsView: View {
         J1Logger.shared.debug("urlCategory = \(String(describing: urlCategory))")
         J1Logger.shared.debug("urlSite     = \(String(describing: urlSite))")
         J1Logger.shared.debug("urlPassword = \(String(describing: urlPassword))")
-        return urlSite!
+        
+        let urlZip = urlSite?.deletingLastPathComponent().appendingPathComponent("Backup-\(timestr).zip")
+        
+        let urls =  [urlCategory!, urlSite!, urlPassword!]
+        do {
+            try Zip.zipFiles(paths: urls, zipFilePath: urlZip!, password: nil) { _ in
+            }
+        } catch let error {
+            J1Logger.shared.error("Zip.zipFiles = \(error)")
+        }
+        
+        urls.forEach { (url) in
+            do {
+                try FileManager.default.removeItem(at: url)
+            } catch let error {
+                J1Logger.shared.error("removeItem \(url.absoluteString) error = \(error)")
+            }
+        }
+        
+        return urlZip!
    }
 }
 

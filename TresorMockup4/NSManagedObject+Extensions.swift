@@ -14,7 +14,7 @@ let ManagedObjectVersion = 1
 
 extension NSManagedObject {
     static let dateFormatter = ISO8601DateFormatter()
-
+    
     convenience init<Value>(from properties: [String: Value],
                             context: NSManagedObjectContext)
     where Value: StringProtocol {
@@ -37,7 +37,7 @@ extension NSManagedObject {
             }
         }
     }
-
+    
     func stringProperty() -> [String: String] {
         let props = Self.entity().properties
         
@@ -70,13 +70,13 @@ extension NSManagedObject {
             guard let rel = prop as? NSRelationshipDescription else { return nil }
             let name  = rel.name
             guard !rel.isToMany else { return nil }
-                                    
+            
             let val   = self.value(forKey: name) as? NSManagedObject
             let uuid  = val?.value(forKey: "uuid") as? UUID
-
+            
             let str = uuid?.uuidString
             return (name, str ?? "")
-
+            
         }
         
         return Dictionary(uniqueKeysWithValues: (attrs + rels).compactMap { $0 } )
@@ -100,7 +100,7 @@ extension NSManagedObject {
             J1Logger.shared.error("fetch error = \(error)")
             items = []
         }
-
+        
         guard let stream = OutputStream(url: url, append: false) else {
             J1Logger.shared.error("OutputStream error url=\(url)")
             return
@@ -127,7 +127,7 @@ extension NSManagedObject {
                 let otherNames  = Set(names!).subtracting(sortNames)
                 names = snames + otherNames
                 J1Logger.shared.debug("names=\(names!)")
-
+                
                 do {
                     try csv.write(row: names!)
                 } catch let error {
@@ -151,10 +151,10 @@ extension NSManagedObject {
         csv.stream.close()
     }
     
-// MARK: -
-
+    // MARK: -
+    
     class func publisher(sortNames: [String] = [])
-        -> AnyPublisher<Dictionary<String, String>, Error> {
+    -> AnyPublisher<Dictionary<String, String>, Error> {
         let names    = Self.entity().properties.map { $0.name }
         var snames   = sortNames
         let unknowns = Set(snames).subtracting(Set(names))
@@ -178,11 +178,11 @@ extension NSManagedObject {
             mobjects = []
             return Fail<Dictionary<String, String>, Error>(error: error).eraseToAnyPublisher()
         }
-
+        
         let pub = Publishers.Sequence<[Dictionary<String, String>], Error>(sequence: mobjects.map { $0.stringProperty() } )
         return pub.eraseToAnyPublisher()
     }
-
+    
     class func backup(url: URL, sortNames: [String] = []) {
         let publisher = Self.publisher(sortNames: sortNames)
         let headerPublisher: AnyPublisher<[String], Error> =
@@ -198,13 +198,12 @@ extension NSManagedObject {
                 names = snames + onames
                 return names
             }.eraseToAnyPublisher()
-
+        
         let filePublisher = headerPublisher.combineLatest(publisher.prepend([:]))
             .map { (keys, dict) -> [String] in
-                dict == [:] ? keys : keys.map { dict[$0]! }
-            }
-        .eraseToAnyPublisher()
-
+                dict == [:] ? keys : keys.map { dict[$0] ?? "" }
+            }.eraseToAnyPublisher()
+        
         guard let stream = OutputStream(url: url, append: false) else {
             J1Logger.shared.error("OutputStream error url=\(url)")
             return
@@ -216,7 +215,7 @@ extension NSManagedObject {
             J1Logger.shared.error("CSVWriter fails=\(error)")
             return
         }
- 
+        
         _ = filePublisher.sink { completion in
             csv.stream.close()
             switch completion {
@@ -233,7 +232,7 @@ extension NSManagedObject {
             }
         }
     }
-
+    
 }
 
 
