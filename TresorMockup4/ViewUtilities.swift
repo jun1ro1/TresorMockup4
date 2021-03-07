@@ -50,8 +50,8 @@ struct PasswordTextField: View {
 }
 
 // MARK: -
-// https://capps.tech/blog/read-files-with-documentpicker-in-swiftui
-class DocumentPickerCoordinator: NSObject, UIDocumentPickerDelegate {
+// https://sarunw.com/posts/how-to-save-export-image-in-mac-catalyst/
+class DocumentPickerCoordinatorForExporting: NSObject, UIDocumentPickerDelegate {
     @Binding var fileURL: URL?
     
     init(fileURL: Binding<URL?>) {
@@ -73,14 +73,13 @@ class DocumentPickerCoordinator: NSObject, UIDocumentPickerDelegate {
     }
 }
 
-// https://sarunw.com/posts/how-to-save-export-image-in-mac-catalyst/
-struct DocumentPicker: UIViewControllerRepresentable {
+struct DocumentPickerForExporting: UIViewControllerRepresentable {
     @Binding var fileURL: URL?
     
     typealias UIViewControllerType = UIDocumentPickerViewController
     
-    func makeCoordinator() -> DocumentPickerCoordinator {
-        return DocumentPickerCoordinator(fileURL: self.$fileURL)
+    func makeCoordinator() -> DocumentPickerCoordinatorForExporting {
+        return DocumentPickerCoordinatorForExporting(fileURL: self.$fileURL)
     }
     
     func makeUIViewController(context: Context) -> UIViewControllerType {
@@ -88,6 +87,42 @@ struct DocumentPicker: UIViewControllerRepresentable {
             return UIDocumentPickerViewController()
         }
         let controller = UIDocumentPickerViewController(forExporting: [self.fileURL!])
+        controller.delegate                 = context.coordinator
+        controller.allowsMultipleSelection  = false
+        controller.shouldShowFileExtensions = true
+        return controller
+    }
+    
+    func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {}
+}
+
+// MARK: -
+// https://capps.tech/blog/read-files-with-documentpicker-in-swiftui
+class DocumentPickerCoordinatorForOpening: NSObject, UIDocumentPickerDelegate {
+    var block: (URL) -> Void
+    
+    init(block: @escaping (URL) -> Void) {
+        self.block = block
+    }
+
+    func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
+        guard let url = urls.first else { return }
+        J1Logger.shared.info("url = \(url)")
+        self.block(url)
+    }
+}
+
+struct DocumentPickerForOpening: UIViewControllerRepresentable {
+    var block: (URL) -> Void
+    
+    typealias UIViewControllerType = UIDocumentPickerViewController
+    
+    func makeCoordinator() -> DocumentPickerCoordinatorForOpening {
+        return DocumentPickerCoordinatorForOpening(block: self.block)
+    }
+    
+    func makeUIViewController(context: Context) -> UIViewControllerType {
+        let controller = UIDocumentPickerViewController(forOpeningContentTypes: [.zip])
         controller.delegate                 = context.coordinator
         controller.allowsMultipleSelection  = false
         controller.shouldShowFileExtensions = true

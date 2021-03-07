@@ -233,6 +233,9 @@ extension NSManagedObject {
         }
     }
     
+    class func restore() {
+        
+    }
 }
 
 
