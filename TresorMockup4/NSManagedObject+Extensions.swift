@@ -211,7 +211,7 @@ extension NSManagedObject {
         let csv: CSVWriter
         do {
             csv = try CSVWriter(stream: stream)
-        } catch(let error) {
+        } catch let error {
             J1Logger.shared.error("CSVWriter fails=\(error)")
             return
         }
@@ -233,8 +233,31 @@ extension NSManagedObject {
         }
     }
     
-    class func restore() {
+
+    
+    class func restore(url: URL) {
+//        request.predicate = NSPredicate(format: "kind = %@", NSNumber(value: kind.rawValue))
+
         
+//        let request: NSFetchRequest<Self> = NSFetchRequest(entityName: Self.entity().name!)
+//        request.sortDescriptors = [NSSortDescriptor(keyPath: \Category.createdAt, ascending: false)]
+    
+
+
+        let subject = ReaderSubject()
+        let cancellable = subject.subject.sink { completion in
+            switch completion {
+            case .finished:
+                print("finished")
+            case .failure(let error):
+                print("error = \(error)")
+            }
+        } receiveValue: { dict in
+            print(dict)
+        }
+
+        subject.start(url: url)
+
     }
 }
 

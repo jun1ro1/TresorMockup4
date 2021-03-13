@@ -116,7 +116,9 @@ struct SettingsView: View {
         } catch let error {
             J1Logger.shared.error("Zip.unzipFile = \(error)")
         }
-        
+
+        let csvURL = tempURL.appendingPathComponent("Site.csv", isDirectory: false)
+        Site.restore(url: csvURL)
     }
 }
 
