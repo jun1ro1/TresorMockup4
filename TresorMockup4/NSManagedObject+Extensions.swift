@@ -44,10 +44,10 @@ extension NSManagedObject {
         let attrs: [(String, String)?] = props.map { prop -> (String, String)? in
             guard let attr = prop as? NSAttributeDescription else { return nil }
             let name = attr.name
-            let ty   = attr.attributeType
+            let typ  = attr.attributeType
             let val  = self.value(forKey: name)
             var str: String? = nil
-            switch (ty, val) {
+            switch (typ, val) {
             case (.booleanAttributeType,   let v as Bool):
                 str = String(v)
             case (.integer16AttributeType, let v as Int),
@@ -233,31 +233,51 @@ extension NSManagedObject {
         }
     }
     
+    class func find(predicate: NSPredicate) throws -> NSManagedObject? {
+        let viewContext = PersistenceController.shared.container.viewContext
 
-    
-    class func restore(url: URL) {
-//        request.predicate = NSPredicate(format: "kind = %@", NSNumber(value: kind.rawValue))
-
+        let request: NSFetchRequest<Self> = NSFetchRequest(entityName: Self.entity().name!)
+        request.predicate = predicate
+        request.sortDescriptors = nil
         
-//        let request: NSFetchRequest<Self> = NSFetchRequest(entityName: Self.entity().name!)
-//        request.sortDescriptors = [NSSortDescriptor(keyPath: \Category.createdAt, ascending: false)]
-    
-
-
-        let subject = ReaderSubject()
-        let cancellable = subject.subject.sink { completion in
-            switch completion {
-            case .finished:
-                print("finished")
-            case .failure(let error):
-                print("error = \(error)")
+        var items: [Self] = []
+        items = try viewContext.fetch(request)
+        
+        switch items.count {
+        case 0:
+            return nil
+        case 1:
+            return items.first
+        default:
+            items.forEach {
+                J1Logger.shared.error("duplicated error = \($0)")
             }
-        } receiveValue: { dict in
-            print(dict)
+            return nil
         }
-
-        subject.start(url: url)
-
+    }
+    
+    class Restorer: NSObject {
+        var cancellable: AnyCancellable?
+        
+        func perform(url: URL) {
+            let publisher = CSVPublisher()
+            self.cancellable = publisher.subject.sink { completion in
+                switch completion {
+                case .finished:
+                    print("finished")
+                case .failure(let error):
+                    print("error = \(error)")
+                }
+            } receiveValue: { dict in
+                print(dict)
+            }
+            
+            publisher.start(url: url)
+        }
+        
+        func cancel() {
+            self.cancellable?.cancel()
+        }
     }
 }
 

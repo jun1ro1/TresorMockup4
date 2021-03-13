@@ -118,7 +118,8 @@ struct SettingsView: View {
         }
 
         let csvURL = tempURL.appendingPathComponent("Site.csv", isDirectory: false)
-        Site.restore(url: csvURL)
+        let restorer = Site.Restorer()
+        restorer.perform(url: csvURL)
     }
 }
 

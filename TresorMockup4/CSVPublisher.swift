@@ -9,7 +9,7 @@ import Foundation
 import Combine
 import CSV
 
-class ReaderSubject: NSObject {
+class CSVPublisher: NSObject {
     private var subjectPrivate = PassthroughSubject<Dictionary<String, String>, Error>()
     
     var subject: PassthroughSubject<Dictionary<String, String>, Error> {
