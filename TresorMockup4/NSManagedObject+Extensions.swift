@@ -38,6 +38,33 @@ extension NSManagedObject {
         }
     }
     
+    func set(from properties: [String: String]) {
+        let names = Site.entity().properties.map { $0.name }
+        names.forEach { name in
+            if let val = properties[name] {
+                switch Self.entity().attributesByName[name]?.attributeType {
+                case .booleanAttributeType:
+                    self.setValue(Bool(val), forKey: name)
+                case .integer16AttributeType, .integer32AttributeType, .integer64AttributeType:
+                    self.setValue(Int(val), forKey: name)
+                case .dateAttributeType:
+                    self.setValue(Self.dateFormatter.date(from: val), forKey: name)
+                case .UUIDAttributeType:
+                    if let v = UUID(uuidString: val) {
+                        self.setValue(v, forKey: name)
+                    } else {
+                        J1Logger.shared.error("can not convert to UUID \(val)")
+                    }
+                case .stringAttributeType:
+                    self.setValue(String(val), forKey: name)
+                default:
+                    self.setValue(nil, forKey: name)
+                }
+            }
+        }
+    }
+
+
     func stringProperty() -> [String: String] {
         let props = Self.entity().properties
         
@@ -80,6 +107,19 @@ extension NSManagedObject {
         }
         
         return Dictionary(uniqueKeysWithValues: (attrs + rels).compactMap { $0 } )
+    }
+}
+
+// MARK: -
+extension NSManagedObject {
+    // https://stackoverflow.com/questions/24658641/ios-delete-all-core-data-swift
+    // https://www.avanderlee.com/swift/nsbatchdeleterequest-core-data/
+    class func deleteAll() throws {
+        let viewContext = PersistenceController.shared.container.viewContext
+        let request: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: Self.entity().name!)
+        let deleteRequest = NSBatchDeleteRequest(fetchRequest: request)
+        try viewContext.execute(deleteRequest)
+        try viewContext.save()
     }
 }
 
@@ -233,9 +273,9 @@ extension NSManagedObject {
         }
     }
     
-    class func find(predicate: NSPredicate) throws -> NSManagedObject? {
+    class func find(predicate: NSPredicate) throws -> [NSManagedObject]? {
         let viewContext = PersistenceController.shared.container.viewContext
-
+        
         let request: NSFetchRequest<Self> = NSFetchRequest(entityName: Self.entity().name!)
         request.predicate = predicate
         request.sortDescriptors = nil
@@ -243,16 +283,10 @@ extension NSManagedObject {
         var items: [Self] = []
         items = try viewContext.fetch(request)
         
-        switch items.count {
-        case 0:
+        if items.count == 0{
             return nil
-        case 1:
-            return items.first
-        default:
-            items.forEach {
-                J1Logger.shared.error("duplicated error = \($0)")
-            }
-            return nil
+        } else {
+            return items
         }
     }
     

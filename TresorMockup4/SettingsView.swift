@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import CoreData
 import SwiftUI
 
 import Zip
@@ -13,6 +14,7 @@ import Zip
 struct SettingsView: View {
     @State var fileURL: URL?
     @State var sheet:   Sheet? = nil
+    @State var modal:   Modal? = nil
 
     // https://qiita.com/1amageek/items/e90e1cfb0ad497e8b27a
     // https://stackoverflow.com/questions/57409804/how-to-confirm-an-enumeration-to-identifiable-protocol-in-swift
@@ -22,13 +24,14 @@ struct SettingsView: View {
         case backup (fileURL: Binding<URL?>)
         case restore(block: (URL) -> Void)
         
-        // ignore parameters to compare values
+        // ignore parameters to compare Sheet values
         var id: ObjectIdentifier {
             switch self {
             case .backup(fileURL: _):
                 return ObjectIdentifier(Self.self)
             case .restore(block: _):
                 return ObjectIdentifier(Self.self)
+
             }
         }
 
@@ -38,6 +41,28 @@ struct SettingsView: View {
                 return AnyView(DocumentPickerForExporting(fileURL: fileURL))
             case .restore(let block):
                 return AnyView(DocumentPickerForOpening(block: block))
+            }
+        }
+    }
+    
+    enum Modal: Identifiable {
+        case deleteAll(block: () -> Void)
+
+        var id: ObjectIdentifier {
+            switch self {
+            case .deleteAll(block: _):
+                return ObjectIdentifier(Self.self)
+            }
+        }
+        
+        var body: Alert {
+            switch self {
+            case .deleteAll(let block):
+                return Alert(title: Text("Delete All Data"),
+                             message: Text("Are you sure? Cannot undo."),
+                             primaryButton:   .cancel(Text("Cancel")),
+                             secondaryButton: .destructive(Text("Delete All Data"),
+                                                           action: block))
             }
         }
     }
@@ -57,12 +82,27 @@ struct SettingsView: View {
                     J1Logger.shared.debug("fileURL = \(String(describing: self.fileURL))")
                 }
             } // Section
+            Section(header: Text("Dangerous Operation").foregroundColor(.red)) {
+                Button("Delete All Data") {
+                    self.modal = .deleteAll { self.deleteAll() }
+                }
+            }
         } // Form
-        .sheet(item: self.$sheet) {
-            $0.body
-        }
+        .sheet(item: self.$sheet) { $0.body }
+        .alert(item: self.$modal) { $0.body }
         .navigationTitle("Settings")
     } // View
+    
+    func deleteAll() {
+        [Password.self, Site.self, Category.self].forEach {
+            do {
+                try $0.deleteAll()
+            } catch let error {
+                J1Logger.shared.error("\($0.entity().name!) error = \(error)")
+            }
+                
+        }
+    }
     
     func backup() -> URL {
         let now       = Date()
@@ -105,6 +145,7 @@ struct SettingsView: View {
     
     func restore(url: URL) {
         let name = Bundle.main.object(forInfoDictionaryKey: kCFBundleNameKey as String) as! String
+        let viewContext = PersistenceController.shared.container.viewContext
 
         J1Logger.shared.debug("url = \(String(describing: url))")
         
@@ -118,6 +159,35 @@ struct SettingsView: View {
         }
 
         let csvURL = tempURL.appendingPathComponent("Site.csv", isDirectory: false)
+        
+        let publisher = CSVPublisher()
+        let cancellable = publisher.subject.sink { completion in
+            do {
+                try viewContext.save()
+            } catch {
+                let nsError = error as NSError
+                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+            }
+
+            switch completion {
+            case .finished:
+                print("finished")                
+            case .failure(let error):
+                print("error = \(error)")
+            }
+        } receiveValue: { dict in
+            print(dict)
+            if let uuid = dict["uuid"] {
+                var obj = (try? Site.find(predicate: NSPredicate(format: "%K == %@", "uuid", uuid)))?.first
+                if obj == nil {
+                    obj = Site.init(context: viewContext)
+                }
+                obj?.set(from: dict)
+            }
+        }
+        
+        publisher.start(url: csvURL)
+
         let restorer = Site.Restorer()
         restorer.perform(url: csvURL)
     }
