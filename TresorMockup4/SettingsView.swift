@@ -145,8 +145,6 @@ struct SettingsView: View {
     
     func restore(url: URL) {
         let name = Bundle.main.object(forInfoDictionaryKey: kCFBundleNameKey as String) as! String
-        let viewContext = PersistenceController.shared.container.viewContext
-
         J1Logger.shared.debug("url = \(String(describing: url))")
         
         let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(name, isDirectory: true)
@@ -160,35 +158,7 @@ struct SettingsView: View {
 
         let csvURL = tempURL.appendingPathComponent("Site.csv", isDirectory: false)
         
-        let publisher = CSVPublisher()
-        let cancellable = publisher.subject.sink { completion in
-            do {
-                try viewContext.save()
-            } catch {
-                let nsError = error as NSError
-                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-            }
-
-            switch completion {
-            case .finished:
-                print("finished")                
-            case .failure(let error):
-                print("error = \(error)")
-            }
-        } receiveValue: { dict in
-            print(dict)
-            if let uuid = dict["uuid"] {
-                var obj = (try? Site.find(predicate: NSPredicate(format: "%K == %@", "uuid", uuid)))?.first
-                if obj == nil {
-                    obj = Site.init(context: viewContext)
-                }
-                obj?.set(from: dict)
-            }
-        }
-        
-        publisher.start(url: csvURL)
-
-        let restorer = Site.Restorer()
+        let restorer = Restorer<Site>()
         restorer.perform(url: csvURL)
     }
 }

@@ -288,31 +288,7 @@ extension NSManagedObject {
         } else {
             return items
         }
-    }
-    
-    class Restorer: NSObject {
-        var cancellable: AnyCancellable?
-        
-        func perform(url: URL) {
-            let publisher = CSVPublisher()
-            self.cancellable = publisher.subject.sink { completion in
-                switch completion {
-                case .finished:
-                    print("finished")
-                case .failure(let error):
-                    print("error = \(error)")
-                }
-            } receiveValue: { dict in
-                print(dict)
-            }
-            
-            publisher.start(url: url)
-        }
-        
-        func cancel() {
-            self.cancellable?.cancel()
-        }
-    }
+    }    
 }
 
 
