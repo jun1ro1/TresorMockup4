@@ -15,7 +15,7 @@ class Restorer<T: NSManagedObject> {
     var cancellable: AnyCancellable?
     
     func perform(url: URL) {
-        let publisher = CSVPublisher()
+        let publisher = CSVPublisher(url: url)
         self.cancellable = publisher.subject.sink { completion in
             switch completion {
             case .finished:
@@ -35,7 +35,7 @@ class Restorer<T: NSManagedObject> {
             }
         }
         
-        publisher.start(url: url)
+        publisher.start()
     }
     
     func cancel() {

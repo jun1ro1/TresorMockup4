@@ -11,6 +11,7 @@ import CSV
 
 class CSVPublisher: NSObject {
     private var subjectPrivate = PassthroughSubject<Dictionary<String, String>, Error>()
+    private var url: URL
     
     var subject: PassthroughSubject<Dictionary<String, String>, Error> {
         get {
@@ -18,9 +19,13 @@ class CSVPublisher: NSObject {
         }
     }
         
-    func start(url: URL) {
-        guard let stream = InputStream(url: url) else {
-            J1Logger.shared.error("InputStream error url=\(url)")
+    init(url: URL) {
+        self.url = url
+    }
+
+    func start() {
+        guard let stream = InputStream(url: self.url) else {
+            J1Logger.shared.error("InputStream error url=\(self.url)")
             self.subjectPrivate.send(completion: .failure(NSCoderValueNotFoundError as! Error))
             return
         }
