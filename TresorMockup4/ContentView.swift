@@ -136,7 +136,7 @@ struct ItemsView: View {
                     try self.viewContext.save()
                 } catch {
                     let nsError = error as NSError
-                    fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+                    J1Logger.shared.error("Unresolved error \(nsError), \(nsError.userInfo)")
                 }
                 J1Logger.shared.debug("save context")
             }            

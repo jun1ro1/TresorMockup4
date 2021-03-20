@@ -14,6 +14,7 @@
 		F916905925D78BE5003EBCCD /* TrashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F916905725D78BE5003EBCCD /* TrashView.swift */; };
 		F916905A25D78BE5003EBCCD /* TrashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F916905725D78BE5003EBCCD /* TrashView.swift */; };
 		F91D3A112562D0BD0018238B /* FocusableTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = F91D3A102562D0BC0018238B /* FocusableTextField.swift */; };
+		F94F67702605BD29004DA90E /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F94F676F2605BD29004DA90E /* CloudKit.framework */; };
 		F954C09125CD8EE600F88AE8 /* NSManagedObject+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F954C09025CD8EE600F88AE8 /* NSManagedObject+Extensions.swift */; };
 		F954C09225CD8EE600F88AE8 /* NSManagedObject+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F954C09025CD8EE600F88AE8 /* NSManagedObject+Extensions.swift */; };
 		F954C09325CD8EE600F88AE8 /* NSManagedObject+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F954C09025CD8EE600F88AE8 /* NSManagedObject+Extensions.swift */; };
@@ -105,6 +106,8 @@
 		F916905725D78BE5003EBCCD /* TrashView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TrashView.swift; sourceTree = "<group>"; };
 		F91D3A102562D0BC0018238B /* FocusableTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FocusableTextField.swift; sourceTree = "<group>"; };
 		F94207AF256579CE008F4883 /* log.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = log.rtf; sourceTree = "<group>"; };
+		F94F676B2605BD22004DA90E /* TresorMockup4.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TresorMockup4.entitlements; sourceTree = "<group>"; };
+		F94F676F2605BD29004DA90E /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		F954C09025CD8EE600F88AE8 /* NSManagedObject+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSManagedObject+Extensions.swift"; sourceTree = "<group>"; };
 		F965518A25AB5EB400FFD4E8 /* CryptorSeed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptorSeed.swift; sourceTree = "<group>"; };
 		F965519125AB5F0E00FFD4E8 /* Validator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Validator.swift; sourceTree = "<group>"; };
@@ -155,6 +158,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6B73189134093D15E9553AF1 /* Pods_TresorMockup4.framework in Frameworks */,
+				F94F67702605BD29004DA90E /* CloudKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -193,6 +197,7 @@
 		C45ADCA91D4C7F715A8CCEC6 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				F94F676F2605BD29004DA90E /* CloudKit.framework */,
 				4C4D39A50D5D146D022D33BB /* Pods_TresorMockup4.framework */,
 				008E8BCFC330C1A0FE90D86D /* Pods_TresorMockup4_TresorMockup4UITests.framework */,
 				61F424751EAF03444D13E416 /* Pods_TresorMockup4Tests.framework */,
@@ -282,6 +287,7 @@
 		F9ECF0F02568303800936DAF /* TresorMockup4 */ = {
 			isa = PBXGroup;
 			children = (
+				F94F676B2605BD22004DA90E /* TresorMockup4.entitlements */,
 				F9730A0825600D05007109F7 /* Info.plist */,
 				F9CDBA1325D1775200780803 /* Category+Extensions.swift */,
 				F9CDBA1A25D19AC200780803 /* CategoryView.swift */,
@@ -762,6 +768,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = TresorMockup4/TresorMockup4.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"TresorMockup4/Preview Content\"";
 				DEVELOPMENT_TEAM = K7G5AYFTLJ;
@@ -785,6 +792,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = TresorMockup4/TresorMockup4.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"TresorMockup4/Preview Content\"";
 				DEVELOPMENT_TEAM = K7G5AYFTLJ;

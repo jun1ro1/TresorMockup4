@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="17709" systemVersion="20D80" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithCloudKit="YES" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="17709" systemVersion="20D91" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithCloudKit="YES" userDefinedModelVersionIdentifier="">
     <entity name="Category" representedClassName=".Category" syncable="YES" codeGenerationType="class">
         <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="kind" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="name" optional="YES" attributeType="String"/>
         <attribute name="nameSort" optional="YES" attributeType="String"/>
         <attribute name="state" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
-        <attribute name="uuid" attributeType="UUID" defaultValueString="00000000-0000-0000-0000-000000000000" usesScalarValueType="NO"/>
+        <attribute name="uuid" optional="YES" attributeType="UUID" defaultValueString="00000000-0000-0000-0000-000000000000" usesScalarValueType="NO"/>
         <attribute name="version" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <relationship name="sites" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Site" inverseName="category" inverseEntity="Site"/>
     </entity>
@@ -16,32 +16,32 @@
         <attribute name="password" optional="YES" attributeType="String"/>
         <attribute name="selectedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="state" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
-        <attribute name="uuid" attributeType="UUID" defaultValueString="00000000-0000-0000-0000-000000000000" usesScalarValueType="NO"/>
+        <attribute name="uuid" optional="YES" attributeType="UUID" defaultValueString="00000000-0000-0000-0000-000000000000" usesScalarValueType="NO"/>
         <attribute name="version" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <relationship name="site" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Site" inverseName="passwords" inverseEntity="Site"/>
     </entity>
     <entity name="Site" representedClassName=".Site" syncable="YES" codeGenerationType="class">
-        <attribute name="charSet" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="charSet" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
-        <attribute name="maxLength" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
-        <attribute name="memo" attributeType="String" defaultValueString=""/>
-        <attribute name="memoSecret" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
-        <attribute name="password" attributeType="String" defaultValueString=""/>
-        <attribute name="pinned" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="maxLength" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="memo" optional="YES" attributeType="String" defaultValueString=""/>
+        <attribute name="memoSecret" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="password" optional="YES" attributeType="String" defaultValueString=""/>
+        <attribute name="pinned" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <attribute name="selectAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
-        <attribute name="state" attributeType="Integer 16" defaultValueString="YES" usesScalarValueType="YES"/>
-        <attribute name="title" attributeType="String" defaultValueString=""/>
-        <attribute name="titleSort" attributeType="String" defaultValueString=""/>
-        <attribute name="url" attributeType="String" defaultValueString=""/>
-        <attribute name="userid" attributeType="String" defaultValueString=""/>
-        <attribute name="uuid" attributeType="UUID" defaultValueString="00000000-0000-0000-0000-000000000000" usesScalarValueType="NO"/>
+        <attribute name="state" optional="YES" attributeType="Integer 16" defaultValueString="YES" usesScalarValueType="YES"/>
+        <attribute name="title" optional="YES" attributeType="String" defaultValueString=""/>
+        <attribute name="titleSort" optional="YES" attributeType="String" defaultValueString=""/>
+        <attribute name="url" optional="YES" attributeType="String" defaultValueString=""/>
+        <attribute name="userid" optional="YES" attributeType="String" defaultValueString=""/>
+        <attribute name="uuid" optional="YES" attributeType="UUID" defaultValueString="00000000-0000-0000-0000-000000000000" usesScalarValueType="NO"/>
         <attribute name="version" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <relationship name="category" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Category" inverseName="sites" inverseEntity="Category"/>
         <relationship name="passwords" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Password" inverseName="site" inverseEntity="Password"/>
     </entity>
     <elements>
         <element name="Category" positionX="461.111328125" positionY="-421.3810424804688" width="128" height="149"/>
-        <element name="Password" positionX="910.6432495117188" positionY="-194.6951599121094" width="128" height="14"/>
+        <element name="Password" positionX="910.6432495117188" positionY="-194.6951599121094" width="128" height="149"/>
         <element name="Site" positionX="658.582763671875" positionY="-316.2332611083984" width="128" height="284"/>
     </elements>
 </model>

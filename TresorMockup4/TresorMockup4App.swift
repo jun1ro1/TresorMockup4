@@ -40,7 +40,7 @@ struct TresorMockup4App: App {
                 .environmentObject(CryptorUI(name: "main", duration: 30))
                 .onAppear {
                     #if DEBUG
-                    TestData.shared.saveDummyData(cryptor: self.cryptorOpening)
+//                    TestData.shared.saveDummyData(cryptor: self.cryptorOpening)
                     #endif
                 }
             case false:

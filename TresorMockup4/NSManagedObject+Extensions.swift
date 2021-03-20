@@ -65,7 +65,7 @@ extension NSManagedObject {
     }
 
 
-    func stringProperty() -> [String: String] {
+    func propertyDictionary() -> [String: String] {
         let props = Self.entity().properties
         
         let attrs: [(String, String)?] = props.map { prop -> (String, String)? in
@@ -157,7 +157,7 @@ extension NSManagedObject {
         var names:  [String]? = nil
         var snames: [String]  = sortNames
         items.forEach { site in
-            let values = site.stringProperty()
+            let values = site.propertyDictionary()
             if names == nil {
                 names = values.keys.map { $0 }
                 if !Set(sortNames).isSubset(of: names!) {
@@ -219,7 +219,11 @@ extension NSManagedObject {
             return Fail<Dictionary<String, String>, Error>(error: error).eraseToAnyPublisher()
         }
         
-        let pub = Publishers.Sequence<[Dictionary<String, String>], Error>(sequence: mobjects.map { $0.stringProperty() } )
+        mobjects.forEach { (obj) in
+            print(obj.objectID.uriRepresentation().absoluteURL)
+        }
+        
+        let pub = Publishers.Sequence<[Dictionary<String, String>], Error>(sequence: mobjects.map { $0.propertyDictionary() } )
         return pub.eraseToAnyPublisher()
     }
     
