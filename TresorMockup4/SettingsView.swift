@@ -158,8 +158,8 @@ struct SettingsView: View {
 
         let csvURL = tempURL.appendingPathComponent("Site.csv", isDirectory: false)
         
-        let restorer = Restorer<Site>()
-        restorer.perform(url: csvURL)
+        let restorer = Loader<Site>(url: csvURL, searchingKeys: ["uuid", "url", "title"])
+        restorer.load()
     }
 }
 

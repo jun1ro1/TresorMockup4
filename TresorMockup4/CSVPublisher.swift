@@ -46,7 +46,6 @@ class CSVPublisher: NSObject {
         
         while let row = csv.next() {
             let dict = Dictionary(uniqueKeysWithValues: zip(header, row))
-            print("send")
             self.subjectPrivate.send(dict)
         }
         self.subjectPrivate.send(completion: .finished)
