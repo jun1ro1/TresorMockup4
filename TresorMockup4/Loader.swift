@@ -52,6 +52,7 @@ class Loader<T: NSManagedObject> {
                 obj = T.init(context: self.viewContext)
             }
             obj?.set(from: dict)
+            obj?.link(by: dict)
         }
         
         publisher.start()

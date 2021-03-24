@@ -39,7 +39,7 @@ extension NSManagedObject {
     }
     
     func set(from properties: [String: String]) {
-        let names = Site.entity().properties.map { $0.name }
+        let names = Self.entity().properties.map { $0.name }
         names.forEach { name in
             if let val = properties[name] {
                 switch Self.entity().attributesByName[name]?.attributeType {
@@ -64,6 +64,45 @@ extension NSManagedObject {
         }
     }
 
+    func link(by properties: [String: String]) {
+        let links = Self.entity().relationshipsByName
+        links.forEach { link in
+            let name = link.key
+            guard !link.value.isToMany else { return }
+            
+            guard let dest = link.value.destinationEntity else {
+                J1Logger.shared.error("name = \(name), \(link.value) has no destinationEntry")
+                return
+            }            
+            guard let uuid = properties[name] else {
+                J1Logger.shared.error("name = \(name), uuid is not found in \(properties)")
+                return
+            }
+
+            let viewContext = PersistenceController.shared.container.viewContext
+            
+            let request: NSFetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: dest.name!)
+            request.predicate = NSPredicate(format: "%K == %@", "uuid", uuid)
+            request.sortDescriptors = nil
+            
+            var items: [Any] = []
+            do {
+                items = try viewContext.fetch(request)
+            } catch let error {
+                J1Logger.shared.error("fetch = \(error)")
+            }
+            guard items.count <= 0 else {
+                J1Logger.shared.error("\(String(describing: request.predicate)) not found")
+                return
+            }
+            guard let item = items.first as? NSManagedObject else {
+                J1Logger.shared.error("\(items) are not NSManagedObject")
+                return
+            }
+            
+            print("\(String(describing: Self.entity().name)) : \(name) -> \(item)")
+        }
+    }
 
     func propertyDictionary() -> [String: String] {
         let props = Self.entity().properties

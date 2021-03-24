@@ -156,10 +156,17 @@ struct SettingsView: View {
             J1Logger.shared.error("Zip.unzipFile = \(error)")
         }
 
-        let csvURL = tempURL.appendingPathComponent("Site.csv", isDirectory: false)
-        
-        let restorer = Loader<Site>(url: csvURL, searchingKeys: ["uuid", "url", "title"])
-        restorer.load()
+        let csvSite = tempURL.appendingPathComponent("Site.csv", isDirectory: false)
+        let loaderSite = Loader<Site>(url: csvSite, searchingKeys: ["uuid", "url", "title"])
+        loaderSite.load()
+
+        let csvCategory = tempURL.appendingPathComponent("Category.csv", isDirectory: false)
+        let loaderCategory = Loader<Category>(url: csvCategory, searchingKeys: ["uuid", "name"])
+        loaderCategory.load()
+ 
+        let csvPassword = tempURL.appendingPathComponent("Password.csv", isDirectory: false)
+        let loaderPassword = Loader<Password>(url: csvPassword, searchingKeys: ["uuid", "password"])
+        loaderPassword.load()
     }
 }
 
