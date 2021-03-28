@@ -24,15 +24,15 @@ extension NSManagedObject {
             if let val = properties[name] as? String {
                 switch Self.entity().attributesByName[name]?.attributeType {
                 case .booleanAttributeType:
-                    self.setValue(Bool(val), forKey: name)
+                    self.setPrimitiveValue(Bool(val), forKey: name)
                 case .integer16AttributeType, .integer32AttributeType, .integer64AttributeType:
-                    self.setValue(Int(val), forKey: name)
+                    self.setPrimitiveValue(Int(val), forKey: name)
                 case .dateAttributeType:
-                    self.setValue(Self.dateFormatter.date(from: val), forKey: name)
+                    self.setPrimitiveValue(Self.dateFormatter.date(from: val), forKey: name)
                 case .stringAttributeType:
-                    self.setValue(String(val), forKey: name)
+                    self.setPrimitiveValue(String(val), forKey: name)
                 default:
-                    self.setValue(nil, forKey: name)
+                    self.setPrimitiveValue(nil, forKey: name)
                 }
             }
         }
@@ -44,21 +44,21 @@ extension NSManagedObject {
             if let val = properties[name] {
                 switch Self.entity().attributesByName[name]?.attributeType {
                 case .booleanAttributeType:
-                    self.setValue(Bool(val), forKey: name)
+                    self.setPrimitiveValue(Bool(val), forKey: name)
                 case .integer16AttributeType, .integer32AttributeType, .integer64AttributeType:
-                    self.setValue(Int(val), forKey: name)
+                    self.setPrimitiveValue(Int(val), forKey: name)
                 case .dateAttributeType:
-                    self.setValue(Self.dateFormatter.date(from: val), forKey: name)
+                    self.setPrimitiveValue(Self.dateFormatter.date(from: val), forKey: name)
                 case .UUIDAttributeType:
                     if let v = UUID(uuidString: val) {
-                        self.setValue(v, forKey: name)
+                        self.setPrimitiveValue(v, forKey: name)
                     } else {
                         J1Logger.shared.error("can not convert to UUID \(val)")
                     }
                 case .stringAttributeType:
-                    self.setValue(String(val), forKey: name)
+                    self.setPrimitiveValue(String(val), forKey: name)
                 default:
-                    self.setValue(nil, forKey: name)
+                    self.setPrimitiveValue(nil, forKey: name)
                 }
             }
         }

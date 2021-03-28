@@ -71,9 +71,9 @@
 		F9ECF1DA2568B7AA00936DAF /* Site+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9ECF1D92568B7AA00936DAF /* Site+Extensions.swift */; };
 		F9ECF1E52568CBF700936DAF /* TresorMockup4.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = F9730A0525600D05007109F7 /* TresorMockup4.xcdatamodeld */; };
 		F9ECF1F625695C7600936DAF /* SearchBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9ECF1F525695C7600936DAF /* SearchBar.swift */; };
-		F9F6074A26038D1E00EB1E66 /* Loader.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F6074926038D1E00EB1E66 /* Loader.swift */; };
-		F9F6074B26038D1E00EB1E66 /* Loader.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F6074926038D1E00EB1E66 /* Loader.swift */; };
-		F9F6074C26038D1E00EB1E66 /* Loader.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F6074926038D1E00EB1E66 /* Loader.swift */; };
+		F9F6074A26038D1E00EB1E66 /* Restorer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F6074926038D1E00EB1E66 /* Restorer.swift */; };
+		F9F6074B26038D1E00EB1E66 /* Restorer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F6074926038D1E00EB1E66 /* Restorer.swift */; };
+		F9F6074C26038D1E00EB1E66 /* Restorer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F6074926038D1E00EB1E66 /* Restorer.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -149,7 +149,7 @@
 		F9ECF1D92568B7AA00936DAF /* Site+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Site+Extensions.swift"; sourceTree = "<group>"; };
 		F9ECF1DE2568C01400936DAF /* memo.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = memo.rtf; sourceTree = "<group>"; };
 		F9ECF1F525695C7600936DAF /* SearchBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchBar.swift; sourceTree = "<group>"; };
-		F9F6074926038D1E00EB1E66 /* Loader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Loader.swift; sourceTree = "<group>"; };
+		F9F6074926038D1E00EB1E66 /* Restorer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Restorer.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -296,7 +296,7 @@
 				F9851EC9256BEEA800784485 /* DetailView.swift */,
 				F9730A6325600E75007109F7 /* J1Logger.swift */,
 				F954C09025CD8EE600F88AE8 /* NSManagedObject+Extensions.swift */,
-				F9F6074926038D1E00EB1E66 /* Loader.swift */,
+				F9F6074926038D1E00EB1E66 /* Restorer.swift */,
 				F9B9AEA425FC4FF800FA8D87 /* CSVPublisher.swift */,
 				F9CEC7DD25CE264600A14B61 /* Password+Extensions.swift.swift */,
 				F9CEC7EF25CEBE3A00A14B61 /* PasswordsView.swift */,
@@ -563,7 +563,7 @@
 				F954C09125CD8EE600F88AE8 /* NSManagedObject+Extensions.swift in Sources */,
 				F97309FD25600D05007109F7 /* ContentView.swift in Sources */,
 				F9851EC2256BEC0500784485 /* TestData.swift in Sources */,
-				F9F6074A26038D1E00EB1E66 /* Loader.swift in Sources */,
+				F9F6074A26038D1E00EB1E66 /* Restorer.swift in Sources */,
 				F9730A6425600E75007109F7 /* J1Logger.swift in Sources */,
 				F9730A5125600E18007109F7 /* RandomData.swift in Sources */,
 				F9B9AEA525FC4FF800FA8D87 /* CSVPublisher.swift in Sources */,
@@ -600,7 +600,7 @@
 				F9B9AEA625FC4FF800FA8D87 /* CSVPublisher.swift in Sources */,
 				F916905925D78BE5003EBCCD /* TrashView.swift in Sources */,
 				F9AE18B625B33336007373E0 /* CryptorError.swift in Sources */,
-				F9F6074B26038D1E00EB1E66 /* Loader.swift in Sources */,
+				F9F6074B26038D1E00EB1E66 /* Restorer.swift in Sources */,
 				F954C09225CD8EE600F88AE8 /* NSManagedObject+Extensions.swift in Sources */,
 				F9730A1225600D05007109F7 /* TresorMockup4Tests.swift in Sources */,
 				F9CEC7F125CEBE3A00A14B61 /* PasswordsView.swift in Sources */,
@@ -622,7 +622,7 @@
 				F9B9AEA725FC4FF800FA8D87 /* CSVPublisher.swift in Sources */,
 				F916905A25D78BE5003EBCCD /* TrashView.swift in Sources */,
 				F9AE18B725B33336007373E0 /* CryptorError.swift in Sources */,
-				F9F6074C26038D1E00EB1E66 /* Loader.swift in Sources */,
+				F9F6074C26038D1E00EB1E66 /* Restorer.swift in Sources */,
 				F954C09325CD8EE600F88AE8 /* NSManagedObject+Extensions.swift in Sources */,
 				F9730A1D25600D06007109F7 /* TresorMockup4UITests.swift in Sources */,
 				F9CEC7F225CEBE3A00A14B61 /* PasswordsView.swift in Sources */,

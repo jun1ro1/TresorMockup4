@@ -158,15 +158,15 @@ struct SettingsView: View {
 
         var csvURL: URL
         csvURL = tempURL.appendingPathComponent("Site.csv", isDirectory: false)
-        let loaderSite = Loader<Site>(url: csvURL, searchingKeys: ["uuid", "url", "title"])
+        let loaderSite = Restorer<Site>(url: csvURL, searchingKeys: ["uuid", "url", "title"])
         loaderSite.load()
 
         csvURL = tempURL.appendingPathComponent("Category.csv", isDirectory: false)
-        let loaderCategory = Loader<Category>(url: csvURL, searchingKeys: ["uuid", "name"])
+        let loaderCategory = Restorer<Category>(url: csvURL, searchingKeys: ["uuid", "name"])
         loaderCategory.load()
  
         csvURL = tempURL.appendingPathComponent("Password.csv", isDirectory: false)
-        let loaderPassword = Loader<Password>(url: csvURL, searchingKeys: ["uuid", "password"])
+        let loaderPassword = Restorer<Password>(url: csvURL, searchingKeys: ["uuid", "password"])
         loaderPassword.load()
         
         loaderSite.link()
