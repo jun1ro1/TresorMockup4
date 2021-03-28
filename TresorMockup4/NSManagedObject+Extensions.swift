@@ -38,7 +38,7 @@ extension NSManagedObject {
         }
     }
     
-    func set(from properties: [String: String]) {
+    func setPrimitive(from properties: [String: String]) {
         let names = Self.entity().properties.map { $0.name }
         names.forEach { name in
             if let val = properties[name] {

@@ -80,7 +80,7 @@ class Restorer<T: NSManagedObject> {
             if obj == nil {
                 obj = T.init(context: self.viewContext)
             }
-            obj!.set(from: dict)
+            obj!.setPrimitive(from: dict)
             self.array.append((obj!, dict))
         }
         
@@ -142,8 +142,6 @@ class Restorer<T: NSManagedObject> {
                 obj.setPrimitiveValue(item, forKey: name)
             }
         }
-        
-//        publisher.start()
     }
     
     func cancel() {
