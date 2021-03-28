@@ -74,8 +74,8 @@ extension NSManagedObject {
                 J1Logger.shared.error("name = \(name), \(link.value) has no destinationEntry")
                 return
             }            
-            guard let uuid = properties[name] else {
-                J1Logger.shared.error("name = \(name), uuid is not found in \(properties)")
+            guard let uuid = properties[name], !uuid.isEmpty else {
+                J1Logger.shared.debug("name = \(name) no link")
                 return
             }
 
@@ -89,14 +89,14 @@ extension NSManagedObject {
             do {
                 items = try viewContext.fetch(request)
             } catch let error {
-                J1Logger.shared.error("fetch = \(error)")
+                J1Logger.shared.error("name = \(name) fetch = \(error)")
             }
-            guard items.count <= 0 else {
-                J1Logger.shared.error("\(String(describing: request.predicate)) not found")
+            guard items.count > 0 else {
+                J1Logger.shared.error("name = \(name) dest = \(dest.name!) \(String(describing: request.predicate)) not found")
                 return
             }
             guard let item = items.first as? NSManagedObject else {
-                J1Logger.shared.error("\(items) are not NSManagedObject")
+                J1Logger.shared.error("name = \(name) \(items) are not NSManagedObject")
                 return
             }
             
