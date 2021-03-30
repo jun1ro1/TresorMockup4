@@ -102,6 +102,16 @@ struct SettingsView: View {
             }
                 
         }
+        let viewContext = PersistenceController.shared.container.viewContext
+        if viewContext.hasChanges {
+            do {
+                try viewContext.save()
+            } catch {
+                let nsError = error as NSError
+                J1Logger.shared.error("Unresolved error \(nsError), \(nsError.userInfo)")
+            }
+            J1Logger.shared.debug("save context")
+        }
     }
     
     func backup() -> URL {
@@ -172,6 +182,17 @@ struct SettingsView: View {
         loaderSite.link()
         loaderCategory.link()
         loaderPassword.link()
+        
+        let viewContext = PersistenceController.shared.container.viewContext
+        if viewContext.hasChanges {
+            do {
+                try viewContext.save()
+            } catch {
+                let nsError = error as NSError
+                J1Logger.shared.error("Unresolved error \(nsError), \(nsError.userInfo)")
+            }
+            J1Logger.shared.debug("save context")
+        }
     }
 }
 

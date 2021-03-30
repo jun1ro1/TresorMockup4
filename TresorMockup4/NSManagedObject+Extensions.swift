@@ -64,46 +64,6 @@ extension NSManagedObject {
         }
     }
 
-    func link(by properties: [String: String]) {
-        let links = Self.entity().relationshipsByName
-        links.forEach { link in
-            let name = link.key
-            guard !link.value.isToMany else { return }
-            
-            guard let dest = link.value.destinationEntity else {
-                J1Logger.shared.error("name = \(name), \(link.value) has no destinationEntry")
-                return
-            }            
-            guard let uuid = properties[name], !uuid.isEmpty else {
-                J1Logger.shared.debug("name = \(name) no link")
-                return
-            }
-
-            let viewContext = PersistenceController.shared.container.viewContext
-            
-            let request: NSFetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: dest.name!)
-            request.predicate = NSPredicate(format: "%K == %@", "uuid", uuid)
-            request.sortDescriptors = nil
-            
-            var items: [Any] = []
-            do {
-                items = try viewContext.fetch(request)
-            } catch let error {
-                J1Logger.shared.error("name = \(name) fetch = \(error)")
-            }
-            guard items.count > 0 else {
-                J1Logger.shared.error("name = \(name) dest = \(dest.name!) \(String(describing: request.predicate)) not found")
-                return
-            }
-            guard let item = items.first as? NSManagedObject else {
-                J1Logger.shared.error("name = \(name) \(items) are not NSManagedObject")
-                return
-            }
-            
-            print("\(String(describing: Self.entity().name)) : \(name) -> \(item)")
-        }
-    }
-
     func propertyDictionary() -> [String: String] {
         let props = Self.entity().properties
         
@@ -151,23 +111,6 @@ extension NSManagedObject {
 
 // MARK: -
 extension NSManagedObject {
-    class func find(predicate: NSPredicate) throws -> [NSManagedObject]? {
-        let viewContext = PersistenceController.shared.container.viewContext
-        
-        let request: NSFetchRequest<Self> = NSFetchRequest(entityName: Self.entity().name!)
-        request.predicate = predicate
-        request.sortDescriptors = nil
-        
-        var items: [Self] = []
-        items = try viewContext.fetch(request)
-        
-        if items.count == 0{
-            return nil
-        } else {
-            return items
-        }
-    }
-
     // https://stackoverflow.com/questions/24658641/ios-delete-all-core-data-swift
     // https://www.avanderlee.com/swift/nsbatchdeleterequest-core-data/
     class func deleteAll() throws {
@@ -227,7 +170,7 @@ extension NSManagedObject {
                     snames.removeAll { unknowns.contains($0) }
                 }
                 let onames  = Set(names).subtracting(snames)
-                names = snames + onames
+                names = snames + onames.sorted()
                 return names
             }.eraseToAnyPublisher()
         
