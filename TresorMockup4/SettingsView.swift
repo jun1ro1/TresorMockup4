@@ -183,7 +183,10 @@ struct SettingsView: View {
         loaderCategory.link()
         loaderPassword.link()
         
+        // https://qiita.com/tasuwo/items/abe90e8302f261f11845
+        // https://qiita.com/MaShunzhe/items/5cc294324f0ecc54c264
         let viewContext = PersistenceController.shared.container.viewContext
+        viewContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
         if viewContext.hasChanges {
             do {
                 try viewContext.save()
