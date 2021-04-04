@@ -113,12 +113,25 @@ extension NSManagedObject {
 extension NSManagedObject {
     // https://stackoverflow.com/questions/24658641/ios-delete-all-core-data-swift
     // https://www.avanderlee.com/swift/nsbatchdeleterequest-core-data/
-    class func deleteAll() throws {
-        let viewContext = PersistenceController.shared.container.viewContext
-        let request: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: Self.entity().name!)
+    // https://developer.apple.com/documentation/coredata/synchronizing_a_local_store_to_the_cloud
+    class func deleteAll(predicate: NSPredicate? = nil) {
+        let name = Self.entity().name!
+        let request: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: name)
+        if predicate != nil {
+            request.predicate = predicate
+        }
         let deleteRequest = NSBatchDeleteRequest(fetchRequest: request)
-        try viewContext.execute(deleteRequest)
-        try viewContext.save()
+        deleteRequest.resultType = .resultTypeCount
+        let context = PersistenceController.shared.container.newBackgroundContext()
+        context.perform {
+            do {
+                let result = try context.execute(deleteRequest) as? NSBatchDeleteResult
+                let count  = result?.result as? NSNumber
+                J1Logger.shared.debug("batch delete request name = \(name) result = \(String(describing: count))")
+            } catch let error {
+                J1Logger.shared.error("batch delete request = \(error)")
+            }
+         }
     }
 }
 

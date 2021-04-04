@@ -40,6 +40,13 @@ extension Category {
 }
 
 extension Category {
+    class func deleteAll() {
+        let predicate =
+            NSPredicate(format: "kind != %@ AND kind != %@",
+                        NSNumber(value: CategoryKind.all.rawValue), NSNumber(value: CategoryKind.trash.rawValue))
+        super.deleteAll(predicate: predicate)
+    }
+
     class func backup() -> URL? {
         let url = FileManager.default.temporaryDirectory
         let fileURL = url

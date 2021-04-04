@@ -94,24 +94,12 @@ struct SettingsView: View {
     } // View
     
     func deleteAll() {
-        [Password.self, Site.self, Category.self].forEach {
-            do {
-                try $0.deleteAll()
-            } catch let error {
-                J1Logger.shared.error("\($0.entity().name!) error = \(error)")
-            }
-                
-        }
+        Password.deleteAll()
+        Site.deleteAll()
+        Category.deleteAll()
+
         let viewContext = PersistenceController.shared.container.viewContext
-        if viewContext.hasChanges {
-            do {
-                try viewContext.save()
-            } catch {
-                let nsError = error as NSError
-                J1Logger.shared.error("Unresolved error \(nsError), \(nsError.userInfo)")
-            }
-            J1Logger.shared.debug("save context")
-        }
+        viewContext.refreshAllObjects()
     }
     
     func backup() -> URL {
@@ -166,27 +154,25 @@ struct SettingsView: View {
             J1Logger.shared.error("Zip.unzipFile = \(error)")
         }
 
+        let viewContext = PersistenceController.shared.container.viewContext
+
         var csvURL: URL
         csvURL = tempURL.appendingPathComponent("Site.csv", isDirectory: false)
-        let loaderSite = Restorer<Site>(url: csvURL, searchingKeys: ["uuid", "url", "title"])
+        let loaderSite = Restorer<Site>(url: csvURL, searchingKeys: ["uuid", "url", "title"], context: viewContext)
         loaderSite.load()
 
         csvURL = tempURL.appendingPathComponent("Category.csv", isDirectory: false)
-        let loaderCategory = Restorer<Category>(url: csvURL, searchingKeys: ["uuid", "name"])
+        let loaderCategory = Restorer<Category>(url: csvURL, searchingKeys: ["uuid", "name"], context: viewContext)
         loaderCategory.load()
  
         csvURL = tempURL.appendingPathComponent("Password.csv", isDirectory: false)
-        let loaderPassword = Restorer<Password>(url: csvURL, searchingKeys: ["uuid", "password"])
+        let loaderPassword = Restorer<Password>(url: csvURL, searchingKeys: ["uuid", "password"], context: viewContext)
         loaderPassword.load()
         
         loaderSite.link()
         loaderCategory.link()
         loaderPassword.link()
         
-        // https://qiita.com/tasuwo/items/abe90e8302f261f11845
-        // https://qiita.com/MaShunzhe/items/5cc294324f0ecc54c264
-        let viewContext = PersistenceController.shared.container.viewContext
-        viewContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
         if viewContext.hasChanges {
             do {
                 try viewContext.save()

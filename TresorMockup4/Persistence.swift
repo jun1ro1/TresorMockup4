@@ -28,16 +28,16 @@ struct PersistenceController {
     let container: NSPersistentCloudKitContainer
     
     init(inMemory: Bool = false) {
-        container = NSPersistentCloudKitContainer(name: "TresorMockup4")
+        self.container = NSPersistentCloudKitContainer(name: "TresorMockup4")
         let debugging = false
         #if DEBUG
 //        debugging = true
         #endif
         
         if inMemory || debugging {
-            container.persistentStoreDescriptions.first!.url = URL(fileURLWithPath: "/dev/null")
+            self.container.persistentStoreDescriptions.first!.url = URL(fileURLWithPath: "/dev/null")
         }
-        container.loadPersistentStores(completionHandler: { (storeDescription, error) in
+        self.container.loadPersistentStores(completionHandler: { (storeDescription, error) in
             #if DEBUG
             let url = storeDescription.url?.absoluteString ?? "nil"
             J1Logger.shared.debug("persistent store URL = \(url)")
@@ -59,5 +59,11 @@ struct PersistenceController {
                 fatalError("Unresolved error \(error), \(error.userInfo)")
             }
         })
+
+        // https://qiita.com/tasuwo/items/abe90e8302f261f11845
+        // https://qiita.com/MaShunzhe/items/5cc294324f0ecc54c264
+        // https://developer.apple.com/documentation/coredata/synchronizing_a_local_store_to_the_cloud
+        self.container.viewContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+        self.container.viewContext.automaticallyMergesChangesFromParent = true
     }
 }
