@@ -14,13 +14,13 @@ class Restorer<T: NSManagedObject> {
     var url: URL
     var keys: [String]
     var array: [(NSManagedObject, [String: String])]
-    var viewContext: NSManagedObjectContext
+    var context: NSManagedObjectContext
     
     init(url: URL, searchingKeys keys: [String], context: NSManagedObjectContext) {
         self.url   = url
         self.keys  = keys
         self.array = []
-        self.viewContext = context
+        self.context = context
     }
     
     func load() {
@@ -35,7 +35,6 @@ class Restorer<T: NSManagedObject> {
         } receiveValue: {  [weak self] dict in
             guard let self = self else { return }
             
-            let viewContext = self.viewContext
             var keys = self.keys
             var obj: T? = nil
             while obj == nil && keys.count > 0 {
@@ -63,10 +62,10 @@ class Restorer<T: NSManagedObject> {
                 
                 request.predicate = predicate
                 request.sortDescriptors = nil
-               
+                
                 var items: [T]
                 do {
-                    items = try viewContext.fetch(request)
+                    items = try self.context.fetch(request)
                 } catch let error {
                     J1Logger.shared.debug("fetch \(request) error = \(error)")
                     return
@@ -79,12 +78,11 @@ class Restorer<T: NSManagedObject> {
             }
             
             if obj == nil {
-                obj = T.init(context: self.viewContext)
+                obj = T.init(context: self.context)
             }
             obj!.setPrimitive(from: dict)
             self.array.append((obj!, dict))
-        }
-        
+        } // receiveValue
         publisher.start()
     }
     
@@ -116,8 +114,6 @@ class Restorer<T: NSManagedObject> {
                     return
                 }
                 
-                let viewContext = self?.viewContext
-                
                 // https://qiita.com/yosshi4486/items/7a2434e0b855d81d6ea9
                 let uuid = UUID(uuidString: uuidstr)
                 let request: NSFetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: dest.name!)
@@ -126,7 +122,7 @@ class Restorer<T: NSManagedObject> {
                 
                 var items: [Any] = []
                 do {
-                    items = try viewContext!.fetch(request)
+                    items = try self!.context.fetch(request)
                 } catch let error {
                     J1Logger.shared.error("name = \(name) fetch = \(error)")
                 }

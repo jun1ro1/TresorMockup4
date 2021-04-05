@@ -154,33 +154,35 @@ struct SettingsView: View {
             J1Logger.shared.error("Zip.unzipFile = \(error)")
         }
 
-        let viewContext = PersistenceController.shared.container.viewContext
-
-        var csvURL: URL
-        csvURL = tempURL.appendingPathComponent("Site.csv", isDirectory: false)
-        let loaderSite = Restorer<Site>(url: csvURL, searchingKeys: ["uuid", "url", "title"], context: viewContext)
-        loaderSite.load()
-
-        csvURL = tempURL.appendingPathComponent("Category.csv", isDirectory: false)
-        let loaderCategory = Restorer<Category>(url: csvURL, searchingKeys: ["uuid", "name"], context: viewContext)
-        loaderCategory.load()
- 
-        csvURL = tempURL.appendingPathComponent("Password.csv", isDirectory: false)
-        let loaderPassword = Restorer<Password>(url: csvURL, searchingKeys: ["uuid", "password"], context: viewContext)
-        loaderPassword.load()
-        
-        loaderSite.link()
-        loaderCategory.link()
-        loaderPassword.link()
-        
-        if viewContext.hasChanges {
-            do {
-                try viewContext.save()
-            } catch {
-                let nsError = error as NSError
-                J1Logger.shared.error("Unresolved error \(nsError), \(nsError.userInfo)")
+        let context = PersistenceController.shared.container.newBackgroundContext()
+        context.perform {
+            var csvURL: URL
+            csvURL = tempURL.appendingPathComponent("Site.csv", isDirectory: false)
+            let loaderSite = Restorer<Site>(url: csvURL, searchingKeys: ["uuid", "url", "title"], context: context)
+            loaderSite.load()
+            
+            csvURL = tempURL.appendingPathComponent("Category.csv", isDirectory: false)
+            let loaderCategory = Restorer<Category>(url: csvURL, searchingKeys: ["uuid", "name"], context: context)
+            loaderCategory.load()
+            
+            csvURL = tempURL.appendingPathComponent("Password.csv", isDirectory: false)
+            let loaderPassword = Restorer<Password>(url: csvURL, searchingKeys: ["uuid", "password"], context: context)
+            loaderPassword.load()
+            
+            loaderSite.link()
+            loaderCategory.link()
+            loaderPassword.link()
+            
+            if context.hasChanges {
+                do {
+                    try context.save()
+                } catch {
+                    let nsError = error as NSError
+                    J1Logger.shared.error("Unresolved error \(nsError), \(nsError.userInfo)")
+                }
+                J1Logger.shared.debug("save context")
             }
-            J1Logger.shared.debug("save context")
+            context.reset()
         }
     }
 }
