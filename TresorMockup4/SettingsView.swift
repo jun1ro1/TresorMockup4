@@ -157,17 +157,25 @@ struct SettingsView: View {
         let context = PersistenceController.shared.container.newBackgroundContext()
         context.perform {
             var csvURL: URL
+            var publisher: CSVPublisher
+            
             csvURL = tempURL.appendingPathComponent("Site.csv", isDirectory: false)
-            let loaderSite = Restorer<Site>(url: csvURL, searchingKeys: ["uuid", "url", "title"], context: context)
-            loaderSite.load()
+            publisher = CSVPublisher(url: csvURL)
+            let loaderSite = Restorer<Site>(searchingKeys: ["uuid", "url", "title"], context: context)
+            loaderSite.load(from: publisher.subject)
+            publisher.start()
             
             csvURL = tempURL.appendingPathComponent("Category.csv", isDirectory: false)
-            let loaderCategory = Restorer<Category>(url: csvURL, searchingKeys: ["uuid", "name"], context: context)
-            loaderCategory.load()
+            publisher = CSVPublisher(url: csvURL)
+            let loaderCategory = Restorer<Category>(searchingKeys: ["uuid", "name"], context: context)
+            loaderCategory.load(from: publisher.subject)
+            publisher.start()
             
             csvURL = tempURL.appendingPathComponent("Password.csv", isDirectory: false)
-            let loaderPassword = Restorer<Password>(url: csvURL, searchingKeys: ["uuid", "password"], context: context)
-            loaderPassword.load()
+            publisher = CSVPublisher(url: csvURL)
+            let loaderPassword = Restorer<Password>(searchingKeys: ["uuid", "password"], context: context)
+            loaderPassword.load(from: publisher.subject)
+            publisher.start()
             
             loaderSite.link()
             loaderCategory.link()

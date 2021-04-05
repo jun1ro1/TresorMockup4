@@ -11,21 +11,18 @@ import Combine
 
 class Restorer<T: NSManagedObject> {
     var cancellable: AnyCancellable?
-    var url: URL
     var keys: [String]
     var array: [(NSManagedObject, [String: String])]
     var context: NSManagedObjectContext
     
-    init(url: URL, searchingKeys keys: [String], context: NSManagedObjectContext) {
-        self.url   = url
+    init(searchingKeys keys: [String], context: NSManagedObjectContext) {
         self.keys  = keys
         self.array = []
         self.context = context
     }
     
-    func load() {
-        let publisher = CSVPublisher(url: self.url)
-        self.cancellable = publisher.subject.sink { completion in
+    func load<P: Publisher>(from publisher: P)  where P.Output == Dictionary<String, String> {
+        self.cancellable = publisher.sink { completion in
             switch completion {
             case .finished:
                 print("load finished")
@@ -56,7 +53,7 @@ class Restorer<T: NSManagedObject> {
                     predicate = nil
                 }
                 guard predicate != nil else {
-                    J1Logger.shared.debug("Unknown attribute type")
+                    J1Logger.shared.error("Unknown attribute type")
                     continue
                 }
                 
@@ -67,7 +64,7 @@ class Restorer<T: NSManagedObject> {
                 do {
                     items = try self.context.fetch(request)
                 } catch let error {
-                    J1Logger.shared.debug("fetch \(request) error = \(error)")
+                    J1Logger.shared.error("fetch \(request) error = \(error)")
                     return
                 }
                 guard items.count > 0 else {
@@ -83,7 +80,6 @@ class Restorer<T: NSManagedObject> {
             obj!.setPrimitive(from: dict)
             self.array.append((obj!, dict))
         } // receiveValue
-        publisher.start()
     }
     
     func link() {
