@@ -52,6 +52,9 @@
 		F9B9AEA525FC4FF800FA8D87 /* CSVPublisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B9AEA425FC4FF800FA8D87 /* CSVPublisher.swift */; };
 		F9B9AEA625FC4FF800FA8D87 /* CSVPublisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B9AEA425FC4FF800FA8D87 /* CSVPublisher.swift */; };
 		F9B9AEA725FC4FF800FA8D87 /* CSVPublisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B9AEA425FC4FF800FA8D87 /* CSVPublisher.swift */; };
+		F9C8F6A8261CA550005920D3 /* CoreDataUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C8F6A7261CA550005920D3 /* CoreDataUtility.swift */; };
+		F9C8F6A9261CA550005920D3 /* CoreDataUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C8F6A7261CA550005920D3 /* CoreDataUtility.swift */; };
+		F9C8F6AA261CA550005920D3 /* CoreDataUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C8F6A7261CA550005920D3 /* CoreDataUtility.swift */; };
 		F9C91A4325974D8300918D07 /* ViewUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C91A4225974D8300918D07 /* ViewUtilities.swift */; };
 		F9C91A4D2597676400918D07 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C91A4C2597676400918D07 /* Utilities.swift */; };
 		F9CDBA1425D1775200780803 /* Category+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9CDBA1325D1775200780803 /* Category+Extensions.swift */; };
@@ -139,6 +142,7 @@
 		F9851EC9256BEEA800784485 /* DetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailView.swift; sourceTree = "<group>"; };
 		F9AE18B425B33336007373E0 /* CryptorError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptorError.swift; sourceTree = "<group>"; };
 		F9B9AEA425FC4FF800FA8D87 /* CSVPublisher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVPublisher.swift; sourceTree = "<group>"; };
+		F9C8F6A7261CA550005920D3 /* CoreDataUtility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataUtility.swift; sourceTree = "<group>"; };
 		F9C91A4225974D8300918D07 /* ViewUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewUtilities.swift; sourceTree = "<group>"; };
 		F9C91A4C2597676400918D07 /* Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
 		F9C91A672597828A00918D07 /* Simulator Screen Shot - iPhone SE (2nd generation) - 2020-12-25 at 23.36.19.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Simulator Screen Shot - iPhone SE (2nd generation) - 2020-12-25 at 23.36.19.png"; sourceTree = "<group>"; };
@@ -292,6 +296,7 @@
 				F9CDBA1325D1775200780803 /* Category+Extensions.swift */,
 				F9CDBA1A25D19AC200780803 /* CategoryView.swift */,
 				F973A7D825E1F5C9002EE692 /* SettingsView.swift */,
+				F9C8F6A7261CA550005920D3 /* CoreDataUtility.swift */,
 				F97309FC25600D05007109F7 /* ContentView.swift */,
 				F9851EC9256BEEA800784485 /* DetailView.swift */,
 				F9730A6325600E75007109F7 /* J1Logger.swift */,
@@ -560,6 +565,7 @@
 				F9CDBA1425D1775200780803 /* Category+Extensions.swift in Sources */,
 				F965519225AB5F0E00FFD4E8 /* Validator.swift in Sources */,
 				F9ECF1E52568CBF700936DAF /* TresorMockup4.xcdatamodeld in Sources */,
+				F9C8F6A8261CA550005920D3 /* CoreDataUtility.swift in Sources */,
 				F954C09125CD8EE600F88AE8 /* NSManagedObject+Extensions.swift in Sources */,
 				F97309FD25600D05007109F7 /* ContentView.swift in Sources */,
 				F9851EC2256BEC0500784485 /* TestData.swift in Sources */,
@@ -598,6 +604,7 @@
 				F9CDBA1C25D19AC200780803 /* CategoryView.swift in Sources */,
 				F9CDBA1525D1775200780803 /* Category+Extensions.swift in Sources */,
 				F9B9AEA625FC4FF800FA8D87 /* CSVPublisher.swift in Sources */,
+				F9C8F6A9261CA550005920D3 /* CoreDataUtility.swift in Sources */,
 				F916905925D78BE5003EBCCD /* TrashView.swift in Sources */,
 				F9AE18B625B33336007373E0 /* CryptorError.swift in Sources */,
 				F9F6074B26038D1E00EB1E66 /* Restorer.swift in Sources */,
@@ -620,6 +627,7 @@
 				F9CDBA1D25D19AC200780803 /* CategoryView.swift in Sources */,
 				F9CDBA1625D1775200780803 /* Category+Extensions.swift in Sources */,
 				F9B9AEA725FC4FF800FA8D87 /* CSVPublisher.swift in Sources */,
+				F9C8F6AA261CA550005920D3 /* CoreDataUtility.swift in Sources */,
 				F916905A25D78BE5003EBCCD /* TrashView.swift in Sources */,
 				F9AE18B725B33336007373E0 /* CryptorError.swift in Sources */,
 				F9F6074C26038D1E00EB1E66 /* Restorer.swift in Sources */,

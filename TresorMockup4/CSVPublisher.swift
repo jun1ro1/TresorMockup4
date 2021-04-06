@@ -23,7 +23,7 @@ class CSVPublisher: NSObject {
         self.url = url
     }
 
-    func start() {
+    func send() {
         guard let stream = InputStream(url: self.url) else {
             J1Logger.shared.error("InputStream error url=\(self.url)")
             self.subjectPrivate.send(completion: .failure(NSCoderValueNotFoundError as! Error))
