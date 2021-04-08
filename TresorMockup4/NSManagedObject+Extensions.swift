@@ -21,16 +21,24 @@ extension NSManagedObject {
         self.init(context: context)
         let names = Self.entity().properties.map { $0.name }
         names.forEach { name in
-            if let val = properties[name] as? String {
+            if let value = properties[name] as? String {
                 switch Self.entity().attributesByName[name]?.attributeType {
                 case .booleanAttributeType:
-                    self.setPrimitiveValue(Bool(val), forKey: name)
+                    let val = Bool(value)
+                    if let old = self.primitiveValue(forKey: name) as? Bool, old == val { return }
+                    self.setPrimitiveValue(val, forKey: name)
                 case .integer16AttributeType, .integer32AttributeType, .integer64AttributeType:
-                    self.setPrimitiveValue(Int(val), forKey: name)
+                    let val = Int(value)
+                    if let old = self.primitiveValue(forKey: name) as? Int, old == val { return }
+                    self.setPrimitiveValue(val, forKey: name)
                 case .dateAttributeType:
-                    self.setPrimitiveValue(Self.dateFormatter.date(from: val), forKey: name)
+                    let val = Self.dateFormatter.date(from: value)
+                    if let old = self.primitiveValue(forKey: name) as? Date, old == val { return }
+                    self.setPrimitiveValue(val, forKey: name)
                 case .stringAttributeType:
-                    self.setPrimitiveValue(String(val), forKey: name)
+                    let val = value
+                    if let old = self.primitiveValue(forKey: name) as? String, old == val { return }
+                   self.setPrimitiveValue(val, forKey: name)
                 default:
                     self.setPrimitiveValue(nil, forKey: name)
                 }

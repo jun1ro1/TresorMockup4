@@ -4,6 +4,8 @@
 //
 //  Created by OKU Junichirou on 2021/03/18.
 //
+// https://stackoverflow.com/questions/1554623/illegal-attempt-to-establish-a-relationship-xyz-between-objects-in-different-c
+// https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/CoreData/FrequentlyAskedQuestions.html
 
 import Foundation
 import CoreData
@@ -22,27 +24,27 @@ class Restorer<T: NSManagedObject> {
     }
     
     func load<P: Publisher>(from publisher: P)  where P.Output == Dictionary<String, String> {
+        let entityName = T.entity().name ?? "nil-name"
+
         self.cancellable = publisher.sink { completion in
             switch completion {
             case .finished:
-                print("load finished")
+                J1Logger.shared.debug("load finished entity = \(entityName)")
             case .failure(let error):
-                print("error = \(error)")
+                J1Logger.shared.debug("load error entity = \(entityName) error = \(error)")
             }
         } receiveValue: {  [weak self] dict in
             guard let self = self else { return }
-            
+                        
             var keys = self.keys
             var obj: T? = nil
             while obj == nil && keys.count > 0 {
                 let key = keys.removeFirst()
                 guard let valstr = dict[key] else {
-                    J1Logger.shared.debug("\(key) value is nil in \(dict)")
+                    J1Logger.shared.debug("entity = \(entityName) \(key) value is nil in \(dict)")
                     continue
                 }
-                
                 let request: NSFetchRequest<T> = NSFetchRequest(entityName: T.entity().name!)
-                
                 var predicate: NSPredicate?
                 switch T.entity().attributesByName[key]?.attributeType {
                 case .UUIDAttributeType:
@@ -53,10 +55,9 @@ class Restorer<T: NSManagedObject> {
                     predicate = nil
                 }
                 guard predicate != nil else {
-                    J1Logger.shared.error("Unknown attribute type")
+                    J1Logger.shared.error("entity = \(entityName) Unknown attribute type")
                     continue
                 }
-                
                 request.predicate = predicate
                 request.sortDescriptors = nil
                 
@@ -64,11 +65,11 @@ class Restorer<T: NSManagedObject> {
                 do {
                     items = try self.context.fetch(request)
                 } catch let error {
-                    J1Logger.shared.error("fetch \(request) error = \(error)")
+                    J1Logger.shared.error("entity = \(entityName) fetch \(request) error = \(error)")
                     return
                 }
                 guard items.count > 0 else {
-                    J1Logger.shared.debug("fetch count = 0 \(request)")
+                    J1Logger.shared.debug("entity = \(entityName) fetch count = 0 \(request)")
                     continue
                 }
                 obj = items.first
@@ -84,7 +85,8 @@ class Restorer<T: NSManagedObject> {
     
     func link() {
         let links = T.entity().relationshipsByName
-        J1Logger.shared.debug("Entity = \(T.entity().name ?? "nil")")
+        let entityName = T.entity().name ?? "nil-name"
+        J1Logger.shared.debug("Entity = \(entityName)")
 
         let publisher = self.array.publisher
         self.cancellable = publisher.sink { completion in
@@ -132,8 +134,12 @@ class Restorer<T: NSManagedObject> {
                     return
                 }
                 
-                print("\(String(describing: T.entity().name)) : \(name) -> \(String(describing: item.value(forKey: "uuid")))")
-                obj.setPrimitiveValue(item, forKey: name)
+                J1Logger.shared.debug("\(entityName) : \(name) -> \(String(describing: item.value(forKey: "uuid")))")
+                if let oldval = obj.primitiveValue(forKey: name) {
+                    J1Logger.shared.debug("\(entityName) : \(name) is \(String(describing: oldval))")
+                } else {
+                    obj.setPrimitiveValue(item, forKey: name)
+                }
             }
         }
     }
