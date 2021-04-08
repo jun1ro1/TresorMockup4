@@ -95,7 +95,7 @@ class CoreDataUtility {
             publisher.send()
             
             let csvPassword = tempURL.appendingPathComponent("Password.csv", isDirectory: false)
-            publisher = CSVPublisher(url: csvCategory)
+            publisher = CSVPublisher(url: csvPassword)
             let loaderPassword = Restorer<Password>(searchingKeys: ["uuid", "password"], context: context)
             loaderPassword.load(from: publisher.subject)
             publisher.send()

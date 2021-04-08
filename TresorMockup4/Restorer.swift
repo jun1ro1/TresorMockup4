@@ -84,7 +84,8 @@ class Restorer<T: NSManagedObject> {
     
     func link() {
         let links = T.entity().relationshipsByName
-        
+        J1Logger.shared.debug("Entity = \(T.entity().name ?? "nil")")
+
         let publisher = self.array.publisher
         self.cancellable = publisher.sink { completion in
             switch completion {
