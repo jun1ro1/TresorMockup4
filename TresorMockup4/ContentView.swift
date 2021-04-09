@@ -143,10 +143,25 @@ struct ItemsView: View {
         }
     }
     
+    // https://stackoverflow.com/questions/1554623/illegal-attempt-to-establish-a-relationship-xyz-between-objects-in-different-c
+    // https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/CoreData/FrequentlyAskedQuestions.html
+
     private func disposeItems(offsets: IndexSet) {
         withAnimation {
+            guard let trashID = Category.Trash?.objectID else {
+                J1Logger.shared.error("ObjectID = nil Category.Trassh = \(String(describing: Category.Trash))")
+                return
+            }
             offsets.map { self.items[$0] }.forEach { site in
-                site.category = Category.Trash
+                guard let context = site.managedObjectContext else {
+                    J1Logger.shared.error("context = nil site = \(site)")
+                    return
+                }
+                guard let trash = context.object(with: trashID) as? Category else {
+                    J1Logger.shared.error("trash = nil trashID = \(trashID)")
+                    return
+                }
+                site.category = trash
             }
             // NOTICE
             // Don't save Core Data context in this method,
