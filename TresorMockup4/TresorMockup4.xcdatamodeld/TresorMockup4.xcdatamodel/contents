@@ -26,6 +26,7 @@
         <attribute name="maxLength" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="memo" optional="YES" attributeType="String" defaultValueString=""/>
         <attribute name="memoSecret" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="observation" optional="YES" transient="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromDataTransformer"/>
         <attribute name="password" optional="YES" attributeType="String" defaultValueString=""/>
         <attribute name="pinned" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <attribute name="selectAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
@@ -42,6 +43,6 @@
     <elements>
         <element name="Category" positionX="461.111328125" positionY="-421.3810424804688" width="128" height="149"/>
         <element name="Password" positionX="910.6432495117188" positionY="-194.6951599121094" width="128" height="149"/>
-        <element name="Site" positionX="658.582763671875" positionY="-316.2332611083984" width="128" height="284"/>
+        <element name="Site" positionX="658.582763671875" positionY="-316.2332611083984" width="128" height="299"/>
     </elements>
 </model>

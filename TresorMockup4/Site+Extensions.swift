@@ -20,16 +20,37 @@ extension Site {
         self.setPrimitiveValue(8, forKey: "maxLength")
         self.setPrimitiveValue(CypherCharacterSet.AlphaNumericsSet.rawValue, forKey: "charSet")
         
+        // https://developer.apple.com/documentation/objectivec/nsobject/keyvalueobservingpublisher
+        // https://developer.apple.com/documentation/swift/cocoa_design_patterns/using_key-value_observing_in_swift
         // https://qiita.com/BlueEventHorizon/items/bf37428b54b937728dc7
         // https://developer.apple.com/documentation/swift/cocoa_design_patterns/using_key-value_observing_in_swift
         // https://stackoverflow.com/questions/60386000/how-to-use-combine-framework-nsobject-keyvalueobservingpublisher
         // https://www.apeth.com/UnderstandingCombine/publishers/publisherskvo.html
         // https://augmentedcode.io/2020/11/08/observing-a-kvo-compatible-model-in-swiftui-and-mvvm/
-        _ = self.observe(\.password, options: [.new, .old]) { (obj, change) in
-            let new = (change.newValue as? String) ?? "nil"
-            let old = (change.oldValue as? String) ?? "nil"
-            J1Logger.shared.debug("old = \(old) new = \(new)")
+      }
+    
+    override public func awakeFromFetch() {
+        super.awakeFromFetch()
+        self.observation = self.observe(\.password, options: [.new, .old], changeHandler: Self.updatePassword)
+    }
+    
+    private static func updatePassword(site: Site, change: NSKeyValueObservedChange<String?>) {
+        guard let newPass = change.newValue as? String    else { return }
+        guard let oldPass = change.oldValue as? String    else { return }
+        guard newPass != oldPass                          else { return }
+        guard let viewContext = site.managedObjectContext else { return }
+        
+        // search oldpassword
+        let passwords = site.passwords
+        if passwords == nil || passwords!.filtered(using: NSPredicate(format: "password == %@", oldPass)) == [] {
+            let oldPassword = Password(context: viewContext)
+            oldPassword.password = oldPass
+            oldPassword.site     = site
         }
+        let newPassword = Password(context: viewContext)
+        newPassword.password = newPass
+        newPassword.site     = site
+        newPassword.select()
     }
     
     public override func willSave() {

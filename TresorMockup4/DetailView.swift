@@ -314,9 +314,13 @@ struct EditView: View {
             else {
                 if self.site.password != self.cipherPass {
                     self.site.password = self.cipherPass
-                    let password = Password(context: self.viewContext)
-                    password.password   = self.site.password
-                    password.select(site: self.site)
+//                    password.select(site: self.site)
+
+//
+//                    self.site.password = self.cipherPass
+//                    let password = Password(context: self.viewContext)
+//                    password.password   = self.site.password
+//                    password.select(site: self.site)
                 }
             }
             

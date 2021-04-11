@@ -26,18 +26,20 @@ extension Password {
 }
 
 extension Password {
-    func select(site: Site){
+    func select() {
+        guard let site = self.site else { return }
         let now = Date()
         self.selectedAt = now
-        site.selectAt   = now
-        site.password   = self.password
-        (site.passwords?.allObjects as? [Password])?.forEach { pass in
+        _ = site.passwords?.map {
+            guard let pass = $0 as? Password else { return }
             if pass.current {
                 pass.current = false
             }
         }
         self.current = true
-        self.site    = site
+
+        site.selectAt   = now
+        site.setPrimitiveValue(self.password, forKey: "password")
     }
 }
 

@@ -82,7 +82,7 @@ struct PasswordItemsView: View {
                             Image(systemName: "doc.on.doc")
                         }
                         Button(action: {
-                            item.select(site: self.site)
+                            item.select()
                         }) {
                             Text("Select")
                             Image(systemName: "checkmark.circle")
