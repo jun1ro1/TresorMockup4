@@ -10,6 +10,7 @@ import Foundation
 
 extension Password {
     override public func awakeFromInsert() {
+        super.awakeFromInsert()
         let now = Date()
         self.setPrimitiveValue(now, forKey: "createdAt")
         self.setPrimitiveValue(now, forKey: "selectedAt")

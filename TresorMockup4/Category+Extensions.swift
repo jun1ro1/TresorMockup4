@@ -18,6 +18,7 @@ enum CategoryKind: Int16 {
 
 extension Category {
     public override func awakeFromInsert() {
+        super.awakeFromInsert()
         let now = Date()
         self.setPrimitiveValue(now, forKey: "createdAt")
         self.setPrimitiveValue(UUID(), forKey: "uuid")
