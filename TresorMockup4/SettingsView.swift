@@ -31,7 +31,6 @@ struct SettingsView: View {
                 return ObjectIdentifier(Self.self)
             case .restore(block: _):
                 return ObjectIdentifier(Self.self)
-
             }
         }
 

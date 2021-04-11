@@ -23,7 +23,7 @@ class CoreDataUtility {
         viewContext.refreshAllObjects()
     }
     
-    func backup() -> URL {
+    private var timeString: String {
         let now       = Date()
         let formatter = ISO8601DateFormatter()
         formatter.timeZone = .autoupdatingCurrent
@@ -32,21 +32,39 @@ class CoreDataUtility {
             [.withDashSeparatorInDate, .withColonSeparatorInTime,
              .withColonSeparatorInTimeZone, .withSpaceBetweenDateAndTime,
              .withTimeZone])
-        let timestr = formatter.string(from: now)
-        
-        let urlCategory = Category.backup()
-        let urlSite     = Site.backup()
-        let urlPassword = Password.backup()
+        return formatter.string(from: now)
+    }
+    
+    private var temporaryURL: URL {
+        let name = Bundle.main.object(forInfoDictionaryKey: kCFBundleNameKey as String) as! String
+        let tempURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent(name, isDirectory: true)
+        return tempURL
+    }
+    
+    func backup() -> URL {
+        let tempURL = self.temporaryURL
+        do {
+            try FileManager.default.createDirectory(at: tempURL, withIntermediateDirectories: true)
+        } catch let error {
+            J1Logger.shared.error("createDirectory error = \(error)")
+        }
+        J1Logger.shared.info("tempURL = \(tempURL)")
+
+        let urlCategory = Category.backup(url: tempURL)
+        let urlSite     = Site.backup(url: tempURL)
+        let urlPassword = Password.backup(url: tempURL)
         J1Logger.shared.debug("urlCategory = \(String(describing: urlCategory))")
         J1Logger.shared.debug("urlSite     = \(String(describing: urlSite))")
         J1Logger.shared.debug("urlPassword = \(String(describing: urlPassword))")
         
         let name = Bundle.main.object(forInfoDictionaryKey: kCFBundleNameKey as String) as! String
-        let urlZip = urlSite?.deletingLastPathComponent().appendingPathComponent("\(name)-\(timestr).zip")
+        let timestr = self.timeString
+        let urlZip = urlSite.deletingLastPathComponent().appendingPathComponent("\(name)-\(timestr).zip")
         
-        let urls =  [urlCategory!, urlSite!, urlPassword!]
+        let urls =  [urlCategory, urlSite, urlPassword]
         do {
-            try Zip.zipFiles(paths: urls, zipFilePath: urlZip!, password: nil) { _ in
+            try Zip.zipFiles(paths: urls, zipFilePath: urlZip, password: nil) { _ in
             }
         } catch let error {
             J1Logger.shared.error("Zip.zipFiles = \(error)")
@@ -59,18 +77,17 @@ class CoreDataUtility {
                 J1Logger.shared.error("removeItem \(url.absoluteString) error = \(error)")
             }
         }
-        return urlZip!
+        return urlZip
     }
     
     func restore(url: URL) {
-        let name = Bundle.main.object(forInfoDictionaryKey: kCFBundleNameKey as String) as! String
-        J1Logger.shared.debug("url = \(String(describing: url))")
-        
-        let tempURL =
-            FileManager.default.temporaryDirectory
-            .appendingPathComponent(name, isDirectory: true)
-            .appendingPathComponent( (0...9).shuffled().map { String($0) }.joined(), isDirectory: true)
-        J1Logger.shared.debug("tempURL = \(tempURL)")
+        let tempURL = self.temporaryURL
+        do {
+            try FileManager.default.createDirectory(at: tempURL, withIntermediateDirectories: true)
+        } catch let error {
+            J1Logger.shared.error("createDirectory error = \(error)")
+        }
+        J1Logger.shared.info("tempURL = \(tempURL)")
         
         do {
             try Zip.unzipFile(url, destination: tempURL, overwrite: true, password: nil)
