@@ -40,16 +40,45 @@ extension Site {
         guard newPass != oldPass                          else { return }
         guard let viewContext = site.managedObjectContext else { return }
         
+        // BUG site.passwords is empty
+        let passwords = (site.passwords?.allObjects as? [Password] ?? [])
+                .sorted { (x, y) -> Bool in
+                    let xp = x.password ?? ""
+                    let yp = y.password ?? ""
+                    if xp != yp {
+                        return xp < yp
+                    }
+                    let xc = x.createdAt ?? Date(timeIntervalSince1970: 0)
+                    let yc = y.createdAt ?? Date(timeIntervalSince1970: 0)
+                    return xc < yc
+                }
+        
+        let cryptor = Cryptor(name: "DEBUG")
+        try? cryptor.open(password: "pass")
+        let newPassPlain = try? cryptor.decrypt(cipher: newPass)
+        let oldPassPlain = try? cryptor.decrypt(cipher: oldPass)
+        J1Logger.shared.debug("newPass = \(newPass) newPassPlain = \(String(describing: newPassPlain))")
+        J1Logger.shared.debug("oldPass = \(oldPass) oldPassPlain = \(String(describing: oldPassPlain))")
+        try? cryptor.close()
+        
+        
         // search oldpassword
-        let passwords = site.passwords
-        if passwords == nil || passwords!.filtered(using: NSPredicate(format: "password == %@", oldPass)) == [] {
+        if passwords.first(where: { $0.password == oldPass }) == nil {
             let oldPassword = Password(context: viewContext)
             oldPassword.password = oldPass
             oldPassword.site     = site
+            site.addToPasswords(oldPassword)
         }
-        let newPassword = Password(context: viewContext)
-        newPassword.password = newPass
-        newPassword.site     = site
+
+        let newPassword = { () -> Password in
+            var p = passwords.first(where: { $0.password == newPass })
+            if p != nil { return p! }
+            p = Password(context: viewContext)
+            p!.password = newPass
+            p!.site     = site
+            site.addToPasswords(p!)
+            return p!
+        }()
         newPassword.select()
     }
     
