@@ -229,9 +229,10 @@ class TestData {
 
         var collection: [(Dictionary<String, String>, Dictionary<String, String>)] = []
         for i in 0..<titles.count {
+            let plain = "pass-\(String(i))"
             let passstr = {
                 (try? cryptor.encrypt(plain: $0)) ?? $0
-            }("pass-\(String(i))")
+            }(plain)
             var site =
                 [ "title": titles[i],
                   "titleSort": titles[i],
@@ -257,8 +258,8 @@ class TestData {
         }
         let viewContext = PersistenceController.shared.container.viewContext
         collection.forEach {
-            let site     = Site(from: $0.0, context: viewContext)
-            let password = Password(from: $0.1, context: viewContext)
+            let site     = Site(from: $0.0, context: viewContext)      // BUG
+            let password = Password(from: $0.1, context: viewContext)  // BUG
             password.site = site
          }
         

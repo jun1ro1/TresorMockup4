@@ -37,7 +37,7 @@ struct DetailView: View {
             }
         }
     }
-}
+} // DtailView
 
 struct NotSelectedView: View {
     var body: some View {
@@ -45,7 +45,7 @@ struct NotSelectedView: View {
             .font(.largeTitle)
             .multilineTextAlignment(.center)
     }
-}
+} // NotSelectedView
 
 struct NewItemView: View {
     @Environment(\.managedObjectContext) private var viewContext
@@ -62,14 +62,16 @@ struct EditView: View {
     @ObservedObject var site:  Site
     @ObservedObject var cryptor: CryptorUI = CryptorUI(name: "edit_password", duration: 30)
     
-    @State private var title:       String = ""
-    @State private var titleSort:   String = ""
-    @State private var url:         String = ""
-    @State private var userid:      String = ""
-    @State private var cipherPass:  String = ""
-    @State private var plainPass:   String = ""
-    @State private var mlength:     Float  = 4.0
-    @State private var chars:       Int    = 0
+    @State private var title:           String = ""
+    @State private var titleSort:       String = ""
+    @State private var url:             String = ""
+    @State private var userid:          String = ""
+    @State private var cipherPass:      String = ""
+    @State private var plainPass:       String = ""
+    @State private var passwordHash:    Data   = Data()
+    @State private var mlength:         Float  = 4.0
+    @State private var length:          Int    = 0
+    @State private var chars:           Int    = 0
     
     @Environment(\.editMode) var editMode
     @Environment(\.managedObjectContext) private var viewContext
@@ -93,12 +95,9 @@ struct EditView: View {
             TextField("URL",
                       text: self.$url,
                       onCommit: {
-                        if self.title.isEmpty,
-                           let host = getDomain(from: self.url) {
+                        if self.title.isEmpty, let host = getDomain(from: self.url) {
                             self.title = host
-                            if self.titleSort.isEmpty {
-                                self.titleSort = host
-                            }
+                            if self.titleSort.isEmpty { self.titleSort = host }
                         }
                       })
                 .introspectTextField { textField in
@@ -137,28 +136,40 @@ struct EditView: View {
                 .disableAutocorrection(true)
             
             HStack {
-                Group {
+//                Group {
                     if self.cryptor.opened {
-                        TextField("", text: self.$plainPass) {_ in
+                        TextField("", text: self.$plainPass) { _ in
                             do {
                                 try self.cipherPass = cryptor.encrypt(plain: self.plainPass)
+                                self.length = self.plainPass.count
                             } catch let error {
                                 J1Logger.shared.error("encrypt failed error=\(error)")
+                            }
+                            do {
+                                self.passwordHash = try self.plainPass.hash()
+                            } catch let error {
+                                J1Logger.shared.error("hash failed = \(error)")
                             }
                         } onCommit: {
                             do {
                                 try self.cipherPass = cryptor.encrypt(plain: self.plainPass)
+                                self.length = self.plainPass.count
                             } catch let error {
                                 J1Logger.shared.error("encrypt failed error=\(error)")
+                            }
+                            do {
+                                self.passwordHash = try self.plainPass.hash()
+                            } catch let error {
+                                J1Logger.shared.error("hash failed = \(error)")
                             }
                         }
                         .disableAutocorrection(true)
                         .autocapitalization(.none)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                     } else {
-                        Text("********")
-                    } //
-                } // Group
+                        Text(String(repeating: "*", count: max(1, self.length)))
+                    }
+//                } // Group
                 Spacer()
                 Button {
                     withAnimation {
@@ -175,7 +186,15 @@ struct EditView: View {
                                     self.cipherPass = try cryptor.encrypt(plain: self.plainPass)
                                 } catch let error {
                                     J1Logger.shared.error("encrypt failed error=\(error)")
+                                    self.cipherPass = ""
                                 }
+                                do {
+                                    self.passwordHash = try self.plainPass.hash()
+                                } catch let error {
+                                    J1Logger.shared.error("hash failed = \(error)")
+                                    self.passwordHash = Data()
+                                }
+                                self.length = self.plainPass.count
                             case true:  // when opened, decrypt cipherPass and sotre it to plainPass
                                 guard !self.cipherPass.isEmpty else {
                                     self.plainPass = "" // no password
@@ -211,13 +230,20 @@ struct EditView: View {
                     Button {
                         if let val = try? RandomData.shared.get(count: Int(self.mlength),
                                                                 in: self.charsArray[self.chars]) {
-                            // self.detailItem?.passwordCurrent = val as NSString  // ***ENCRYPT***
                             self.plainPass  = val
                             do {
                                 try self.cipherPass = cryptor.encrypt(plain: self.plainPass)
                             } catch let error {
                                 J1Logger.shared.error("encrypt failed error=\(error)")
+                                self.cipherPass = ""
                             }
+                            do {
+                                self.passwordHash = try self.plainPass.hash()
+                            } catch let error {
+                                J1Logger.shared.error("hash failed = \(error)")
+                                self.passwordHash = Data()
+                            }
+                            self.length = self.plainPass.count
                         }
                     } label: {
                         Text("Generate Password")
@@ -252,11 +278,13 @@ struct EditView: View {
             J1Logger.shared.debug("onAppear")
             self.site.on(state: .editing)
             
-            self.title      = self.site.title ?? ""
-            self.titleSort  = self.site.titleSort ?? ""
-            self.url        = self.site.url   ?? ""
-            self.userid     = self.site.userid ?? ""
-            self.cipherPass = self.site.password ?? ""
+            self.title        = self.site.title ?? ""
+            self.titleSort    = self.site.titleSort ?? ""
+            self.url          = self.site.url   ?? ""
+            self.userid       = self.site.userid ?? ""
+            self.cipherPass   = self.site.password ?? ""
+            self.passwordHash = self.site.passwordHash ?? Data()
+            self.length       = Int(self.site.length)
             self.mlength = {
                 let len = Int(self.site.maxLength)
                 var val = 0
@@ -290,9 +318,16 @@ struct EditView: View {
             update(&self.site.titleSort, with: self.titleSort)
             update(&self.site.url      , with: self.url)
             update(&self.site.userid   , with: self.userid)
-            let i = Int16(self.mlength)
-            if self.site.maxLength != i {
-                self.site.maxLength = i
+            if self.site.passwordHash != self.passwordHash {
+                self.site.passwordHash = self.passwordHash
+            }
+            let i = Int16(self.length)
+            if self.site.length != i {
+                self.site.length = i
+            }
+            let j = Int16(self.mlength)
+            if self.site.maxLength != j {
+                self.site.maxLength = j
             }
             let c = self.charsArray[self.chars].rawValue
             if self.site.charSet != c {
@@ -310,9 +345,8 @@ struct EditView: View {
                 withAnimation {
                     self.viewContext.delete(self.site)
                 }
-            }
-            else {
-                if self.site.password != self.cipherPass {
+            } else {
+                if self.site.password != self.cipherPass {  // BUG
                     self.site.password = self.cipherPass
 //                    password.select(site: self.site)
 
@@ -364,7 +398,7 @@ struct PresentView: View {
                         Group {
                             let str: String = {
                                 guard self.cryptor.opened else {
-                                    return "********"
+                                    return String(repeating: "*", count: max(1, Int(self.site.length)))
                                 }
                                 guard let cipher = self.site.password else {
                                     return ""

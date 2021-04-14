@@ -80,6 +80,13 @@ public extension Data {
 
 
 public extension String {
+    func hash() throws -> Data {
+        guard let data = self.data(using: .utf8, allowLossyConversion: false) else {
+            throw CryptorError.invalidCharacter
+        }
+        return data.hash()
+    }
+    
     func decrypt(using key: SymmetricKey) throws -> Data {
         guard let data = Data(base64Encoded: self, options: .ignoreUnknownCharacters) else {
             throw CryptorError.invalidCharacter
