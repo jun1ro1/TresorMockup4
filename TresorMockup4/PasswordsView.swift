@@ -50,7 +50,7 @@ struct PasswordItemsView: View {
             let pass = item as Password
             let str: String = {
                 guard self.cryptor.opened else {
-                    return "********"
+                    return String(repeating: "*", count: Int(item.length))
                 }
                 guard let cipher = pass.password else {
                     return ""

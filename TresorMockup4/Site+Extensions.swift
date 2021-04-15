@@ -29,55 +29,46 @@ extension Site {
         // https://augmentedcode.io/2020/11/08/observing-a-kvo-compatible-model-in-swiftui-and-mvvm/
       }
     
-    override public func awakeFromFetch() {
-        super.awakeFromFetch()
-        self.observation = self.observe(\.password, options: [.new, .old], changeHandler: Self.updatePassword)
-    }
+//    override public func awakeFromFetch() {
+//        super.awakeFromFetch()
+//        self.observation = self.observe(\.password, options: [.new, .old], changeHandler: Self.updatePassword)
+//    }
     
-    private static func updatePassword(site: Site, change: NSKeyValueObservedChange<String?>) {
-        guard let newPass = change.newValue as? String    else { return }
-        guard let oldPass = change.oldValue as? String    else { return }
-        guard newPass != oldPass                          else { return }
-        guard let viewContext = site.managedObjectContext else { return }
-        
-        // BUG site.passwords is empty
-        let passwords = (site.passwords?.allObjects as? [Password] ?? [])
+    public func setPassword(cipher newPassCipher: String, plain newPassPlain: String) throws {
+        guard let viewContext = self.managedObjectContext else { return }
+        let passwords = (self.passwords?.allObjects as? [Password] ?? [])
                 .sorted { (x, y) -> Bool in
-                    let xp = x.password ?? ""
-                    let yp = y.password ?? ""
-                    if xp != yp {
-                        return xp < yp
-                    }
                     let xc = x.createdAt ?? Date(timeIntervalSince1970: 0)
                     let yc = y.createdAt ?? Date(timeIntervalSince1970: 0)
                     return xc < yc
                 }
-        
-        
-        let cryptor = Cryptor(name: "DEBUG")
-        try? cryptor.open(password: "pass")
-        let newPassPlain = try? cryptor.decrypt(cipher: newPass)
-        let oldPassPlain = try? cryptor.decrypt(cipher: oldPass)
-        J1Logger.shared.debug("newPass = \(newPass) newPassPlain = \(String(describing: newPassPlain))")
-        J1Logger.shared.debug("oldPass = \(oldPass) oldPassPlain = \(String(describing: oldPassPlain))")
-        try? cryptor.close()
-        
-        
-        // search oldpassword
-        if passwords.first(where: { $0.password == oldPass }) == nil {
-            let oldPassword = Password(context: viewContext)
-            oldPassword.password = oldPass
-            oldPassword.site     = site
-            site.addToPasswords(oldPassword)
+        let newPassHash = try newPassPlain.hash()
+
+        // save old password
+        if let oldPassStr  = self.password, let oldPassHash = self.passwordHash {
+            if passwords.first(where: { $0.passwordHash == oldPassHash }) == nil {
+                let oldPassword = Password(context: viewContext)
+                oldPassword.password     = oldPassStr
+                oldPassword.passwordHash = self.passwordHash
+                oldPassword.length       = self.length
+                oldPassword.site         = self
+                self.addToPasswords(oldPassword)
+            }
         }
+        
+        self.password     = newPassCipher
+        self.passwordHash = try newPassPlain.hash()
+        self.length       = Int16(newPassPlain.count)
 
         let newPassword = { () -> Password in
-            var p = passwords.first(where: { $0.password == newPass })
+            var p = passwords.first(where: { $0.passwordHash == newPassHash })
             if p != nil { return p! }
             p = Password(context: viewContext)
-            p!.password = newPass
-            p!.site     = site
-            site.addToPasswords(p!)
+            p!.password     = self.password
+            p!.passwordHash = self.passwordHash
+            p!.length       = self.length
+            p!.site         = self
+            self.addToPasswords(p!)
             return p!
         }()
         newPassword.select()

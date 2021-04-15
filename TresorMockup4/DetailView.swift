@@ -68,9 +68,7 @@ struct EditView: View {
     @State private var userid:          String = ""
     @State private var cipherPass:      String = ""
     @State private var plainPass:       String = ""
-    @State private var passwordHash:    Data   = Data()
     @State private var mlength:         Float  = 4.0
-    @State private var length:          Int    = 0
     @State private var chars:           Int    = 0
     
     @Environment(\.editMode) var editMode
@@ -141,33 +139,23 @@ struct EditView: View {
                         TextField("", text: self.$plainPass) { _ in
                             do {
                                 try self.cipherPass = cryptor.encrypt(plain: self.plainPass)
-                                self.length = self.plainPass.count
                             } catch let error {
                                 J1Logger.shared.error("encrypt failed error=\(error)")
+                                self.cipherPass = ""
                             }
-                            do {
-                                self.passwordHash = try self.plainPass.hash()
-                            } catch let error {
-                                J1Logger.shared.error("hash failed = \(error)")
-                            }
-                        } onCommit: {
+                         } onCommit: {
                             do {
                                 try self.cipherPass = cryptor.encrypt(plain: self.plainPass)
-                                self.length = self.plainPass.count
                             } catch let error {
                                 J1Logger.shared.error("encrypt failed error=\(error)")
-                            }
-                            do {
-                                self.passwordHash = try self.plainPass.hash()
-                            } catch let error {
-                                J1Logger.shared.error("hash failed = \(error)")
-                            }
-                        }
+                                self.cipherPass = ""
+                           }
+                         }
                         .disableAutocorrection(true)
                         .autocapitalization(.none)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                     } else {
-                        Text(String(repeating: "*", count: max(1, self.length)))
+                        Text(String(repeating: "*", count: max(1, Int(self.site.length))))
                     }
 //                } // Group
                 Spacer()
@@ -188,13 +176,6 @@ struct EditView: View {
                                     J1Logger.shared.error("encrypt failed error=\(error)")
                                     self.cipherPass = ""
                                 }
-                                do {
-                                    self.passwordHash = try self.plainPass.hash()
-                                } catch let error {
-                                    J1Logger.shared.error("hash failed = \(error)")
-                                    self.passwordHash = Data()
-                                }
-                                self.length = self.plainPass.count
                             case true:  // when opened, decrypt cipherPass and sotre it to plainPass
                                 guard !self.cipherPass.isEmpty else {
                                     self.plainPass = "" // no password
@@ -204,7 +185,8 @@ struct EditView: View {
                                     self.plainPass = try cryptor.decrypt(cipher: self.cipherPass)
                                 } catch let error {
                                     J1Logger.shared.error("decrypt failed: \(self.cipherPass) error=\(error)")
-                                }
+                                    self.cipherPass = ""
+                               }
                             default:    // unknown status
                                 break
                             }
@@ -237,13 +219,6 @@ struct EditView: View {
                                 J1Logger.shared.error("encrypt failed error=\(error)")
                                 self.cipherPass = ""
                             }
-                            do {
-                                self.passwordHash = try self.plainPass.hash()
-                            } catch let error {
-                                J1Logger.shared.error("hash failed = \(error)")
-                                self.passwordHash = Data()
-                            }
-                            self.length = self.plainPass.count
                         }
                     } label: {
                         Text("Generate Password")
@@ -283,8 +258,6 @@ struct EditView: View {
             self.url          = self.site.url   ?? ""
             self.userid       = self.site.userid ?? ""
             self.cipherPass   = self.site.password ?? ""
-            self.passwordHash = self.site.passwordHash ?? Data()
-            self.length       = Int(self.site.length)
             self.mlength = {
                 let len = Int(self.site.maxLength)
                 var val = 0
@@ -318,16 +291,9 @@ struct EditView: View {
             update(&self.site.titleSort, with: self.titleSort)
             update(&self.site.url      , with: self.url)
             update(&self.site.userid   , with: self.userid)
-            if self.site.passwordHash != self.passwordHash {
-                self.site.passwordHash = self.passwordHash
-            }
-            let i = Int16(self.length)
-            if self.site.length != i {
-                self.site.length = i
-            }
-            let j = Int16(self.mlength)
-            if self.site.maxLength != j {
-                self.site.maxLength = j
+            let i = Int16(self.mlength)
+            if self.site.maxLength != i {
+                self.site.maxLength = i
             }
             let c = self.charsArray[self.chars].rawValue
             if self.site.charSet != c {
@@ -346,8 +312,14 @@ struct EditView: View {
                     self.viewContext.delete(self.site)
                 }
             } else {
-                if self.site.password != self.cipherPass {  // BUG
-                    self.site.password = self.cipherPass
+                do {
+                    try self.site.setPassword(cipher: self.cipherPass, plain: self.plainPass)
+                } catch let error {
+                    J1Logger.shared.error("setPassword error = \(error)")
+                }
+                
+//                if self.site.password != self.cipherPass {  // BUG
+//                    self.site.password = self.cipherPass
 //                    password.select(site: self.site)
 
 //
@@ -355,7 +327,7 @@ struct EditView: View {
 //                    let password = Password(context: self.viewContext)
 //                    password.password   = self.site.password
 //                    password.select(site: self.site)
-                }
+//                }
             }
             
             // NOTICE
@@ -438,6 +410,7 @@ struct PresentView: View {
                                 .foregroundColor(.secondary)
                         }
                         .buttonStyle(PlainButtonStyle())
+                        .padding()
                     } // Navigation Link
                 } // Hstack                
                 Text(self.site.selectAt == nil ?
