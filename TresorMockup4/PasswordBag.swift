@@ -7,7 +7,7 @@
 
 import Foundation
 
-class PasswordPack: ObservableObject {
+class PasswordBag: ObservableObject {
     @Published var passwordPlain:  String   = ""
     @Published var passwordCipher: String   = ""
     @Published var passwordHash:   Data     = Data()
@@ -42,7 +42,7 @@ class PasswordPack: ObservableObject {
     func set(plain: String) {
         self.passwordPlain  = plain
         self.passwordCipher = ""
-        self.passwordHash   = Data()
+        self.passwordHash   = plain.isEmpty ? Data() : (try? plain.hash()) ?? Data()
         self.length         = Int16(plain.count)
     }
     
@@ -53,14 +53,14 @@ class PasswordPack: ObservableObject {
         self.length         = 0
     }
     
-    func integrize(cryptor: CryptorUI) throws {
+    func endecrypt(cryptor: CryptorUI) throws {
         switch (self.passwordPlain.isEmpty, self.passwordCipher.isEmpty) {
         case (true, false):
-            self.passwordHash  = try self.passwordPlain.hash()
             self.passwordPlain = try cryptor.decrypt(cipher: self.passwordCipher)
+            self.passwordHash  = try self.passwordPlain.hash()
         case (false, true):
-            self.passwordHash   = try self.passwordPlain.hash()
             self.passwordCipher = try cryptor.encrypt(plain: self.passwordPlain)
+            self.passwordHash   = try self.passwordPlain.hash()
         default:
             break
         }

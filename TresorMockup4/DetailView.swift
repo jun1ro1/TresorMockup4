@@ -70,7 +70,7 @@ struct EditView: View {
     @State private var mlength:         Float  = 4.0
     @State private var chars:           Int    = 0
     
-    @StateObject private var password = PasswordPack()
+    @StateObject private var password = PasswordBag()
     
     @Environment(\.editMode) var editMode
     @Environment(\.managedObjectContext) private var viewContext
@@ -138,10 +138,15 @@ struct EditView: View {
                 if self.cryptor.opened {
                     TextField("", text: self.$plainPass) { _ in
                         self.password.set(plain: self.plainPass)
-                    } onCommit: {
+                        do {
+                            try self.password.endecrypt(cryptor: self.cryptor)
+                        } catch let error {
+                            J1Logger.shared.error("encrypt error = \(error)")
+                        }
+                   } onCommit: {
                         self.password.set(plain: self.plainPass)
                         do {
-                            try self.password.integrize(cryptor: self.cryptor)
+                            try self.password.endecrypt(cryptor: self.cryptor)
                         } catch let error {
                             J1Logger.shared.error("encrypt error = \(error)")
                         }
@@ -162,13 +167,13 @@ struct EditView: View {
                             case false: // when closed, encrypt plainPass
                                 self.password.set(plain: self.plainPass)
                                 do {
-                                    try self.password.integrize(cryptor: self.cryptor)
+                                    try self.password.endecrypt(cryptor: self.cryptor)
                                 } catch let error {
                                     J1Logger.shared.error("encrypt error = \(error)")
                                 }
                             case true:  // when opened, set a decrypted password to plainPass
                                 do {
-                                    try self.password.integrize(cryptor: self.cryptor)
+                                    try self.password.endecrypt(cryptor: self.cryptor)
                                 } catch let error {
                                     J1Logger.shared.error("encrypt error = \(error)")
                                 }
@@ -201,7 +206,7 @@ struct EditView: View {
                             self.plainPass  = val
                             self.password.set(plain: self.plainPass)
                             do {
-                                try self.password.integrize(cryptor: self.cryptor)
+                                try self.password.endecrypt(cryptor: self.cryptor)
                             } catch let error {
                                 J1Logger.shared.error("encrypt error = \(error)")
                             }
@@ -343,9 +348,7 @@ struct PresentView: View {
                                 guard self.cryptor.opened else {
                                     return String(repeating: "*", count: Int(self.site.length))
                                 }
-  
-                                
-                                guard let cipher = self.site.password else {
+                                guard let cipher = self.site.password, !cipher.isEmpty else {
                                     return ""
                                 }
                                 guard let plain = try? self.cryptor.decrypt(cipher: cipher) else {
@@ -359,7 +362,7 @@ struct PresentView: View {
                                     Button(action: {
                                         self.cryptor.open {
                                             if ($0 != nil) && $0! {
-                                                guard let cipher = self.site.password else {
+                                                guard let cipher = self.site.password, !cipher.isEmpty else {
                                                     return
                                                 }
                                                 guard let plain = try? cryptor.decrypt(cipher: cipher) else {
