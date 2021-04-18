@@ -71,7 +71,7 @@ extension Site {
             self.addToPasswords(p!)
             return p!
         }()
-        newPassword.select()
+        newPassword.toCurrent()
     }
     
     public override func willSave() {

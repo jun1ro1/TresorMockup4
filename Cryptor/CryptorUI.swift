@@ -4,6 +4,7 @@
 //
 //  Created by OKU Junichirou on 2021/01/23.
 //
+// https://www.vadimbulavin.com/asynchronous-programming-with-future-and-promise-in-swift-with-combine-framework/
 
 import Foundation
 import LocalAuthentication
@@ -78,6 +79,7 @@ public class CryptorUI: Cryptor, ObservableObject {
         try self.open(password: localPass!.password!)
         return true
     }
+    
     
     func open(_ block: ((Bool?) -> Void)? = nil) {
         guard Cryptor.core.isPrepared else {

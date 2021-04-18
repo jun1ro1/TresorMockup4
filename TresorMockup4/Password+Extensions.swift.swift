@@ -26,7 +26,7 @@ extension Password {
 }
 
 extension Password {
-    func select() {
+    func toCurrent() {
         guard let site = self.site else { return }
         let now = Date()
         self.selectedAt = now
@@ -40,6 +40,12 @@ extension Password {
 
         site.selectAt   = now
         site.setPrimitiveValue(self.password, forKey: "password")
+    }
+    
+    func select() {
+        guard let site = self.site else { return }
+        let pack = PasswordPack(password: self)
+        pack.setTo(site: site)
     }
 }
 
