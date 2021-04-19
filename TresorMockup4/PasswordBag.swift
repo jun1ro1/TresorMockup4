@@ -20,6 +20,13 @@ class PasswordBag: ObservableObject {
         self.length         = password.length
     }
     
+    convenience init(site: Site) {
+        self.init()
+        self.passwordCipher = site.password     ?? ""
+        self.passwordHash   = site.passwordHash ?? Data()
+        self.length         = site.length
+    }
+
     var isEmpty: Bool {
         return self.length == 0
     }
@@ -67,7 +74,19 @@ class PasswordBag: ObservableObject {
         self.length        = Int16(self.passwordPlain.count)
     }
     
-    func setTo(password: Password) {
+    func setFrom(password: Password) {
+        self.passwordCipher = password.password     ?? ""
+        self.passwordHash   = password.passwordHash ?? Data()
+        self.length         = password.length
+    }
+
+    func setFrom(site: Site) {
+        self.passwordCipher = site.password     ?? ""
+        self.passwordHash   = site.passwordHash ?? Data()
+        self.length         = site.length
+    }
+
+   func setTo(password: Password) {
         password.password     = self.passwordCipher
         password.passwordHash = self.passwordHash
         password.length       = self.length

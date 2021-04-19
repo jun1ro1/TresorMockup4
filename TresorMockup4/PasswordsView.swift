@@ -52,7 +52,7 @@ struct PasswordItemsView: View {
                 guard self.cryptor.opened else {
                     return String(repeating: "*", count: Int(item.length))
                 }
-                guard let cipher = pass.password else {
+                guard let cipher = pass.password, !cipher.isEmpty else {
                     return ""
                 }
                 guard let plain = try? cryptor.decrypt(cipher: cipher) else {

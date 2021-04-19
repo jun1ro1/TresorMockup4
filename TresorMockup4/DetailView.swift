@@ -66,7 +66,6 @@ struct EditView: View {
     @State private var titleSort:       String = ""
     @State private var url:             String = ""
     @State private var userid:          String = ""
-    @State private var plainPass:       String = ""
     @State private var mlength:         Float  = 4.0
     @State private var chars:           Int    = 0
     
@@ -136,15 +135,13 @@ struct EditView: View {
             
             HStack {
                 if self.cryptor.opened {
-                    TextField("", text: self.$plainPass) { _ in
-                        self.password.set(plain: self.plainPass)
+                    TextField("", text: self.$password.passwordPlain) { _ in
                         do {
                             try self.password.endecrypt(cryptor: self.cryptor)
                         } catch let error {
                             J1Logger.shared.error("encrypt error = \(error)")
                         }
                    } onCommit: {
-                        self.password.set(plain: self.plainPass)
                         do {
                             try self.password.endecrypt(cryptor: self.cryptor)
                         } catch let error {
@@ -165,7 +162,6 @@ struct EditView: View {
                             case nil:   // authentication failed, nothing to do
                                 return
                             case false: // when closed, encrypt plainPass
-                                self.password.set(plain: self.plainPass)
                                 do {
                                     try self.password.endecrypt(cryptor: self.cryptor)
                                 } catch let error {
@@ -177,7 +173,6 @@ struct EditView: View {
                                 } catch let error {
                                     J1Logger.shared.error("encrypt error = \(error)")
                                 }
-                                self.plainPass = self.password.plain
                             default:    // unknown status
                                 break
                             }
@@ -203,8 +198,7 @@ struct EditView: View {
                     Button {
                         if let val = try? RandomData.shared.get(count: Int(self.mlength),
                                                                 in: self.charsArray[self.chars]) {
-                            self.plainPass  = val
-                            self.password.set(plain: self.plainPass)
+                            self.password.set(plain: val)
                             do {
                                 try self.password.endecrypt(cryptor: self.cryptor)
                             } catch let error {
@@ -244,7 +238,7 @@ struct EditView: View {
             J1Logger.shared.debug("onAppear")
             self.site.on(state: .editing)
             
-            self.password.set(cipher: self.site.password ?? "")
+            self.password.setFrom(site: self.site)
             
             self.title        = self.site.title ?? ""
             self.titleSort    = self.site.titleSort ?? ""
