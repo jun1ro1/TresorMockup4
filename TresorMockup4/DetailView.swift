@@ -24,10 +24,10 @@ struct DetailView: View {
             //                NotSelectedView()
             //            }
             if self.editMode?.wrappedValue.isEditing == true {
-                EditView(site: self.site)
+                EditView(site: self.site, passwordProxy: PasswordProxy(site: self.site))
             }
             else {
-                PresentView(site: self.site)
+                PresentView(site: self.site, passwordProxy: PasswordProxy(site: self.site))
             }
         }
         //        .navigationTitle(self.item.title ?? "")
@@ -59,7 +59,9 @@ struct NewItemView: View {
 
 
 struct EditView: View {
-    @ObservedObject var site:  Site
+    @ObservedObject var site:          Site
+    @ObservedObject var passwordProxy: PasswordProxy
+
     @ObservedObject var cryptor: CryptorUI = CryptorUI(name: "edit_password", duration: 30)
     
     @State private var title:           String = ""
@@ -69,7 +71,6 @@ struct EditView: View {
     @State private var mlength:         Float  = 4.0
     @State private var chars:           Int    = 0
     
-    @StateObject private var password = PasswordBag()
     
     @Environment(\.editMode) var editMode
     @Environment(\.managedObjectContext) private var viewContext
@@ -135,15 +136,15 @@ struct EditView: View {
             
             HStack {
                 if self.cryptor.opened {
-                    TextField("", text: self.$password.passwordPlain) { _ in
+                    TextField("", text: self.$passwordProxy.passwordPlain) { _ in
                         do {
-                            try self.password.endecrypt(cryptor: self.cryptor)
+                            try self.passwordProxy.endecrypt(cryptor: self.cryptor)
                         } catch let error {
                             J1Logger.shared.error("encrypt error = \(error)")
                         }
                    } onCommit: {
                         do {
-                            try self.password.endecrypt(cryptor: self.cryptor)
+                            try self.passwordProxy.endecrypt(cryptor: self.cryptor)
                         } catch let error {
                             J1Logger.shared.error("encrypt error = \(error)")
                         }
@@ -163,13 +164,13 @@ struct EditView: View {
                                 return
                             case false: // when closed, encrypt plainPass
                                 do {
-                                    try self.password.endecrypt(cryptor: self.cryptor)
+                                    try self.passwordProxy.endecrypt(cryptor: self.cryptor)
                                 } catch let error {
                                     J1Logger.shared.error("encrypt error = \(error)")
                                 }
                             case true:  // when opened, set a decrypted password to plainPass
                                 do {
-                                    try self.password.endecrypt(cryptor: self.cryptor)
+                                    try self.passwordProxy.endecrypt(cryptor: self.cryptor)
                                 } catch let error {
                                     J1Logger.shared.error("encrypt error = \(error)")
                                 }
@@ -198,9 +199,9 @@ struct EditView: View {
                     Button {
                         if let val = try? RandomData.shared.get(count: Int(self.mlength),
                                                                 in: self.charsArray[self.chars]) {
-                            self.password.set(plain: val)
+                            self.passwordProxy.plain = val
                             do {
-                                try self.password.endecrypt(cryptor: self.cryptor)
+                                try self.passwordProxy.endecrypt(cryptor: self.cryptor)
                             } catch let error {
                                 J1Logger.shared.error("encrypt error = \(error)")
                             }
@@ -237,8 +238,6 @@ struct EditView: View {
         .onAppear {
             J1Logger.shared.debug("onAppear")
             self.site.on(state: .editing)
-            
-            self.password.setFrom(site: self.site)
             
             self.title        = self.site.title ?? ""
             self.titleSort    = self.site.titleSort ?? ""
@@ -291,14 +290,14 @@ struct EditView: View {
                 self.title      == "" &&
                 self.url        == "" &&
                 self.userid     == "" &&
-                self.password.isEmpty {
+                self.passwordProxy.isEmpty {
                 // new item is cancelled
                 J1Logger.shared.debug("Site will delete \(self.site.description)")
                 withAnimation {
                     self.viewContext.delete(self.site)
                 }
             } else {
-                self.password.setTo(site: self.site) 
+                self.passwordProxy.setTo(site: self.site) 
             }
             // NOTICE
             // Don't save Core Data context in this view,
@@ -312,7 +311,9 @@ struct EditView: View {
 } // EditView
 
 struct PresentView: View {
-    @ObservedObject var site: Site
+    @ObservedObject var site:          Site
+    @ObservedObject var passwordProxy: PasswordProxy
+
     @EnvironmentObject var cryptor: CryptorUI
     
     var body: some View {
@@ -342,28 +343,27 @@ struct PresentView: View {
                                 guard self.cryptor.opened else {
                                     return String(repeating: "*", count: Int(self.site.length))
                                 }
-                                guard let cipher = self.site.password, !cipher.isEmpty else {
-                                    return ""
+
+                                do {
+                                    try self.passwordProxy.endecrypt(cryptor: self.cryptor)
+                                } catch let error {
+                                    J1Logger.shared.error("endecrypt error = \(error)")
                                 }
-                                guard let plain = try? self.cryptor.decrypt(cipher: cipher) else {
-                                    J1Logger.shared.error("decrypt failed: \(cipher)")
-                                    return ""
-                                }
-                                return plain
+                                return "++++"
+                                print(self.passwordProxy.plain)
+                                return self.passwordProxy.plain
                             }()
                             Text(str)
                                 .contextMenu {
                                     Button(action: {
                                         self.cryptor.open {
                                             if ($0 != nil) && $0! {
-                                                guard let cipher = self.site.password, !cipher.isEmpty else {
-                                                    return
+                                                do {
+                                                    try self.passwordProxy.endecrypt(cryptor: self.cryptor)
+                                                } catch let error {
+                                                    J1Logger.shared.error("endecrypt error = \(error)")
                                                 }
-                                                guard let plain = try? cryptor.decrypt(cipher: cipher) else {
-                                                    J1Logger.shared.error("decrypt failed: \(cipher)")
-                                                    return
-                                                }
-                                                UIPasteboard.general.string = plain
+                                                UIPasteboard.general.string = self.passwordProxy.plain
                                             }
                                         }
                                     }) {

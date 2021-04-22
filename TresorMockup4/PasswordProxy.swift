@@ -7,7 +7,7 @@
 
 import Foundation
 
-class PasswordBag: ObservableObject {
+class PasswordProxy: ObservableObject {
     @Published var passwordPlain:  String   = ""
     @Published var passwordCipher: String   = ""
     @Published var passwordHash:   Data     = Data()
@@ -32,30 +32,33 @@ class PasswordBag: ObservableObject {
     }
     
     var cipher: String {
-        return self.passwordCipher
+        get {
+            return self.passwordCipher
+        }
+        set {
+            self.passwordPlain = ""
+            self.passwordCipher = newValue
+            self.passwordHash   = Data()
+            self.length         = 0
+        }
     }
     
     var plain: String {
-        return self.passwordPlain
+        get {
+            return self.passwordPlain
+        }
+        set {
+            self.passwordPlain  = newValue
+            self.passwordCipher = ""
+            self.passwordHash   = self.passwordPlain.isEmpty ?
+                Data() : (try? self.passwordPlain.hash()) ?? Data()
+            self.length         = Int16(self.passwordPlain.count)
+        }
     }
     
     func clear() {
         self.passwordPlain  = ""
         self.passwordCipher = ""
-        self.passwordHash   = Data()
-        self.length         = 0
-    }
-    
-    func set(plain: String) {
-        self.passwordPlain  = plain
-        self.passwordCipher = ""
-        self.passwordHash   = plain.isEmpty ? Data() : (try? plain.hash()) ?? Data()
-        self.length         = Int16(plain.count)
-    }
-    
-    func set(cipher: String) {
-        self.passwordPlain = ""
-        self.passwordCipher = cipher
         self.passwordHash   = Data()
         self.length         = 0
     }
@@ -74,18 +77,6 @@ class PasswordBag: ObservableObject {
         self.length        = Int16(self.passwordPlain.count)
     }
     
-    func setFrom(password: Password) {
-        self.passwordCipher = password.password     ?? ""
-        self.passwordHash   = password.passwordHash ?? Data()
-        self.length         = password.length
-    }
-
-    func setFrom(site: Site) {
-        self.passwordCipher = site.password     ?? ""
-        self.passwordHash   = site.passwordHash ?? Data()
-        self.length         = site.length
-    }
-
    func setTo(password: Password) {
         password.password     = self.passwordCipher
         password.passwordHash = self.passwordHash

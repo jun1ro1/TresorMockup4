@@ -44,7 +44,7 @@ extension Password {
     
     func select() {
         guard let site = self.site else { return }
-        let bag = PasswordBag(password: self)
+        let bag = PasswordProxy(password: self)
         bag.setTo(site: site)
     }
 }
