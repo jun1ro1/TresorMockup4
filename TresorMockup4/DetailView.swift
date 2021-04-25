@@ -136,7 +136,7 @@ struct EditView: View {
             
             HStack {
                 if self.cryptor.opened {
-                    TextField("", text: self.$passwordProxy.passwordPlain) { _ in
+                    TextField("", text: self.$passwordProxy.plainPassword) { _ in   // BUG plainPassword is abandaned
                         do {
                             try self.passwordProxy.endecrypt(cryptor: self.cryptor)
                         } catch let error {
@@ -164,7 +164,7 @@ struct EditView: View {
                                 return
                             case false: // when closed, encrypt plainPass
                                 do {
-                                    try self.passwordProxy.endecrypt(cryptor: self.cryptor)
+                                    try self.passwordProxy.endecrypt(cryptor: self.cryptor) // nothing to do
                                 } catch let error {
                                     J1Logger.shared.error("encrypt error = \(error)")
                                 }
@@ -349,8 +349,6 @@ struct PresentView: View {
                                 } catch let error {
                                     J1Logger.shared.error("endecrypt error = \(error)")
                                 }
-                                return "++++"
-                                print(self.passwordProxy.plain)
                                 return self.passwordProxy.plain
                             }()
                             Text(str)

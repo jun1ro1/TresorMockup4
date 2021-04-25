@@ -8,21 +8,22 @@
 import Foundation
 
 class PasswordProxy: ObservableObject {
-    @Published var passwordPlain:  String   = ""
-    @Published var passwordCipher: String   = ""
-    @Published var passwordHash:   Data     = Data()
-    @Published var length:         Int16    = 0
+    @Published var plainPassword:  String   = ""
+    
+    private var cipherPassword: String   = ""
+    private var passwordHash:   Data     = Data()
+    private var length:         Int16    = 0
     
     convenience init(password: Password) {
         self.init()
-        self.passwordCipher = password.password     ?? ""
+        self.cipherPassword = password.password     ?? ""
         self.passwordHash   = password.passwordHash ?? Data()
         self.length         = password.length
     }
     
     convenience init(site: Site) {
         self.init()
-        self.passwordCipher = site.password     ?? ""
+        self.cipherPassword = site.password     ?? ""
         self.passwordHash   = site.passwordHash ?? Data()
         self.length         = site.length
     }
@@ -33,11 +34,11 @@ class PasswordProxy: ObservableObject {
     
     var cipher: String {
         get {
-            return self.passwordCipher
+            return self.cipherPassword
         }
         set {
-            self.passwordPlain = ""
-            self.passwordCipher = newValue
+            self.plainPassword = ""
+            self.cipherPassword = newValue
             self.passwordHash   = Data()
             self.length         = 0
         }
@@ -45,40 +46,40 @@ class PasswordProxy: ObservableObject {
     
     var plain: String {
         get {
-            return self.passwordPlain
+            return self.plainPassword
         }
         set {
-            self.passwordPlain  = newValue
-            self.passwordCipher = ""
-            self.passwordHash   = self.passwordPlain.isEmpty ?
-                Data() : (try? self.passwordPlain.hash()) ?? Data()
-            self.length         = Int16(self.passwordPlain.count)
+            self.plainPassword  = newValue
+            self.cipherPassword = ""
+            self.passwordHash   = self.plainPassword.isEmpty ?
+                Data() : (try? self.plainPassword.hash()) ?? Data()
+            self.length         = Int16(self.plainPassword.count)
         }
     }
     
     func clear() {
-        self.passwordPlain  = ""
-        self.passwordCipher = ""
+        self.plainPassword  = ""
+        self.cipherPassword = ""
         self.passwordHash   = Data()
         self.length         = 0
     }
     
     func endecrypt(cryptor: CryptorUI) throws {
-        switch (self.passwordPlain.isEmpty, self.passwordCipher.isEmpty) {
+        switch (self.plainPassword.isEmpty, self.cipherPassword.isEmpty) {
         case (true, false):
-            self.passwordPlain = try cryptor.decrypt(cipher: self.passwordCipher)
-            self.passwordHash  = try self.passwordPlain.hash()
+            self.plainPassword = try cryptor.decrypt(cipher: self.cipherPassword)
+            self.passwordHash  = try self.plainPassword.hash()
         case (false, true):
-            self.passwordCipher = try cryptor.encrypt(plain: self.passwordPlain)
-            self.passwordHash   = try self.passwordPlain.hash()
+            self.cipherPassword = try cryptor.encrypt(plain: self.plainPassword)
+            self.passwordHash   = try self.plainPassword.hash()
         default:
             break
         }
-        self.length        = Int16(self.passwordPlain.count)
+        self.length        = Int16(self.plainPassword.count)
     }
     
    func setTo(password: Password) {
-        password.password     = self.passwordCipher
+        password.password     = self.cipherPassword
         password.passwordHash = self.passwordHash
         password.length       = self.length
     }
@@ -101,7 +102,7 @@ class PasswordProxy: ObservableObject {
             site.addToPasswords(oldPassword)
         }
         
-        site.password     = self.passwordCipher
+        site.password     = self.cipherPassword
         site.passwordHash = self.passwordHash
         site.length       = self.length
         
