@@ -8,7 +8,14 @@
 import Foundation
 
 class PasswordProxy: ObservableObject {
-    @Published var plainPassword:  String   = ""
+    @Published var plainPassword:  String   = "" {
+        didSet {
+            self.cipherPassword = ""
+            self.passwordHash   = self.plainPassword.isEmpty ?
+                Data() : (try? self.plainPassword.hash()) ?? Data()
+            self.length         = Int16(self.plainPassword.count)
+        }
+    }
     
     private var cipherPassword: String   = ""
     private var passwordHash:   Data     = Data()
@@ -50,11 +57,7 @@ class PasswordProxy: ObservableObject {
         }
         set {
             self.plainPassword  = newValue
-            self.cipherPassword = ""
-            self.passwordHash   = self.plainPassword.isEmpty ?
-                Data() : (try? self.plainPassword.hash()) ?? Data()
-            self.length         = Int16(self.plainPassword.count)
-        }
+         }
     }
     
     func clear() {

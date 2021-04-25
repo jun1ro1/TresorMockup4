@@ -61,7 +61,7 @@ struct NewItemView: View {
 struct EditView: View {
     @ObservedObject var site:          Site
     @ObservedObject var passwordProxy: PasswordProxy
-
+    
     @ObservedObject var cryptor: CryptorUI = CryptorUI(name: "edit_password", duration: 30)
     
     @State private var title:           String = ""
@@ -136,13 +136,13 @@ struct EditView: View {
             
             HStack {
                 if self.cryptor.opened {
-                    TextField("", text: self.$passwordProxy.plainPassword) { _ in   // BUG plainPassword is abandaned
+                    TextField("", text: self.$passwordProxy.plainPassword) { _ in
                         do {
                             try self.passwordProxy.endecrypt(cryptor: self.cryptor)
                         } catch let error {
                             J1Logger.shared.error("encrypt error = \(error)")
                         }
-                   } onCommit: {
+                    } onCommit: {
                         do {
                             try self.passwordProxy.endecrypt(cryptor: self.cryptor)
                         } catch let error {
@@ -313,7 +313,7 @@ struct EditView: View {
 struct PresentView: View {
     @ObservedObject var site:          Site
     @ObservedObject var passwordProxy: PasswordProxy
-
+    
     @EnvironmentObject var cryptor: CryptorUI
     
     var body: some View {
@@ -343,7 +343,7 @@ struct PresentView: View {
                                 guard self.cryptor.opened else {
                                     return String(repeating: "*", count: Int(self.site.length))
                                 }
-
+                                
                                 do {
                                     try self.passwordProxy.endecrypt(cryptor: self.cryptor)
                                 } catch let error {
@@ -391,7 +391,7 @@ struct PresentView: View {
                 Text(self.site.memo ?? "")
             }
         }
-//                .navigationBarItems(trailing: Image(systemName: self.ui.opened ? "lock.open" : "lock"))
+        //                .navigationBarItems(trailing: Image(systemName: self.ui.opened ? "lock.open" : "lock"))
         .navigationBarTitle(self.site.title ?? "", displayMode: .automatic)
         .sheet(isPresented: self.$cryptor.shouldShow) {
             self.cryptor.view
