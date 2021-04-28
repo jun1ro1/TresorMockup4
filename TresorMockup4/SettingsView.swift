@@ -68,6 +68,16 @@ struct SettingsView: View {
     
     var body: some View {
         Form {
+            Section(header: Text("Export / Imoort")) {
+                Button("Export") {
+                    self.fileURL = CoreDataUtility.shared.export()
+                    guard self.fileURL != nil else { return }
+                    self.sheet = .backup(fileURL: self.$fileURL)
+                }
+                Button("Import") {
+                    //
+                }
+            }
             Section(header: Text("Backup / Restore")) {
                 Button("Backup") {
                     self.fileURL = CoreDataUtility.shared.backup()

@@ -141,4 +141,26 @@ class CoreDataUtility {
             }
         }
     }
+    
+    func export() -> URL {
+        let tempURL = self.temporaryURL
+        do {
+            try FileManager.default.createDirectory(at: tempURL, withIntermediateDirectories: true)
+        } catch let error {
+            J1Logger.shared.error("createDirectory error = \(error)")
+        }
+        J1Logger.shared.info("tempURL = \(tempURL)")
+
+        let name = Bundle.main.object(forInfoDictionaryKey: kCFBundleNameKey as String) as! String
+        let timestr = self.timeString
+        let fileURL = tempURL
+            .appendingPathComponent("\(name)-\(timestr)", isDirectory: false)
+            .appendingPathExtension(for: .commaSeparatedText)
+
+        Site.export(url: fileURL)
+        J1Logger.shared.debug("fileURL = \(String(describing: fileURL))")
+
+        return fileURL
+    }
+
 }
