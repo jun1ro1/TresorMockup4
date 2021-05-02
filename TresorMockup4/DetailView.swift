@@ -32,6 +32,10 @@ struct DetailView: View {
         }
         //        .navigationTitle(self.item.title ?? "")
         .toolbar {
+            // https://stackoverflow.com/questions/64409091/swiftui-navigation-bar-button-disappears-after-entering-the-third-view-controll
+            ToolbarItem(placement: .navigationBarLeading) {
+                Text("")
+            }
             ToolbarItem(placement: .navigationBarTrailing) {
                 EditButton()
             }

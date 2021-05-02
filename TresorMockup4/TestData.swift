@@ -17,7 +17,7 @@ class TestData {
         return manager!
     }()
     
-    func saveDummyData(cryptor: Cryptor) {
+    func saveDummyData(cryptor: CryptorUI) {
         let titles = [
             "T1",
             "T2",
@@ -230,15 +230,11 @@ class TestData {
         var collection: [(Dictionary<String, String>, Dictionary<String, String>)] = []
         for i in 0..<titles.count {
             let plain = "pass-\(String(i))"
-            let passstr = {
-                (try? cryptor.encrypt(plain: $0)) ?? $0
-            }(plain)
             var site =
                 [ "title": titles[i],
                   "titleSort": titles[i],
                   "url":   urls[i],
                   "userid":  "user-\(String(i))",
-                  "password": passstr,
                   "selectAt": formatter.string(from: Date())
                 ]
             
@@ -251,16 +247,22 @@ class TestData {
                 break
             }
             
-            let pass = [ "password": passstr,
-                         "current":  "true",
-            ]
+            let pass = [ "password": plain ]
             collection.append( (site, pass) )
         }
         let viewContext = PersistenceController.shared.container.viewContext
         collection.forEach {
-            let site     = Site(from: $0.0, context: viewContext)      // BUG
-            let password = Password(from: $0.1, context: viewContext)  // BUG
-            password.site = site
+            let siteProp = $0.0
+            let passProp = $0.1
+            let site     = Site(from: siteProp, context: viewContext)
+            let proxy    = PasswordProxy()
+            proxy.plain  = passProp["password"] ?? ""
+            do {
+                try proxy.endecrypt(cryptor: cryptor)
+            } catch let error {
+                J1Logger.shared.error("endecrypt error = \(error)")
+            }
+            proxy.setTo(site: site)
          }
         
         do {

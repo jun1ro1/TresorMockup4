@@ -35,6 +35,8 @@ struct TresorMockup4App: App {
                 NavigationView {
                     CategoryView()
                 }
+                // https://stackoverflow.com/questions/63934037/swiftui-navigationlink-cell-in-a-form-stays-highlighted-after-detail-pop
+                .navigationViewStyle(StackNavigationViewStyle())
                 .environment(\.managedObjectContext, self.persistenceController.container.viewContext)
                 .environmentObject(self.appState)
                 .environmentObject(CryptorUI(name: "main", duration: 30))
