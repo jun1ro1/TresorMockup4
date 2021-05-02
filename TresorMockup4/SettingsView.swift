@@ -15,6 +15,8 @@ struct SettingsView: View {
     @State var fileURL: URL?
     @State var sheet:   Sheet? = nil
     @State var modal:   Modal? = nil
+    
+    @ObservedObject var cryptor: CryptorUI = CryptorUI(name: "export_import")
 
     // https://qiita.com/1amageek/items/e90e1cfb0ad497e8b27a
     // https://stackoverflow.com/questions/57409804/how-to-confirm-an-enumeration-to-identifiable-protocol-in-swift
@@ -23,6 +25,7 @@ struct SettingsView: View {
     enum Sheet: View, Identifiable {
         case backup (fileURL: Binding<URL?>)
         case restore(block: (URL) -> Void)
+        case authenticate(cryptor: CryptorUI)
         
         // ignore parameters to compare Sheet values
         var id: ObjectIdentifier {
@@ -30,6 +33,8 @@ struct SettingsView: View {
             case .backup(fileURL: _):
                 return ObjectIdentifier(Self.self)
             case .restore(block: _):
+                return ObjectIdentifier(Self.self)
+            case .authenticate(cryptor: _):
                 return ObjectIdentifier(Self.self)
             }
         }
@@ -40,6 +45,8 @@ struct SettingsView: View {
                 return AnyView(DocumentPickerForExporting(fileURL: fileURL))
             case .restore(let block):
                 return AnyView(DocumentPickerForOpening(block: block))
+            case .authenticate(let cryptor):
+                return cryptor.view
             }
         }
     }
@@ -70,9 +77,18 @@ struct SettingsView: View {
         Form {
             Section(header: Text("Export / Imoort")) {
                 Button("Export") {
-                    self.fileURL = CoreDataUtility.shared.export()
-                    guard self.fileURL != nil else { return }
-                    self.sheet = .backup(fileURL: self.$fileURL)
+                    self.sheet = .authenticate(cryptor: self.cryptor)
+                    defer { self.sheet = nil }
+                    self.cryptor.open { opened in
+                        guard opened == true else {
+                            self.cryptor.close(keep: false)
+                            return
+                        }
+                        self.fileURL = CoreDataUtility.shared.export(cryptor: self.cryptor)
+                        guard self.fileURL != nil else { return }
+                        self.sheet = .backup(fileURL: self.$fileURL)
+                        self.cryptor.close(keep: false)
+                    }
                 }
                 Button("Import") {
                     //

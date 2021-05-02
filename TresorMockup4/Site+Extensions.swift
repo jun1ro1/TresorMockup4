@@ -101,7 +101,21 @@ extension Site {
         return fileURL
     }
     
-
+    
+    class func publisherPlain(sortNames: [String] = [], cryptor: CryptorUI)
+    -> AnyPublisher<Dictionary<String, String>, Error> {
+        Self.publisher().tryMap {
+            var dict = $0
+            guard let cipher = dict["password"], !cipher.isEmpty else {
+                return dict
+            }
+            let plain = try cryptor.decrypt(cipher: cipher)
+            dict["password"] = plain
+            return dict
+        }
+        .eraseToAnyPublisher()
+    }
+    
     class func headerPublisher(publisher: AnyPublisher<Dictionary<String, String>, Error>,
                                sortNames: [String] = [])
     -> AnyPublisher<[String], Error> {
@@ -120,7 +134,8 @@ extension Site {
     }
 
     class func tablePublisher2(publisher: AnyPublisher<Dictionary<String, String>, Error>,
-                               sortNames: [String] = [])
+                               sortNames: [String] = [],
+                               cryptor: CryptorUI)
     -> AnyPublisher<[String], Error> {
         return Self.headerPublisher(publisher:publisher, sortNames: sortNames)
             .combineLatest(publisher.prepend([:]))
@@ -129,7 +144,7 @@ extension Site {
             }.eraseToAnyPublisher()
     }
 
-    class func export(url: URL) {
+    class func export(url: URL, cryptor: CryptorUI) {
         guard let stream = OutputStream(url: url, append: false) else {
             J1Logger.shared.error("OutputStream error url=\(url)")
             return
@@ -143,8 +158,9 @@ extension Site {
         }
         
         let sortNames = ["title", "url", "userid", "password", "memo"]
-        _ = Self.tablePublisher2(publisher: Self.publisher(sortNames: sortNames),
-                                 sortNames: sortNames)
+        _ = Self.tablePublisher2(publisher: Self.publisherPlain(sortNames: sortNames, cryptor: cryptor),
+                                 sortNames: sortNames,
+                                 cryptor: cryptor)
             .map { values -> [String] in
                 let num = min(sortNames.count, values.count)
                 return Array(values[0..<num])

@@ -142,7 +142,7 @@ class CoreDataUtility {
         }
     }
     
-    func export() -> URL {
+    func export(cryptor: CryptorUI) -> URL {
         let tempURL = self.temporaryURL
         do {
             try FileManager.default.createDirectory(at: tempURL, withIntermediateDirectories: true)
@@ -157,7 +157,7 @@ class CoreDataUtility {
             .appendingPathComponent("\(name)-\(timestr)", isDirectory: false)
             .appendingPathExtension(for: .commaSeparatedText)
 
-        Site.export(url: fileURL)
+        Site.export(url: fileURL, cryptor: cryptor)
         J1Logger.shared.debug("fileURL = \(String(describing: fileURL))")
 
         return fileURL

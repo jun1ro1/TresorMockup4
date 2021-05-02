@@ -271,11 +271,11 @@
 				F9730A3F25600E17007109F7 /* CryptorCore.swift */,
 				F9AE18B425B33336007373E0 /* CryptorError.swift */,
 				F9730A3E25600E17007109F7 /* CryptorExtensions.swift */,
+				F965518A25AB5EB400FFD4E8 /* CryptorSeed.swift */,
 				F9730A3D25600E17007109F7 /* LocalPassword.swift */,
 				F9730A4025600E17007109F7 /* RandomData.swift */,
 				F9730A3C25600E17007109F7 /* SecureStore.swift */,
 				F91D3A102562D0BC0018238B /* FocusableTextField.swift */,
-				F965518A25AB5EB400FFD4E8 /* CryptorSeed.swift */,
 				F965519125AB5F0E00FFD4E8 /* Validator.swift */,
 			);
 			path = Cryptor;

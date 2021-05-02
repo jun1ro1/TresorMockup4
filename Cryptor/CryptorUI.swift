@@ -192,10 +192,13 @@ public class CryptorUI: Cryptor, ObservableObject {
         }
     } // open
     
-    func close(_ block: ((Bool?) -> Void)? = nil) {
+    func close(keep: Bool = true, _ block: ((Bool?) -> Void)? = nil) {
         block?(false)
         self.opened = false
         try? super.close()
+        if !keep {
+            self.authenticated = false
+        }
     }
     
     func toggle(_ block: ((Bool?) -> Void)? = nil) {

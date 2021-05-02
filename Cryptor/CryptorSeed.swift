@@ -10,10 +10,10 @@ import CryptoKit
 
 // MARK: - CryptorSeed
 internal struct CryptorSeed {
-    var version: String
-    var salt:         Data?
+    var version:      String         // export
+    var salt:         Data?          // export
     var rounds:       UInt32
-    var key:          SymmetricKey?
+    var key:          SymmetricKey?  // export
     var dateCreated:  Date?
     var dateModified: Date?
 
