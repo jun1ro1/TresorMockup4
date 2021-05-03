@@ -78,10 +78,10 @@ struct SettingsView: View {
             Section(header: Text("Export / Imoort")) {
                 Button("Export") {
                     self.sheet = .authenticate(cryptor: self.cryptor)
-                    defer { self.sheet = nil }
                     self.cryptor.open { opened in
                         guard opened == true else {
                             self.cryptor.close(keep: false)
+                            self.sheet = nil
                             return
                         }
                         self.fileURL = CoreDataUtility.shared.export(cryptor: self.cryptor)

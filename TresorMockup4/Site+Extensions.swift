@@ -29,23 +29,23 @@ extension Site {
         // https://stackoverflow.com/questions/60386000/how-to-use-combine-framework-nsobject-keyvalueobservingpublisher
         // https://www.apeth.com/UnderstandingCombine/publishers/publisherskvo.html
         // https://augmentedcode.io/2020/11/08/observing-a-kvo-compatible-model-in-swiftui-and-mvvm/
-      }
+    }
     
-//    override public func awakeFromFetch() {
-//        super.awakeFromFetch()
-//        self.observation = self.observe(\.password, options: [.new, .old], changeHandler: Self.updatePassword)
-//    }
+    //    override public func awakeFromFetch() {
+    //        super.awakeFromFetch()
+    //        self.observation = self.observe(\.password, options: [.new, .old], changeHandler: Self.updatePassword)
+    //    }
     
     public func setPassword(cipher newPassCipher: String, plain newPassPlain: String) throws {
         guard let viewContext = self.managedObjectContext else { return }
         let passwords = (self.passwords?.allObjects as? [Password] ?? [])
-                .sorted { (x, y) -> Bool in
-                    let xc = x.createdAt ?? Date(timeIntervalSince1970: 0)
-                    let yc = y.createdAt ?? Date(timeIntervalSince1970: 0)
-                    return xc < yc
-                }
+            .sorted { (x, y) -> Bool in
+                let xc = x.createdAt ?? Date(timeIntervalSince1970: 0)
+                let yc = y.createdAt ?? Date(timeIntervalSince1970: 0)
+                return xc < yc
+            }
         let newPassHash = try newPassPlain.hash()
-
+        
         // save old password
         if let oldPassStr  = self.password, let oldPassHash = self.passwordHash {
             if passwords.first(where: { $0.passwordHash == oldPassHash }) == nil {
@@ -61,7 +61,7 @@ extension Site {
         self.password     = newPassCipher
         self.passwordHash = try newPassPlain.hash()
         self.length       = Int16(newPassPlain.count)
-
+        
         let newPassword = { () -> Password in
             var p = passwords.first(where: { $0.passwordHash == newPassHash })
             if p != nil { return p! }
@@ -102,9 +102,9 @@ extension Site {
     }
     
     
-    class func publisherPlain(sortNames: [String] = [], cryptor: CryptorUI)
+    class func publisherPlain(sortNames: [String] = [], predicate: NSPredicate? = nil, cryptor: CryptorUI)
     -> AnyPublisher<Dictionary<String, String>, Error> {
-        Self.publisher().tryMap {
+        Self.publisher(sortNames: sortNames, predicate: predicate).tryMap {
             var dict = $0
             guard let cipher = dict["password"], !cipher.isEmpty else {
                 return dict
@@ -132,7 +132,7 @@ extension Site {
             return names
         }.eraseToAnyPublisher()
     }
-
+    
     class func tablePublisher2(publisher: AnyPublisher<Dictionary<String, String>, Error>,
                                sortNames: [String] = [],
                                cryptor: CryptorUI)
@@ -143,7 +143,7 @@ extension Site {
                 dict == [:] ? keys : keys.map { dict[$0] ?? "" }
             }.eraseToAnyPublisher()
     }
-
+    
     class func export(url: URL, cryptor: CryptorUI) {
         guard let stream = OutputStream(url: url, append: false) else {
             J1Logger.shared.error("OutputStream error url=\(url)")
@@ -158,7 +158,12 @@ extension Site {
         }
         
         let sortNames = ["title", "url", "userid", "password", "memo"]
-        _ = Self.tablePublisher2(publisher: Self.publisherPlain(sortNames: sortNames, cryptor: cryptor),
+        let kind = Int(CategoryKind.trash.rawValue)
+        let predicate = NSPredicate(format: "category == nil OR category.kind !=\(kind)")
+        _ = Self.tablePublisher2(publisher: Self.publisherPlain(
+                                    sortNames: sortNames,
+                                    predicate: predicate,
+                                    cryptor: cryptor),
                                  sortNames: sortNames,
                                  cryptor: cryptor)
             .map { values -> [String] in
@@ -166,19 +171,19 @@ extension Site {
                 return Array(values[0..<num])
             }
             .sink { completion in
-            csv.stream.close()
-            switch completion {
-            case .finished:
-                J1Logger.shared.debug("finished")
-            case .failure(let error):
-                J1Logger.shared.error("error = \(error)")
+                csv.stream.close()
+                switch completion {
+                case .finished:
+                    J1Logger.shared.debug("finished")
+                case .failure(let error):
+                    J1Logger.shared.error("error = \(error)")
+                }
+            } receiveValue: { values in
+                do {
+                    try csv.write(row: values)
+                } catch let error {
+                    J1Logger.shared.error("error = \(error)")
+                }
             }
-        } receiveValue: { values in
-            do {
-                try csv.write(row: values)
-            } catch let error {
-                J1Logger.shared.error("error = \(error)")
-            }
-        }
     }
 }

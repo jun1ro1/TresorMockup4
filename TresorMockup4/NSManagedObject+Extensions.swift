@@ -146,7 +146,7 @@ extension NSManagedObject {
 // MARK: -
 
 extension NSManagedObject {
-    class func publisher(sortNames: [String] = [])
+    class func publisher(sortNames: [String] = [], predicate: NSPredicate? = nil)
     -> AnyPublisher<Dictionary<String, String>, Error> {
         let names    = Self.entity().properties.map { $0.name }
         var snames   = sortNames
@@ -158,6 +158,7 @@ extension NSManagedObject {
         
         let viewContext = PersistenceController.shared.container.viewContext
         let request: NSFetchRequest<Self> = NSFetchRequest(entityName: Self.entity().name!)
+        request.predicate = predicate
         let sorts: [NSSortDescriptor] = snames.map {
             NSSortDescriptor(key: $0, ascending: true)
         }
