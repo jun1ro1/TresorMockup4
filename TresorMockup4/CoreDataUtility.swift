@@ -50,7 +50,7 @@ class CoreDataUtility {
             J1Logger.shared.error("createDirectory error = \(error)")
         }
         J1Logger.shared.info("tempURL = \(tempURL)")
-
+        
         let urlCategory = Category.backup(url: tempURL)
         let urlSite     = Site.backup(url: tempURL)
         let urlPassword = Password.backup(url: tempURL)
@@ -150,17 +150,46 @@ class CoreDataUtility {
             J1Logger.shared.error("createDirectory error = \(error)")
         }
         J1Logger.shared.info("tempURL = \(tempURL)")
-
+        
         let name = Bundle.main.object(forInfoDictionaryKey: kCFBundleNameKey as String) as! String
         let timestr = self.timeString
         let fileURL = tempURL
             .appendingPathComponent("\(name)-\(timestr)", isDirectory: false)
             .appendingPathExtension(for: .commaSeparatedText)
-
+        
         Site.export(url: fileURL, cryptor: cryptor)
         J1Logger.shared.debug("fileURL = \(String(describing: fileURL))")
-
+        
         return fileURL
     }
-
+    
+    func `import`(url: URL, cryptor: CryptorUI) {
+        let context = PersistenceController.shared.container.newBackgroundContext()
+        context.perform {
+            let publisher = CSVPublisher(url: url)
+            let subject:  AnyPublisher<Dictionary<String, String>, Error>
+                = publisher.subject.tryMap {
+                    var dict = $0
+                    if let plain = dict["password"], !plain.isEmpty {
+                        let cipher = try cryptor.encrypt(plain: plain)
+                        dict["password"] = cipher
+                    }
+                    return dict
+                }.eraseToAnyPublisher()
+            let loaderSite = Restorer<Site>(searchingKeys: ["url", "title"], context: context)
+            loaderSite.load(from: subject)
+            publisher.send()
+            
+            if context.hasChanges {
+                do {
+                    try context.save()
+                } catch {
+                    let nsError = error as NSError
+                    J1Logger.shared.error("Unresolved error \(nsError), \(nsError.userInfo)")
+                }
+                J1Logger.shared.debug("save context")
+            }
+            context.reset()
+        }
+    }
 }

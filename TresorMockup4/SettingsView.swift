@@ -17,7 +17,7 @@ struct SettingsView: View {
     @State var modal:   Modal? = nil
     
     @ObservedObject var cryptor: CryptorUI = CryptorUI(name: "export_import")
-
+    
     // https://qiita.com/1amageek/items/e90e1cfb0ad497e8b27a
     // https://stackoverflow.com/questions/57409804/how-to-confirm-an-enumeration-to-identifiable-protocol-in-swift
     // https://qiita.com/hachinobu/items/392c96820588d1c03b0c
@@ -25,6 +25,8 @@ struct SettingsView: View {
     enum Sheet: View, Identifiable {
         case backup (fileURL: Binding<URL?>)
         case restore(block: (URL) -> Void)
+        case export(fileURL: Binding<URL?>)
+        case `import`(block: (URL) -> Void)
         case authenticate(cryptor: CryptorUI)
         
         // ignore parameters to compare Sheet values
@@ -34,17 +36,25 @@ struct SettingsView: View {
                 return ObjectIdentifier(Self.self)
             case .restore(block: _):
                 return ObjectIdentifier(Self.self)
+            case .export(fileURL: _):
+                return ObjectIdentifier(Self.self)
+            case .import(block: _):
+                return ObjectIdentifier(Self.self)
             case .authenticate(cryptor: _):
                 return ObjectIdentifier(Self.self)
             }
         }
-
+        
         var body: some View {
             switch self {
             case .backup(let fileURL):
                 return AnyView(DocumentPickerForExporting(fileURL: fileURL))
             case .restore(let block):
-                return AnyView(DocumentPickerForOpening(block: block))
+                return AnyView(DocumentPickerForOpening(block: block, fileType: [.zip]))
+            case .export(let fileURL):
+                return AnyView(DocumentPickerForExporting(fileURL: fileURL))
+            case .import(let block):
+                return AnyView(DocumentPickerForOpening(block: block, fileType: [.commaSeparatedText]))
             case .authenticate(let cryptor):
                 return cryptor.view
             }
@@ -53,7 +63,7 @@ struct SettingsView: View {
     
     enum Modal: Identifiable {
         case deleteAll(block: () -> Void)
-
+        
         var id: ObjectIdentifier {
             switch self {
             case .deleteAll(block: _):
@@ -80,20 +90,31 @@ struct SettingsView: View {
                     self.sheet = .authenticate(cryptor: self.cryptor)
                     self.cryptor.open { opened in
                         guard opened == true else {
-                            self.cryptor.close(keep: false)
                             self.sheet = nil
                             return
                         }
                         self.fileURL = CoreDataUtility.shared.export(cryptor: self.cryptor)
                         guard self.fileURL != nil else { return }
-                        self.sheet = .backup(fileURL: self.$fileURL)
+                        self.sheet = .export(fileURL: self.$fileURL)
                         self.cryptor.close(keep: false)
                     }
                 }
                 Button("Import") {
-                    //
+                    self.sheet = .authenticate(cryptor: self.cryptor)
+                    self.cryptor.open { opened in
+                        guard opened == true else {
+                            self.sheet = nil
+                            self.cryptor.close(keep: false)
+                            return
+                        }
+                        self.sheet = .import { url in
+                            CoreDataUtility.shared.import(url: url, cryptor: self.cryptor)
+                            J1Logger.shared.debug("fileURL = \(String(describing: url))")
+                            self.cryptor.close(keep: false)
+                        }
+                    }
                 }
-            }
+            } // Section
             Section(header: Text("Backup / Restore")) {
                 Button("Backup") {
                     self.fileURL = CoreDataUtility.shared.backup()
@@ -111,7 +132,7 @@ struct SettingsView: View {
                 Button("Delete All Data") {
                     self.modal = .deleteAll { CoreDataUtility.shared.deleteAll() }
                 }
-            }
+            } // Section
         } // Form
         .sheet(item: self.$sheet) { $0.body }
         .alert(item: self.$modal) { $0.body }

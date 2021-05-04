@@ -8,6 +8,7 @@
 // https://developer.apple.com/forums/thread/121162
 
 import SwiftUI
+import UniformTypeIdentifiers
 
 public struct ClearButton: ViewModifier {
     @Binding var text: String
@@ -98,6 +99,8 @@ struct DocumentPickerForExporting: UIViewControllerRepresentable {
 
 // MARK: -
 // https://capps.tech/blog/read-files-with-documentpicker-in-swiftui
+// https://qiita.com/mittsu/items/5e027f4cb62719abba72
+
 class DocumentPickerCoordinatorForOpening: NSObject, UIDocumentPickerDelegate {
     var block: (URL) -> Void
     
@@ -114,6 +117,7 @@ class DocumentPickerCoordinatorForOpening: NSObject, UIDocumentPickerDelegate {
 
 struct DocumentPickerForOpening: UIViewControllerRepresentable {
     var block: (URL) -> Void
+    var fileType: [UTType]
     
     typealias UIViewControllerType = UIDocumentPickerViewController
     
@@ -122,7 +126,7 @@ struct DocumentPickerForOpening: UIViewControllerRepresentable {
     }
     
     func makeUIViewController(context: Context) -> UIViewControllerType {
-        let controller = UIDocumentPickerViewController(forOpeningContentTypes: [.zip])
+        let controller = UIDocumentPickerViewController(forOpeningContentTypes: fileType)
         controller.delegate                 = context.coordinator
         controller.allowsMultipleSelection  = false
         controller.shouldShowFileExtensions = true
