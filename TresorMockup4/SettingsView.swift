@@ -110,7 +110,6 @@ struct SettingsView: View {
                         self.sheet = .import { url in
                             CoreDataUtility.shared.import(url: url, cryptor: self.cryptor)
                             J1Logger.shared.debug("fileURL = \(String(describing: url))")
-                            self.cryptor.close(keep: false)
                         }
                     }
                 }

@@ -171,15 +171,18 @@ class CoreDataUtility {
                 = publisher.subject.tryMap {
                     var dict = $0
                     if let plain = dict["password"], !plain.isEmpty {
-                        let cipher = try cryptor.encrypt(plain: plain)
-                        dict["password"] = cipher
+                        let proxy = PasswordProxy()
+                        proxy.plain = plain
+                        try proxy.endecrypt(cryptor: cryptor)
+                        dict["password"] = proxy.cipher
+//                        dict["passwordHash"] = proxy.passwordHash
                     }
                     return dict
                 }.eraseToAnyPublisher()
             let loaderSite = Restorer<Site>(searchingKeys: ["url", "title"], context: context)
             loaderSite.load(from: subject)
             publisher.send()
-            
+
             if context.hasChanges {
                 do {
                     try context.save()
@@ -190,6 +193,9 @@ class CoreDataUtility {
                 J1Logger.shared.debug("save context")
             }
             context.reset()
+            DispatchQueue.main.async {
+                cryptor.close(keep: false)
+            }
         }
     }
 }
