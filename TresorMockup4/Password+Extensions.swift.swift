@@ -7,6 +7,7 @@
 // https://www.hackingwithswift.com/books/ios-swiftui/one-to-many-relationships-with-core-data-swiftui-and-fetchrequest
 
 import Foundation
+import Combine
 
 extension Password {
     override public func awakeFromInsert() {
@@ -29,14 +30,14 @@ extension Password {
     func toCurrent() {
         guard let site = self.site else { return }
         let now = Date()
-        self.selectedAt = now
         _ = site.passwords?.map {
             guard let pass = $0 as? Password else { return }
             if pass.current {
                 pass.current = false
             }
         }
-        self.current = true
+        self.selectedAt = now
+        self.current    = true
 
         site.selectAt   = now
         site.setPrimitiveValue(self.password, forKey: "password")
@@ -49,12 +50,11 @@ extension Password {
     }
 }
 
-extension Password {
-    class func backup(url: URL) -> URL {
-        let fileURL = url
-            .appendingPathComponent(String(describing: Self.self), isDirectory: false)
-            .appendingPathExtension(for: .commaSeparatedText)        
-        Self.backup(url: fileURL, sortNames: ["selectedAt", "password"])
-        return fileURL
+extension Password: BackupedPublisher {
+    class func backupPublisher() -> AnyPublisher<[String], Error> {
+        let sortNames = ["selectedAt", "password"]
+        let publisher = Self.publisher(sortNames: sortNames)
+        let header    = Self.tableHeaderPublisher(publisher: publisher, sortNames: sortNames)
+        return Self.tablePublisher(publisher: publisher, headerPublisher: header)
     }
 }

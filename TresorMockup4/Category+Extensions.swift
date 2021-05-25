@@ -9,6 +9,7 @@
 import Foundation
 import CoreData
 import SwiftUI
+import Combine
 
 enum CategoryKind: Int16 {
     case all   =    0
@@ -68,13 +69,14 @@ extension Category {
         self.Trash_private = nil
         super.deleteAll(predicate: predicate)
     }
+}
 
-    class func backup(url: URL) -> URL {
-        let fileURL = url
-            .appendingPathComponent(String(describing: Self.self), isDirectory: false)
-            .appendingPathExtension(for: .commaSeparatedText)        
-        Self.backup(url: fileURL, sortNames: ["kind", "nameSort", "name"])
-        return fileURL
+extension Category: BackupedPublisher {
+    class func backupPublisher() -> AnyPublisher<[String], Error> {
+        let sortNames = ["kind", "nameSort", "name"]
+        let publisher = Self.publisher(sortNames: sortNames)
+        let header    = Self.tableHeaderPublisher(publisher: publisher, sortNames: sortNames)
+        return Self.tablePublisher(publisher: publisher, headerPublisher: header)
     }
 }
 
@@ -94,7 +96,7 @@ class CategoryManager {
         let req: NSFetchRequest<Category> = NSFetchRequest(entityName: Category.entity().name!)
         req.predicate = NSPredicate(format: "kind = %@", NSNumber(value: kind.rawValue))
         req.sortDescriptors = [NSSortDescriptor(keyPath: \Category.createdAt, ascending: false)]
-    
+
         var result: [Category] = []
         do {
             result = try self.viewContext.fetch(req)

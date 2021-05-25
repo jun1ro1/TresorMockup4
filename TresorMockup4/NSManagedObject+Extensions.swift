@@ -8,7 +8,6 @@
 import Foundation
 import CoreData
 import Combine
-import CSV
 
 let ManagedObjectVersion = 1
 
@@ -38,7 +37,7 @@ extension NSManagedObject {
                 case .stringAttributeType:
                     let val = value
                     if let old = self.primitiveValue(forKey: name) as? String, old == val { return }
-                   self.setPrimitiveValue(val, forKey: name)
+                    self.setPrimitiveValue(val, forKey: name)
                 default:
                     self.setPrimitiveValue(nil, forKey: name)
                 }
@@ -71,7 +70,7 @@ extension NSManagedObject {
             }
         }
     }
-
+    
     func propertyDictionary() -> [String: String] {
         let props = Self.entity().properties
         
@@ -139,15 +138,14 @@ extension NSManagedObject {
             } catch let error {
                 J1Logger.shared.error("batch delete request = \(error)")
             }
-         }
+        }
     }
 }
 
 // MARK: -
-
 extension NSManagedObject {
     class func publisher(sortNames: [String] = [], predicate: NSPredicate? = nil)
-    -> AnyPublisher<Dictionary<String, String>, Error> {
+    -> AnyPublisher<[String: String]?, Error> {
         let names    = Self.entity().properties.map { $0.name }
         var snames   = sortNames
         let unknowns = Set(snames).subtracting(Set(names))
@@ -170,69 +168,46 @@ extension NSManagedObject {
         } catch let error {
             J1Logger.shared.error("fetch error = \(error)")
             mobjects = []
-            return Fail<Dictionary<String, String>, Error>(error: error).eraseToAnyPublisher()
+            return Fail<[String: String]?, Error>(error: error).eraseToAnyPublisher()
         }
         
-        let pub = Publishers.Sequence<[Dictionary<String, String>], Error>(sequence: mobjects.map {
+        let pub = Publishers.Sequence<[[String: String]?], Error>(sequence: mobjects.map {
             $0.propertyDictionary()
         })
         return pub.eraseToAnyPublisher()
     }
-
-    class func tablePublisher(sortNames: [String] = [])
+    
+    class func tablePublisher(publisher: AnyPublisher<[String: String]?, Error>,
+                              headerPublisher: AnyPublisher<[String], Error>)
     -> AnyPublisher<[String], Error> {
-        let publisher = Self.publisher(sortNames: sortNames)
-        let headerPublisher: AnyPublisher<[String], Error> =
-            publisher.first().map {
-                var names    = Array($0.keys)
-                var snames   = sortNames
-                let unknowns = Set(snames).subtracting(Set(names))
-                if unknowns != [] {
-                    J1Logger.shared.error("\(sortNames) have unknown names \(unknowns)")
-                    snames.removeAll { unknowns.contains($0) }
-                }
-                let onames  = Set(names).subtracting(snames)
-                names = snames + onames.sorted()
-                return names
-            }.eraseToAnyPublisher()
-        
-        return headerPublisher.combineLatest(publisher.prepend([:]))
+        return headerPublisher.combineLatest(publisher.prepend(nil))
             .map { (keys, dict) -> [String] in
-                dict == [:] ? keys : keys.map { dict[$0] ?? "" }
+                dict == nil ? keys : keys.map { dict![$0] ?? "" }
             }.eraseToAnyPublisher()
     }
     
-    class func backup(url: URL, sortNames: [String] = []) {
-        guard let stream = OutputStream(url: url, append: false) else {
-            J1Logger.shared.error("OutputStream error url=\(url)")
-            return
-        }
-        let csv: CSVWriter
-        do {
-            csv = try CSVWriter(stream: stream)
-        } catch let error {
-            J1Logger.shared.error("CSVWriter fails=\(error)")
-            return
-        }
-        
-        _ = Self.tablePublisher(sortNames: sortNames).sink { completion in
-            csv.stream.close()
-            switch completion {
-            case .finished:
-                J1Logger.shared.debug("finished")
-            case .failure(let error):
-                J1Logger.shared.error("error = \(error)")
+    class func tableHeaderPublisher(publisher: AnyPublisher<[String: String]?, Error>,
+                                    sortNames: [String] = [])
+    -> AnyPublisher<[String], Error> {
+        return publisher.first().map {
+            guard let dict = $0 else { return [] }
+            var names    = Array(dict.keys)
+            var snames   = sortNames
+            let unknowns = Set(snames).subtracting(Set(names))
+            if unknowns != [] {
+                J1Logger.shared.error("\(sortNames) have unknown names \(unknowns)")
+                snames.removeAll { unknowns.contains($0) }
             }
-        } receiveValue: { values in
-            do {
-                try csv.write(row: values)
-            } catch let error {
-                J1Logger.shared.error("error = \(error)")
-            }
-        }
+            let onames  = Set(names).subtracting(snames)
+            names = snames + onames.sorted()
+            return names
+        }.eraseToAnyPublisher()
     }
 }
 
+protocol BackupedPublisher {
+    static func backupPublisher() -> AnyPublisher<[String], Error>
+}
 
 // MARK: -
 struct ObjectState: OptionSet, Hashable {

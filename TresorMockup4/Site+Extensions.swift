@@ -36,15 +36,33 @@ extension Site {
     //        self.observation = self.observe(\.password, options: [.new, .old], changeHandler: Self.updatePassword)
     //    }
     
-    public func setPassword(cipher newPassCipher: String, plain newPassPlain: String) throws {
+    public override func willSave() {
+        var state = ObjectState(rawValue: (self.value(forKey: "state") as? Int16) ?? 0)
+        _ = state.insert(ObjectState.saved)
+        self.setPrimitiveValue(state.rawValue, forKey: "state")
+    }
+    
+    public var currentPassword: Password? {
+        return self.passwords?.first {($0 as! Password).current} as? Password
+    }
+}
+
+// MARK: -
+extension Site {
+    public func setPassword(cryptor: Cryptor, plain newPassPlain: String) throws {
         guard let viewContext = self.managedObjectContext else { return }
+        guard !newPassPlain.isEmpty else { return }
+        
         let passwords = (self.passwords?.allObjects as? [Password] ?? [])
             .sorted { (x, y) -> Bool in
                 let xc = x.createdAt ?? Date(timeIntervalSince1970: 0)
                 let yc = y.createdAt ?? Date(timeIntervalSince1970: 0)
                 return xc < yc
             }
-        let newPassHash = try newPassPlain.hash()
+                
+        let newPassCipher = try cryptor.encrypt(plain: newPassPlain)
+        let newPassHash   = try newPassPlain.hash()
+        let newPassLength = Int16(newPassPlain.count)
         
         // save old password
         if let oldPassStr  = self.password, let oldPassHash = self.passwordHash {
@@ -58,132 +76,112 @@ extension Site {
             }
         }
         
+        // set new password
         self.password     = newPassCipher
-        self.passwordHash = try newPassPlain.hash()
-        self.length       = Int16(newPassPlain.count)
+        self.passwordHash = newPassHash
+        self.length       = newPassLength
         
-        let newPassword = { () -> Password in
-            var p = passwords.first(where: { $0.passwordHash == newPassHash })
-            if p != nil { return p! }
-            p = Password(context: viewContext)
-            p!.password     = self.password
-            p!.passwordHash = self.passwordHash
-            p!.length       = self.length
-            p!.site         = self
-            self.addToPasswords(p!)
-            return p!
-        }()
+        let newPassword =
+            passwords.first(where: { $0.passwordHash == newPassHash }) ??
+            {
+                let p = Password(context: viewContext)
+                p.password     = self.password
+                p.passwordHash = self.passwordHash
+                p.length       = self.length
+                p.site         = self
+                self.addToPasswords(p)
+                return p
+            }()
         newPassword.toCurrent()
     }
-    
-    public override func willSave() {
-        var state = ObjectState(rawValue: (self.value(forKey: "state") as? Int16) ?? 0)
-        _ = state.insert(ObjectState.saved)
-        self.setPrimitiveValue(state.rawValue, forKey: "state")
-    }
-    
-    public var currentPassword: Password? {
-        return self.passwords?.first {($0 as! Password).current} as? Password
-    }
-    
+}
+
+// MARK: -
+extension Site {
     class func delete(_ site: Site, context: NSManagedObjectContext) {
         site.passwords?.allObjects.forEach { pass in
             context.delete(pass as! NSManagedObject)
         }
         context.delete(site)
+    }    
+}
+
+extension Site: BackupedPublisher {
+    class func backupPublisher() -> AnyPublisher<[String], Error> {
+        let sortNames = ["titleSort", "title", "url", "userid", "password"]
+        let publisher = Self.publisher(sortNames: sortNames)
+        let header    = Self.tableHeaderPublisher(publisher: publisher, sortNames: sortNames)
+        return Self.tablePublisher(publisher: publisher, headerPublisher: header)
     }
-    
-    class func backup(url: URL) -> URL {
-        let fileURL = url
-            .appendingPathComponent(String(describing: Self.self), isDirectory: false)
-            .appendingPathExtension(for: .commaSeparatedText)
-        Self.backup(url: fileURL, sortNames: ["titleSort", "title", "url", "userid", "password"])
-        return fileURL
-    }
-    
-    
+}
+
+extension Site {
     class func publisherPlain(sortNames: [String] = [], predicate: NSPredicate? = nil, cryptor: CryptorUI)
     -> AnyPublisher<Dictionary<String, String>, Error> {
         Self.publisher(sortNames: sortNames, predicate: predicate).tryMap {
-            var dict = $0
-            guard let cipher = dict["password"], !cipher.isEmpty else {
-                return dict
-            }
-            let plain = try cryptor.decrypt(cipher: cipher)
-            dict["password"] = plain
-            return dict
+            let dict = $0
+//            guard let cipher = dict["password"], !cipher.isEmpty else {
+//                return dict
+//            }
+//            let plain = try cryptor.decrypt(cipher: cipher)
+//            dict["password"] = plain
+            return dict!
         }
         .eraseToAnyPublisher()
     }
     
-    class func headerPublisher(publisher: AnyPublisher<Dictionary<String, String>, Error>,
-                               sortNames: [String] = [])
-    -> AnyPublisher<[String], Error> {
-        publisher.first().map {
-            var names    = Array($0.keys)
-            var snames   = sortNames
-            let unknowns = Set(snames).subtracting(Set(names))
-            if unknowns != [] {
-                J1Logger.shared.error("\(sortNames) have unknown names \(unknowns)")
-                snames.removeAll { unknowns.contains($0) }
-            }
-            let onames  = Set(names).subtracting(snames)
-            names = snames + onames.sorted()
-            return names
-        }.eraseToAnyPublisher()
-    }
-    
-    class func tablePublisher2(publisher: AnyPublisher<Dictionary<String, String>, Error>,
-                               sortNames: [String] = [],
-                               cryptor: CryptorUI)
-    -> AnyPublisher<[String], Error> {
-        return Self.headerPublisher(publisher:publisher, sortNames: sortNames)
-            .combineLatest(publisher.prepend([:]))
-            .map { (keys, dict) -> [String] in
-                dict == [:] ? keys : keys.map { dict[$0] ?? "" }
-            }.eraseToAnyPublisher()
-    }
+     
+//    class func tablePublisher2(publisher: AnyPublisher<[String: String]?, Error>,
+//                               sortNames: [String] = [],
+//                               cryptor: CryptorUI)
+//    -> AnyPublisher<[String], Error> {
+//        return Self.tableHeaderPublisher(publisher:publisher, sortNames: sortNames)
+//            .combineLatest(publisher.prepend(nil)
+//            .map { (keys, dict) -> [String] in
+//                dict == [:] ? keys : keys.map { dict[$0] ?? "" }
+//            }.eraseToAnyPublisher()
+//    }
     
     class func export(url: URL, cryptor: CryptorUI) {
-        guard let stream = OutputStream(url: url, append: false) else {
-            J1Logger.shared.error("OutputStream error url=\(url)")
-            return
-        }
-        let csv: CSVWriter
-        do {
-            csv = try CSVWriter(stream: stream)
-        } catch let error {
-            J1Logger.shared.error("CSVWriter fails=\(error)")
-            return
-        }
-        
-        let sortNames = ["title", "url", "userid", "password", "memo"]
-        let kind = Int(CategoryKind.trash.rawValue)
-        let predicate = NSPredicate(format: "category == nil OR category.kind !=\(kind)")
-        _ = Self.tablePublisher2(publisher: Self.publisherPlain(
-                                    sortNames: sortNames,
-                                    predicate: predicate,
-                                    cryptor: cryptor),
-                                 sortNames: sortNames,
-                                 cryptor: cryptor)
-            .map { values -> [String] in
-                let num = min(sortNames.count, values.count)
-                return Array(values[0..<num])
-            }
-            .sink { completion in
-                csv.stream.close()
-                switch completion {
-                case .finished:
-                    J1Logger.shared.debug("finished")
-                case .failure(let error):
-                    J1Logger.shared.error("error = \(error)")
-                }
-            } receiveValue: { values in
-                do {
-                    try csv.write(row: values)
-                } catch let error {
-                    J1Logger.shared.error("error = \(error)")
-                }
-            }
+//        guard let stream = OutputStream(url: url, append: false) else {
+//            J1Logger.shared.error("OutputStream error url=\(url)")
+//            return
+//        }
+//        let csv: CSVWriter
+//        do {
+//            csv = try CSVWriter(stream: stream)
+//        } catch let error {
+//            J1Logger.shared.error("CSVWriter fails=\(error)")
+//            return
+//        }
+//
+//        let sortNames = ["title", "url", "userid", "password", "memo"]
+//        let kind = Int(CategoryKind.trash.rawValue)
+//        let predicate = NSPredicate(format: "category == nil OR category.kind !=\(kind)")
+//        _ = Self.tablePublisher(publisher: Self.publisherPlain(
+//                                    sortNames: sortNames,
+//                                    predicate: predicate,
+//                                    cryptor: cryptor),
+//                                 sortNames: sortNames,
+//                                 cryptor: cryptor)
+//            .map { values -> [String] in
+//                let num = min(sortNames.count, values.count)
+//                return Array(values[0..<num])
+//            }
+//            .sink { completion in
+//                csv.stream.close()
+//                switch completion {
+//                case .finished:
+//                    J1Logger.shared.debug("finished")
+//                case .failure(let error):
+//                    J1Logger.shared.error("error = \(error)")
+//                }
+//            } receiveValue: { values in
+//                do {
+//                    try csv.write(row: values)
+//                } catch let error {
+//                    J1Logger.shared.error("error = \(error)")
+//                }
+//            }
     }
 }

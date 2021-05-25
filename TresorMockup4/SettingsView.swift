@@ -93,7 +93,7 @@ struct SettingsView: View {
                             self.sheet = nil
                             return
                         }
-                        self.fileURL = CoreDataUtility.shared.export(cryptor: self.cryptor)
+                        self.fileURL = DataManager.shared.export(cryptor: self.cryptor)
                         guard self.fileURL != nil else { return }
                         self.sheet = .export(fileURL: self.$fileURL)
                         self.cryptor.close(keep: false)
@@ -108,7 +108,7 @@ struct SettingsView: View {
                             return
                         }
                         self.sheet = .import { url in
-                            CoreDataUtility.shared.import(url: url, cryptor: self.cryptor)
+                            DataManager.shared.import(url: url, cryptor: self.cryptor)
                             J1Logger.shared.debug("fileURL = \(String(describing: url))")
                         }
                     }
@@ -116,20 +116,20 @@ struct SettingsView: View {
             } // Section
             Section(header: Text("Backup / Restore")) {
                 Button("Backup") {
-                    self.fileURL = CoreDataUtility.shared.backup()
+                    self.fileURL = DataManager.shared.backup()
                     guard self.fileURL != nil else { return }
                     self.sheet = .backup(fileURL: self.$fileURL)
                 }
                 Button("Restore") {
                     self.sheet = .restore { url in
-                        CoreDataUtility.shared.restore(url: url)
+                        DataManager.shared.restore(url: url)
                     }
                     J1Logger.shared.debug("fileURL = \(String(describing: self.fileURL))")
                 }
             } // Section
             Section(header: Text("Dangerous Operation").foregroundColor(.red)) {
                 Button("Delete All Data") {
-                    self.modal = .deleteAll { CoreDataUtility.shared.deleteAll() }
+                    self.modal = .deleteAll { DataManager.shared.deleteAll() }
                 }
             } // Section
         } // Form

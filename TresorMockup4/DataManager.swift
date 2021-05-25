@@ -9,10 +9,11 @@ import Foundation
 import CoreData
 import Combine
 
+import CSV
 import Zip
 
-class CoreDataUtility {
-    static let shared = CoreDataUtility()
+class DataManager {
+    static let shared = DataManager()
     
     func deleteAll() {
         Password.deleteAll()
@@ -41,8 +42,9 @@ class CoreDataUtility {
             .appendingPathComponent(name, isDirectory: true)
         return tempURL
     }
+
     
-    func backup() -> URL {
+    func backup() -> URL? {
         let tempURL = self.temporaryURL
         do {
             try FileManager.default.createDirectory(at: tempURL, withIntermediateDirectories: true)
@@ -50,34 +52,101 @@ class CoreDataUtility {
             J1Logger.shared.error("createDirectory error = \(error)")
         }
         J1Logger.shared.info("tempURL = \(tempURL)")
-        
-        let urlCategory = Category.backup(url: tempURL)
-        let urlSite     = Site.backup(url: tempURL)
-        let urlPassword = Password.backup(url: tempURL)
-        J1Logger.shared.debug("urlCategory = \(String(describing: urlCategory))")
-        J1Logger.shared.debug("urlSite     = \(String(describing: urlSite))")
-        J1Logger.shared.debug("urlPassword = \(String(describing: urlPassword))")
-        
-        let name = Bundle.main.object(forInfoDictionaryKey: kCFBundleNameKey as String) as! String
-        let timestr = self.timeString
-        let urlZip = urlSite.deletingLastPathComponent().appendingPathComponent("\(name)-\(timestr).zip")
-        
-        let urls =  [urlCategory, urlSite, urlPassword]
-        do {
-            try Zip.zipFiles(paths: urls, zipFilePath: urlZip, password: nil) { _ in
-            }
-        } catch let error {
-            J1Logger.shared.error("Zip.zipFiles = \(error)")
+
+        let writerPublisher = {
+            [$0].publisher.tryMap { (schema) -> (CSVWriter, URL) in
+                let fileURL = tempURL
+                    .appendingPathComponent(String(describing: schema), isDirectory: false)
+                    .appendingPathExtension(for: .commaSeparatedText)
+                let stream = OutputStream(url: fileURL, append: false)!
+                let writer = try CSVWriter(stream: stream)
+                return (writer, fileURL)
+            }.eraseToAnyPublisher()
         }
-        
-        urls.forEach { (url) in
-            do {
-                try FileManager.default.removeItem(at: url)
-            } catch let error {
-                J1Logger.shared.error("removeItem \(url.absoluteString) error = \(error)")
+
+        let publisherCategory = Category.backupPublisher().combineLatest(writerPublisher(Category.self))
+            .tryMap { (values: [String], arg2) -> ([String], CSVWriter, URL) in
+                let csv = arg2.0
+                let url = arg2.1
+                try csv.write(row: values)
+                return (values, csv, url)
+            }.eraseToAnyPublisher()
+        let publisherSite = Site.backupPublisher().combineLatest(writerPublisher(Site.self))
+            .tryMap { (values: [String], arg2) -> ([String], CSVWriter, URL) in
+                let csv = arg2.0
+                let url = arg2.1
+                try csv.write(row: values)
+                return (values, csv, url)
+            }.eraseToAnyPublisher()
+        let publisherPassword = Password.backupPublisher().combineLatest(writerPublisher(Password.self))
+            .tryMap { (values: [String], arg2) -> ([String], CSVWriter, URL) in
+                let csv = arg2.0
+                let url = arg2.1
+                try csv.write(row: values)
+                return (values, csv, url)
+            }.eraseToAnyPublisher()
+
+        let cancellable = publisherCategory
+            .flatMap { _ in publisherSite     }
+            .flatMap { _ in publisherPassword }
+
+        _ = cancellable.sink { completion in
+            switch completion {
+            case .finished:
+                break
+            case .failure(let error):
+                J1Logger.shared.error("error = \(error)")
+
             }
+        } receiveValue: { arg in
+            print(arg)
         }
-        return urlZip
+
+        return tempURL
+
+
+//            .sink { completion -> URL? in
+//                csv.stream.close()
+//                switch completion {
+//                case .finished:
+//                    J1Logger.shared.debug("finished")
+//                    return fileURL
+//                case .failure(let error):
+//                    J1Logger.shared.error("error = \(error)")
+//                    return nil
+//                }
+//            } receiveValue: { values in
+//                do {
+//                    try csv.write(row: values)
+//                } catch let error {
+//                    J1Logger.shared.error("error = \(error)")
+//                }
+//            }
+//        }
+//        guard !urls.isEmpty else {
+//            return nil
+//        }
+//
+//        let name = Bundle.main.object(forInfoDictionaryKey: kCFBundleNameKey as String) as! String
+//        let timestr = self.timeString
+//        let urlZip = urls[0].deletingLastPathComponent().appendingPathComponent("\(name)-\(timestr).zip")
+//
+//        do {
+//            try Zip.zipFiles(paths: urls, zipFilePath: urlZip, password: nil) { _ in
+//            }
+//        } catch let error {
+//            J1Logger.shared.error("Zip.zipFiles = \(error)")
+//        }
+//
+//        urls.forEach { (url) in
+//            do {
+//                try FileManager.default.removeItem(at: url)
+//            } catch let error {
+//                J1Logger.shared.error("removeItem \(url.absoluteString) error = \(error)")
+//            }
+//        }
+//        return urlZip
+
     }
     
     func restore(url: URL) {
