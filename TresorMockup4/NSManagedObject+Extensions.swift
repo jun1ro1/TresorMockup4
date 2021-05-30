@@ -205,10 +205,6 @@ extension NSManagedObject {
     }
 }
 
-protocol BackupedPublisher {
-    static func backupPublisher() -> AnyPublisher<[String], Error>
-}
-
 // MARK: -
 struct ObjectState: OptionSet, Hashable {
     let rawValue:  Int16

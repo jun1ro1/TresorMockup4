@@ -12,9 +12,73 @@ import Combine
 import CSV
 import Zip
 
+protocol BackupedPublisher {
+    static func backupPublisher() -> AnyPublisher<[String], Error>
+}
+
+class ExportEngine {
+    private var entity:  BackupedPublisher.Type
+    private var fileURL: URL
+    private var stream:  OutputStream
+    private var writer:  CSVWriter? = nil
+    private var error:   Error?     = nil
+
+    private var temporaryURL: URL {
+        let name = Bundle.main.object(forInfoDictionaryKey: kCFBundleNameKey as String) as! String
+        let tempURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent(name, isDirectory: true)
+        return tempURL
+    }
+
+    init(entity: BackupedPublisher.Type, url: URL) {
+        self.entity =  entity
+        self.fileURL = url
+            .appendingPathComponent(String(describing: self.entity), isDirectory: false)
+            .appendingPathExtension(for: .commaSeparatedText)
+
+        self.stream = OutputStream(url: self.fileURL, append: false)!
+        do {
+            self.writer = try CSVWriter(stream: stream)
+        } catch let error {
+            self.error = error
+        }
+    }
+
+    var url: URL {
+        return self.fileURL
+    }
+
+    var publisher: AnyPublisher<[String], Error> {
+        return self.entity.backupPublisher()
+            .tryMap {
+                guard self.error == nil else {
+                    throw self.error!
+                }
+                do {
+                    try self.writer?.write(row: $0)
+                } catch let error {
+                    self.error = error
+                    throw self.error!
+                }
+                return $0
+            }.eraseToAnyPublisher()
+    }
+
+    func close() {
+        self.writer?.stream.close()
+    }
+}
+
 class DataManager {
     static let shared = DataManager()
     
+    private var temporaryURL: URL {
+        let name = Bundle.main.object(forInfoDictionaryKey: kCFBundleNameKey as String) as! String
+        let tempURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent(name, isDirectory: true)
+        return tempURL
+    }
+
     func deleteAll() {
         Password.deleteAll()
         Site.deleteAll()
@@ -35,17 +99,9 @@ class DataManager {
              .withTimeZone])
         return formatter.string(from: now)
     }
-    
-    private var temporaryURL: URL {
-        let name = Bundle.main.object(forInfoDictionaryKey: kCFBundleNameKey as String) as! String
-        let tempURL = FileManager.default.temporaryDirectory
-            .appendingPathComponent(name, isDirectory: true)
-        return tempURL
-    }
 
-    
-    func backup() -> URL? {
-        let tempURL = self.temporaryURL
+    func backup() -> AnyPublisher<URL, Error> {
+         let tempURL = self.temporaryURL
         do {
             try FileManager.default.createDirectory(at: tempURL, withIntermediateDirectories: true)
         } catch let error {
@@ -53,100 +109,59 @@ class DataManager {
         }
         J1Logger.shared.info("tempURL = \(tempURL)")
 
-        let writerPublisher = {
-            [$0].publisher.tryMap { (schema) -> (CSVWriter, URL) in
-                let fileURL = tempURL
-                    .appendingPathComponent(String(describing: schema), isDirectory: false)
-                    .appendingPathExtension(for: .commaSeparatedText)
-                let stream = OutputStream(url: fileURL, append: false)!
-                let writer = try CSVWriter(stream: stream)
-                return (writer, fileURL)
-            }.eraseToAnyPublisher()
+        let engineCategory = ExportEngine(entity: Category.self, url: tempURL)
+        let engineSite     = ExportEngine(entity: Site.self,     url: tempURL)
+        let enginePassword = ExportEngine(entity: Password.self, url: tempURL)
+
+        let engines: [ExportEngine] = [engineCategory, engineSite, enginePassword]
+        let publishers = engines.map { $0.publisher }
+        let cancellable = publishers.dropFirst().reduce(publishers[0]) {
+            $0.append($1).eraseToAnyPublisher()
         }
 
-        let publisherCategory = Category.backupPublisher().combineLatest(writerPublisher(Category.self))
-            .tryMap { (values: [String], arg2) -> ([String], CSVWriter, URL) in
-                let csv = arg2.0
-                let url = arg2.1
-                try csv.write(row: values)
-                return (values, csv, url)
-            }.eraseToAnyPublisher()
-        let publisherSite = Site.backupPublisher().combineLatest(writerPublisher(Site.self))
-            .tryMap { (values: [String], arg2) -> ([String], CSVWriter, URL) in
-                let csv = arg2.0
-                let url = arg2.1
-                try csv.write(row: values)
-                return (values, csv, url)
-            }.eraseToAnyPublisher()
-        let publisherPassword = Password.backupPublisher().combineLatest(writerPublisher(Password.self))
-            .tryMap { (values: [String], arg2) -> ([String], CSVWriter, URL) in
-                let csv = arg2.0
-                let url = arg2.1
-                try csv.write(row: values)
-                return (values, csv, url)
-            }.eraseToAnyPublisher()
+        return Deferred {
+            Future<URL, Error> { promise in
+                _ = cancellable.sink { completion in
+                    engines.forEach { $0.close() }
 
-        let cancellable = publisherCategory
-            .flatMap { _ in publisherSite     }
-            .flatMap { _ in publisherPassword }
+                    switch completion {
+                    case .finished:
+                        var error: Error? = nil
+                        let urls =  [engineCategory.url, engineSite.url, enginePassword.url]
+                        let name = Bundle.main.object(forInfoDictionaryKey: kCFBundleNameKey as String) as! String
+                        let timestr = self.timeString
+                        let urlZip = urls[0].deletingLastPathComponent().appendingPathComponent("\(name)-\(timestr).zip")
+                        do {
+                            try Zip.zipFiles(paths: urls, zipFilePath: urlZip, password: nil) { _ in
+                            }
+                        } catch let err {
+                            error = err
+                            J1Logger.shared.error("Zip.zipFiles = \(error!)")
+                        }
 
-        _ = cancellable.sink { completion in
-            switch completion {
-            case .finished:
-                break
-            case .failure(let error):
-                J1Logger.shared.error("error = \(error)")
+                        urls.forEach { (url) in
+                            do {
+                                try FileManager.default.removeItem(at: url)
+                            } catch let error {
+                                J1Logger.shared.error("removeItem \(url.absoluteString) error = \(error)")
+                            }
+                        }
+                        if error == nil {
+                            promise(.success(urlZip))
+                        } else {
+                            promise(.failure(error!))
+                        }
+
+                    case .failure(let error):
+                        J1Logger.shared.error("error = \(error)")
+                        promise(.failure(error))
+                    }
+                } receiveValue: { arg in
+                    print(arg)
+                }
 
             }
-        } receiveValue: { arg in
-            print(arg)
-        }
-
-        return tempURL
-
-
-//            .sink { completion -> URL? in
-//                csv.stream.close()
-//                switch completion {
-//                case .finished:
-//                    J1Logger.shared.debug("finished")
-//                    return fileURL
-//                case .failure(let error):
-//                    J1Logger.shared.error("error = \(error)")
-//                    return nil
-//                }
-//            } receiveValue: { values in
-//                do {
-//                    try csv.write(row: values)
-//                } catch let error {
-//                    J1Logger.shared.error("error = \(error)")
-//                }
-//            }
-//        }
-//        guard !urls.isEmpty else {
-//            return nil
-//        }
-//
-//        let name = Bundle.main.object(forInfoDictionaryKey: kCFBundleNameKey as String) as! String
-//        let timestr = self.timeString
-//        let urlZip = urls[0].deletingLastPathComponent().appendingPathComponent("\(name)-\(timestr).zip")
-//
-//        do {
-//            try Zip.zipFiles(paths: urls, zipFilePath: urlZip, password: nil) { _ in
-//            }
-//        } catch let error {
-//            J1Logger.shared.error("Zip.zipFiles = \(error)")
-//        }
-//
-//        urls.forEach { (url) in
-//            do {
-//                try FileManager.default.removeItem(at: url)
-//            } catch let error {
-//                J1Logger.shared.error("removeItem \(url.absoluteString) error = \(error)")
-//            }
-//        }
-//        return urlZip
-
+        }.eraseToAnyPublisher()
     }
     
     func restore(url: URL) {
@@ -244,7 +259,7 @@ class DataManager {
                         proxy.plain = plain
                         try proxy.endecrypt(cryptor: cryptor)
                         dict["password"] = proxy.cipher
-//                        dict["passwordHash"] = proxy.passwordHash
+                        //                        dict["passwordHash"] = proxy.passwordHash
                     }
                     return dict
                 }.eraseToAnyPublisher()

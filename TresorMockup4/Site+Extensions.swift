@@ -117,7 +117,7 @@ extension Site: BackupedPublisher {
 
 extension Site {
     class func publisherPlain(sortNames: [String] = [], predicate: NSPredicate? = nil, cryptor: CryptorUI)
-    -> AnyPublisher<Dictionary<String, String>, Error> {
+    -> AnyPublisher<[String: String], Error> {
         Self.publisher(sortNames: sortNames, predicate: predicate).tryMap {
             let dict = $0
 //            guard let cipher = dict["password"], !cipher.isEmpty else {

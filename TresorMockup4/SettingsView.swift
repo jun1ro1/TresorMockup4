@@ -62,10 +62,13 @@ struct SettingsView: View {
     }
     
     enum Modal: Identifiable {
+        case failure(error: Error)
         case deleteAll(block: () -> Void)
         
         var id: ObjectIdentifier {
             switch self {
+            case .failure(_):
+                return ObjectIdentifier(Self.self)
             case .deleteAll(block: _):
                 return ObjectIdentifier(Self.self)
             }
@@ -73,6 +76,10 @@ struct SettingsView: View {
         
         var body: Alert {
             switch self {
+            case .failure(let error):
+                return Alert(title: Text("ERROR"),
+                             message: Text(error.localizedDescription))
+
             case .deleteAll(let block):
                 return Alert(title: Text("Delete All Data"),
                              message: Text("Are you sure? Cannot undo."),
@@ -116,16 +123,26 @@ struct SettingsView: View {
             } // Section
             Section(header: Text("Backup / Restore")) {
                 Button("Backup") {
-                    self.fileURL = DataManager.shared.backup()
-                    guard self.fileURL != nil else { return }
-                    self.sheet = .backup(fileURL: self.$fileURL)
+                    let _ = DataManager.shared.backup().sink { completion in
+                            switch completion {
+                            case .finished:
+                                break
+                            case .failure(let error):
+                                J1Logger.shared.error("error = \(error)")
+                                self.modal = .failure(error: error)
+                            }
+                        } receiveValue: { fileURL in
+                            self.fileURL = fileURL
+                            guard self.fileURL != nil else { return }
+                            self.sheet = .backup(fileURL: self.$fileURL)
+                        }
                 }
-                Button("Restore") {
-                    self.sheet = .restore { url in
-                        DataManager.shared.restore(url: url)
-                    }
-                    J1Logger.shared.debug("fileURL = \(String(describing: self.fileURL))")
+            Button("Restore") {
+                self.sheet = .restore { url in
+                    DataManager.shared.restore(url: url)
                 }
+                J1Logger.shared.debug("fileURL = \(String(describing: self.fileURL))")
+            }
             } // Section
             Section(header: Text("Dangerous Operation").foregroundColor(.red)) {
                 Button("Delete All Data") {
