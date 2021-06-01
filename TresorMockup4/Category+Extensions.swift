@@ -71,12 +71,9 @@ extension Category {
     }
 }
 
-extension Category: BackupedPublisher {
-    class func backupPublisher() -> AnyPublisher<[String], Error> {
-        let sortNames = ["kind", "nameSort", "name"]
-        let publisher = Self.publisher(sortNames: sortNames)
-        let header    = Self.tableHeaderPublisher(publisher: publisher, sortNames: sortNames)
-        return Self.tablePublisher(publisher: publisher, headerPublisher: header)
+extension Category: PrioritizedNameManagedObject {
+    static var sortNames: [String] {
+        return ["kind", "nameSort", "name"]
     }
 }
 

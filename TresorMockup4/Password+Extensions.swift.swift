@@ -50,11 +50,8 @@ extension Password {
     }
 }
 
-extension Password: BackupedPublisher {
-    class func backupPublisher() -> AnyPublisher<[String], Error> {
-        let sortNames = ["selectedAt", "password"]
-        let publisher = Self.publisher(sortNames: sortNames)
-        let header    = Self.tableHeaderPublisher(publisher: publisher, sortNames: sortNames)
-        return Self.tablePublisher(publisher: publisher, headerPublisher: header)
+extension Password: PrioritizedNameManagedObject {
+    static var sortNames: [String] {
+        return ["selectedAt", "password"]
     }
 }

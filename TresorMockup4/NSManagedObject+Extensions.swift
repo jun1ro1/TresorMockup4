@@ -143,7 +143,7 @@ extension NSManagedObject {
 }
 
 // MARK: -
-extension NSManagedObject {
+extension NSManagedObject: PublishableManagedObject {
     class func publisher(sortNames: [String] = [], predicate: NSPredicate? = nil)
     -> AnyPublisher<[String: String]?, Error> {
         let names    = Self.entity().properties.map { $0.name }
@@ -175,33 +175,6 @@ extension NSManagedObject {
             $0.propertyDictionary()
         })
         return pub.eraseToAnyPublisher()
-    }
-    
-    class func tablePublisher(publisher: AnyPublisher<[String: String]?, Error>,
-                              headerPublisher: AnyPublisher<[String], Error>)
-    -> AnyPublisher<[String], Error> {
-        return headerPublisher.combineLatest(publisher.prepend(nil))
-            .map { (keys, dict) -> [String] in
-                dict == nil ? keys : keys.map { dict![$0] ?? "" }
-            }.eraseToAnyPublisher()
-    }
-    
-    class func tableHeaderPublisher(publisher: AnyPublisher<[String: String]?, Error>,
-                                    sortNames: [String] = [])
-    -> AnyPublisher<[String], Error> {
-        return publisher.first().map {
-            guard let dict = $0 else { return [] }
-            var names    = Array(dict.keys)
-            var snames   = sortNames
-            let unknowns = Set(snames).subtracting(Set(names))
-            if unknowns != [] {
-                J1Logger.shared.error("\(sortNames) have unknown names \(unknowns)")
-                snames.removeAll { unknowns.contains($0) }
-            }
-            let onames  = Set(names).subtracting(snames)
-            names = snames + onames.sorted()
-            return names
-        }.eraseToAnyPublisher()
     }
 }
 

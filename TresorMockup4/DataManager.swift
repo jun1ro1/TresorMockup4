@@ -12,12 +12,16 @@ import Combine
 import CSV
 import Zip
 
-protocol BackupedPublisher {
-    static func backupPublisher() -> AnyPublisher<[String], Error>
+protocol PrioritizedNameManagedObject {
+    static var sortNames: [String] { get }
+}
+protocol PublishableManagedObject {
+    static func publisher(sortNames: [String], predicate: NSPredicate?)
+    -> AnyPublisher<[String: String]?, Error>
 }
 
 class ExportEngine {
-    private var entity:  BackupedPublisher.Type
+    private var entity:  PublishableManagedObject.Type
     private var fileURL: URL
     private var stream:  OutputStream
     private var writer:  CSVWriter? = nil
@@ -30,7 +34,7 @@ class ExportEngine {
         return tempURL
     }
 
-    init(entity: BackupedPublisher.Type, url: URL) {
+    init(entity: PublishableManagedObject.Type, url: URL) {
         self.entity =  entity
         self.fileURL = url
             .appendingPathComponent(String(describing: self.entity), isDirectory: false)
@@ -48,8 +52,42 @@ class ExportEngine {
         return self.fileURL
     }
 
+    func tablePublisher(publisher: AnyPublisher<[String: String]?, Error>,
+                              headerPublisher: AnyPublisher<[String], Error>)
+    -> AnyPublisher<[String], Error> {
+        return headerPublisher.combineLatest(publisher.prepend(nil))
+            .map { (keys, dict) -> [String] in
+                dict == nil ? keys : keys.map { dict![$0] ?? "" }
+            }.eraseToAnyPublisher()
+    }
+
+    func tableHeaderPublisher(publisher: AnyPublisher<[String: String]?, Error>,
+                              sortNames: [String] = [])
+    -> AnyPublisher<[String], Error> {
+        return publisher.first().map {
+            guard let dict = $0 else { return [] }
+            var names    = Array(dict.keys)
+            var snames   = sortNames
+            let unknowns = Set(snames).subtracting(Set(names))
+            if unknowns != [] {
+                J1Logger.shared.error("\(sortNames) have unknown names \(unknowns)")
+                snames.removeAll { unknowns.contains($0) }
+            }
+            let onames  = Set(names).subtracting(snames)
+            names = snames + onames.sorted()
+            return names
+        }.eraseToAnyPublisher()
+    }
+
+    func backupPublisher() -> AnyPublisher<[String], Error> {
+        let sortNames = (self.entity as! PrioritizedNameManagedObject.Type).sortNames
+        let publisher = self.entity.publisher(sortNames: sortNames, predicate: nil)
+        let header    = self.tableHeaderPublisher(publisher: publisher, sortNames: sortNames)
+        return self.tablePublisher(publisher: publisher, headerPublisher: header)
+    }
+
     var publisher: AnyPublisher<[String], Error> {
-        return self.entity.backupPublisher()
+        return self.backupPublisher()
             .tryMap {
                 guard self.error == nil else {
                     throw self.error!

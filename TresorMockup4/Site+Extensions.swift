@@ -106,12 +106,9 @@ extension Site {
     }    
 }
 
-extension Site: BackupedPublisher {
-    class func backupPublisher() -> AnyPublisher<[String], Error> {
-        let sortNames = ["titleSort", "title", "url", "userid", "password"]
-        let publisher = Self.publisher(sortNames: sortNames)
-        let header    = Self.tableHeaderPublisher(publisher: publisher, sortNames: sortNames)
-        return Self.tablePublisher(publisher: publisher, headerPublisher: header)
+extension Site: PrioritizedNameManagedObject {
+    static var sortNames: [String] {
+        return ["titleSort", "title", "url", "userid", "password"]
     }
 }
 
@@ -120,45 +117,28 @@ extension Site {
     -> AnyPublisher<[String: String], Error> {
         Self.publisher(sortNames: sortNames, predicate: predicate).tryMap {
             let dict = $0
-//            guard let cipher = dict["password"], !cipher.isEmpty else {
-//                return dict
-//            }
-//            let plain = try cryptor.decrypt(cipher: cipher)
-//            dict["password"] = plain
             return dict!
         }
         .eraseToAnyPublisher()
     }
-    
-     
-//    class func tablePublisher2(publisher: AnyPublisher<[String: String]?, Error>,
-//                               sortNames: [String] = [],
-//                               cryptor: CryptorUI)
-//    -> AnyPublisher<[String], Error> {
-//        return Self.tableHeaderPublisher(publisher:publisher, sortNames: sortNames)
-//            .combineLatest(publisher.prepend(nil)
-//            .map { (keys, dict) -> [String] in
-//                dict == [:] ? keys : keys.map { dict[$0] ?? "" }
-//            }.eraseToAnyPublisher()
-//    }
-    
+
     class func export(url: URL, cryptor: CryptorUI) {
-//        guard let stream = OutputStream(url: url, append: false) else {
-//            J1Logger.shared.error("OutputStream error url=\(url)")
-//            return
-//        }
-//        let csv: CSVWriter
-//        do {
-//            csv = try CSVWriter(stream: stream)
-//        } catch let error {
-//            J1Logger.shared.error("CSVWriter fails=\(error)")
-//            return
-//        }
-//
-//        let sortNames = ["title", "url", "userid", "password", "memo"]
-//        let kind = Int(CategoryKind.trash.rawValue)
-//        let predicate = NSPredicate(format: "category == nil OR category.kind !=\(kind)")
-//        _ = Self.tablePublisher(publisher: Self.publisherPlain(
+        guard let stream = OutputStream(url: url, append: false) else {
+            J1Logger.shared.error("OutputStream error url=\(url)")
+            return
+        }
+        let csv: CSVWriter
+        do {
+            csv = try CSVWriter(stream: stream)
+        } catch let error {
+            J1Logger.shared.error("CSVWriter fails=\(error)")
+            return
+        }
+
+        let sortNames = ["title", "url", "userid", "password", "memo"]
+        let kind = Int(CategoryKind.trash.rawValue)
+        let predicate = NSPredicate(format: "category == nil OR category.kind !=\(kind)")
+//        _ = Self.tablePublisher2(publisher: Self.publisherPlain(
 //                                    sortNames: sortNames,
 //                                    predicate: predicate,
 //                                    cryptor: cryptor),
