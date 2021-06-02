@@ -24,7 +24,7 @@ class ExportEngine {
     private var entity:  PublishableManagedObject.Type
     private var fileURL: URL
     private var stream:  OutputStream
-    private var writer:  CSVWriter? = nil
+    private var csv:     CSVWriter? = nil
     private var error:   Error?     = nil
 
     private var temporaryURL: URL {
@@ -42,7 +42,7 @@ class ExportEngine {
 
         self.stream = OutputStream(url: self.fileURL, append: false)!
         do {
-            self.writer = try CSVWriter(stream: stream)
+            self.csv = try CSVWriter(stream: stream)
         } catch let error {
             self.error = error
         }
@@ -86,14 +86,14 @@ class ExportEngine {
         return self.tablePublisher(publisher: publisher, headerPublisher: header)
     }
 
-    var publisher: AnyPublisher<[String], Error> {
+    var csvPublisher: AnyPublisher<[String], Error> {
         return self.backupPublisher()
             .tryMap {
                 guard self.error == nil else {
                     throw self.error!
                 }
                 do {
-                    try self.writer?.write(row: $0)
+                    try self.csv?.write(row: $0)
                 } catch let error {
                     self.error = error
                     throw self.error!
@@ -103,7 +103,7 @@ class ExportEngine {
     }
 
     func close() {
-        self.writer?.stream.close()
+        self.csv?.stream.close()
     }
 }
 
@@ -152,7 +152,7 @@ class DataManager {
         let enginePassword = ExportEngine(entity: Password.self, url: tempURL)
 
         let engines: [ExportEngine] = [engineCategory, engineSite, enginePassword]
-        let publishers = engines.map { $0.publisher }
+        let publishers = engines.map { $0.csvPublisher }
         let cancellable = publishers.dropFirst().reduce(publishers[0]) {
             $0.append($1).eraseToAnyPublisher()
         }
@@ -165,7 +165,7 @@ class DataManager {
                     switch completion {
                     case .finished:
                         var error: Error? = nil
-                        let urls =  [engineCategory.url, engineSite.url, enginePassword.url]
+                        let urls = engines.map { $0.url }
                         let name = Bundle.main.object(forInfoDictionaryKey: kCFBundleNameKey as String) as! String
                         let timestr = self.timeString
                         let urlZip = urls[0].deletingLastPathComponent().appendingPathComponent("\(name)-\(timestr).zip")
