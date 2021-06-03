@@ -26,18 +26,16 @@ class ExportEngine {
     private var stream:  OutputStream
     private var csv:     CSVWriter? = nil
     private var error:   Error?     = nil
-
-    private var temporaryURL: URL {
-        let name = Bundle.main.object(forInfoDictionaryKey: kCFBundleNameKey as String) as! String
-        let tempURL = FileManager.default.temporaryDirectory
-            .appendingPathComponent(name, isDirectory: true)
-        return tempURL
-    }
+    public  var cryptor: Cryptor?   = nil
 
     init(entity: PublishableManagedObject.Type, url: URL) {
-        self.entity =  entity
+        self.entity   = entity
+
+        let nameApp   = Bundle.main.object(forInfoDictionaryKey: kCFBundleNameKey as String) as! String
+        let nameTitle = String(describing: self.entity)
+        let timestr   = Self.timeString
         self.fileURL = url
-            .appendingPathComponent(String(describing: self.entity), isDirectory: false)
+            .appendingPathComponent("\(nameApp)-\(nameTitle)-\(timestr)", isDirectory: false)
             .appendingPathExtension(for: .commaSeparatedText)
 
         self.stream = OutputStream(url: self.fileURL, append: false)!
@@ -45,15 +43,33 @@ class ExportEngine {
             self.csv = try CSVWriter(stream: stream)
         } catch let error {
             self.error = error
+            J1Logger.shared.error("error = \(error)")
         }
     }
 
-    var url: URL {
-        return self.fileURL
+    static var temporaryURL: URL {
+        let name = Bundle.main.object(forInfoDictionaryKey: kCFBundleNameKey as String) as! String
+        let tempURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent(name, isDirectory: true)
+        return tempURL
+    }
+
+    var url: URL { return self.fileURL }
+
+    static var timeString: String {
+        let now       = Date()
+        let formatter = ISO8601DateFormatter()
+        formatter.timeZone = .autoupdatingCurrent
+        formatter.formatOptions = [.withFullDate, .withFullTime, .withSpaceBetweenDateAndTime]
+        formatter.formatOptions.remove(
+            [.withDashSeparatorInDate, .withColonSeparatorInTime,
+             .withColonSeparatorInTimeZone, .withSpaceBetweenDateAndTime,
+             .withTimeZone])
+        return formatter.string(from: now)
     }
 
     func tablePublisher(publisher: AnyPublisher<[String: String]?, Error>,
-                              headerPublisher: AnyPublisher<[String], Error>)
+                        headerPublisher: AnyPublisher<[String], Error>)
     -> AnyPublisher<[String], Error> {
         return headerPublisher.combineLatest(publisher.prepend(nil))
             .map { (keys, dict) -> [String] in
@@ -86,8 +102,37 @@ class ExportEngine {
         return self.tablePublisher(publisher: publisher, headerPublisher: header)
     }
 
-    var csvPublisher: AnyPublisher<[String], Error> {
-        return self.backupPublisher()
+    func plainPublisher(publisher: AnyPublisher<[String: String]?, Error>,
+                        headerPublisher: AnyPublisher<[String], Error>)
+    -> AnyPublisher<[String], Error> {
+        return headerPublisher.combineLatest(publisher.prepend(nil))
+            .tryMap { (keys, dict) -> [String] in
+                guard dict != nil else {
+                    return keys
+                }
+                var dictPlain = dict!
+                if let cipher = dictPlain["password"], !cipher.isEmpty {
+                    guard self.cryptor != nil else {
+                        throw CryptorError.notOpened
+                    }
+                    let plain = try self.cryptor!.decrypt(cipher: cipher)
+                    dictPlain["password"] = plain
+                }
+                return keys.map { dictPlain[$0] ?? "" }
+            }.eraseToAnyPublisher()
+    }
+
+    func exportPublisher() -> AnyPublisher<[String], Error> {
+        let sortNames = ["title", "url", "userid", "password", "memo", "selectAt"]
+        let publisher = self.entity.publisher(sortNames: sortNames, predicate: nil)
+        let header    = Just(sortNames)
+            .setFailureType(to: Error.self).eraseToAnyPublisher()
+        return self.plainPublisher(publisher: publisher, headerPublisher: header)
+    }
+
+    func csvPublisher(source: AnyPublisher<[String], Error> )
+    -> AnyPublisher<[String], Error> {
+        return source
             .tryMap {
                 guard self.error == nil else {
                     throw self.error!
@@ -109,13 +154,6 @@ class ExportEngine {
 
 class DataManager {
     static let shared = DataManager()
-    
-    private var temporaryURL: URL {
-        let name = Bundle.main.object(forInfoDictionaryKey: kCFBundleNameKey as String) as! String
-        let tempURL = FileManager.default.temporaryDirectory
-            .appendingPathComponent(name, isDirectory: true)
-        return tempURL
-    }
 
     func deleteAll() {
         Password.deleteAll()
@@ -126,20 +164,8 @@ class DataManager {
         viewContext.refreshAllObjects()
     }
     
-    private var timeString: String {
-        let now       = Date()
-        let formatter = ISO8601DateFormatter()
-        formatter.timeZone = .autoupdatingCurrent
-        formatter.formatOptions = [.withFullDate, .withFullTime, .withSpaceBetweenDateAndTime]
-        formatter.formatOptions.remove(
-            [.withDashSeparatorInDate, .withColonSeparatorInTime,
-             .withColonSeparatorInTimeZone, .withSpaceBetweenDateAndTime,
-             .withTimeZone])
-        return formatter.string(from: now)
-    }
-
     func backup() -> AnyPublisher<URL, Error> {
-         let tempURL = self.temporaryURL
+        let tempURL = ExportEngine.temporaryURL
         do {
             try FileManager.default.createDirectory(at: tempURL, withIntermediateDirectories: true)
         } catch let error {
@@ -147,12 +173,14 @@ class DataManager {
         }
         J1Logger.shared.info("tempURL = \(tempURL)")
 
-        let engineCategory = ExportEngine(entity: Category.self, url: tempURL)
-        let engineSite     = ExportEngine(entity: Site.self,     url: tempURL)
-        let enginePassword = ExportEngine(entity: Password.self, url: tempURL)
-
-        let engines: [ExportEngine] = [engineCategory, engineSite, enginePassword]
-        let publishers = engines.map { $0.csvPublisher }
+        let engines = [
+            ExportEngine(entity: Category.self, url: tempURL),
+            ExportEngine(entity: Site.self,     url: tempURL),
+            ExportEngine(entity: Password.self, url: tempURL),
+        ]
+        let publishers = engines.map {
+            $0.csvPublisher(source: $0.backupPublisher())
+        }
         let cancellable = publishers.dropFirst().reduce(publishers[0]) {
             $0.append($1).eraseToAnyPublisher()
         }
@@ -167,7 +195,7 @@ class DataManager {
                         var error: Error? = nil
                         let urls = engines.map { $0.url }
                         let name = Bundle.main.object(forInfoDictionaryKey: kCFBundleNameKey as String) as! String
-                        let timestr = self.timeString
+                        let timestr = ExportEngine.timeString
                         let urlZip = urls[0].deletingLastPathComponent().appendingPathComponent("\(name)-\(timestr).zip")
                         do {
                             try Zip.zipFiles(paths: urls, zipFilePath: urlZip, password: nil) { _ in
@@ -202,8 +230,41 @@ class DataManager {
         }.eraseToAnyPublisher()
     }
     
+    func export(cryptor: Cryptor) -> AnyPublisher<URL, Error> {
+        let tempURL = ExportEngine.temporaryURL
+        do {
+            try FileManager.default.createDirectory(at: tempURL, withIntermediateDirectories: true)
+        } catch let error {
+            J1Logger.shared.error("createDirectory error = \(error)")
+        }
+        J1Logger.shared.info("tempURL = \(tempURL)")
+
+        let engine     = ExportEngine(entity: Site.self, url: tempURL)
+        engine.cryptor = cryptor
+        let publisher  = engine.csvPublisher(source: engine.exportPublisher())
+
+        return Deferred {
+            Future<URL, Error> { promise in
+                _ = publisher.sink { completion in
+                    engine.close()
+
+                    switch completion {
+                    case .finished:
+                        promise(.success(engine.url))
+                    case .failure(let error):
+                        J1Logger.shared.error("error = \(error)")
+                        promise(.failure(error))
+                    }
+                } receiveValue: { arg in
+                    print(arg)
+                }
+
+            }
+        }.eraseToAnyPublisher()
+    }
+
     func restore(url: URL) {
-        let tempURL = self.temporaryURL
+        let tempURL = ExportEngine.temporaryURL
         do {
             try FileManager.default.createDirectory(at: tempURL, withIntermediateDirectories: true)
         } catch let error {
@@ -263,28 +324,7 @@ class DataManager {
             }
         }
     }
-    
-    func export(cryptor: CryptorUI) -> URL {
-        let tempURL = self.temporaryURL
-        do {
-            try FileManager.default.createDirectory(at: tempURL, withIntermediateDirectories: true)
-        } catch let error {
-            J1Logger.shared.error("createDirectory error = \(error)")
-        }
-        J1Logger.shared.info("tempURL = \(tempURL)")
-        
-        let name = Bundle.main.object(forInfoDictionaryKey: kCFBundleNameKey as String) as! String
-        let timestr = self.timeString
-        let fileURL = tempURL
-            .appendingPathComponent("\(name)-\(timestr)", isDirectory: false)
-            .appendingPathExtension(for: .commaSeparatedText)
-        
-        Site.export(url: fileURL, cryptor: cryptor)
-        J1Logger.shared.debug("fileURL = \(String(describing: fileURL))")
-        
-        return fileURL
-    }
-    
+
     func `import`(url: URL, cryptor: CryptorUI) {
         let context = PersistenceController.shared.container.newBackgroundContext()
         context.perform {

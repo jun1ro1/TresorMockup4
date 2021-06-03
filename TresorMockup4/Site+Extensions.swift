@@ -108,60 +108,6 @@ extension Site {
 
 extension Site: PrioritizedNameManagedObject {
     static var sortNames: [String] {
-        return ["titleSort", "title", "url", "userid", "password"]
-    }
-}
-
-extension Site {
-    class func publisherPlain(sortNames: [String] = [], predicate: NSPredicate? = nil, cryptor: CryptorUI)
-    -> AnyPublisher<[String: String], Error> {
-        Self.publisher(sortNames: sortNames, predicate: predicate).tryMap {
-            let dict = $0
-            return dict!
-        }
-        .eraseToAnyPublisher()
-    }
-
-    class func export(url: URL, cryptor: CryptorUI) {
-        guard let stream = OutputStream(url: url, append: false) else {
-            J1Logger.shared.error("OutputStream error url=\(url)")
-            return
-        }
-        let csv: CSVWriter
-        do {
-            csv = try CSVWriter(stream: stream)
-        } catch let error {
-            J1Logger.shared.error("CSVWriter fails=\(error)")
-            return
-        }
-
-        let sortNames = ["title", "url", "userid", "password", "memo"]
-        let kind = Int(CategoryKind.trash.rawValue)
-        let predicate = NSPredicate(format: "category == nil OR category.kind !=\(kind)")
-//        _ = Self.tablePublisher2(publisher: Self.publisherPlain(
-//                                    sortNames: sortNames,
-//                                    predicate: predicate,
-//                                    cryptor: cryptor),
-//                                 sortNames: sortNames,
-//                                 cryptor: cryptor)
-//            .map { values -> [String] in
-//                let num = min(sortNames.count, values.count)
-//                return Array(values[0..<num])
-//            }
-//            .sink { completion in
-//                csv.stream.close()
-//                switch completion {
-//                case .finished:
-//                    J1Logger.shared.debug("finished")
-//                case .failure(let error):
-//                    J1Logger.shared.error("error = \(error)")
-//                }
-//            } receiveValue: { values in
-//                do {
-//                    try csv.write(row: values)
-//                } catch let error {
-//                    J1Logger.shared.error("error = \(error)")
-//                }
-//            }
+        return ["titleSort", "title", "url", "userid", "password", "selectAt"]
     }
 }

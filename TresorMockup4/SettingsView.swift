@@ -100,10 +100,22 @@ struct SettingsView: View {
                             self.sheet = nil
                             return
                         }
-                        self.fileURL = DataManager.shared.export(cryptor: self.cryptor)
-                        guard self.fileURL != nil else { return }
-                        self.sheet = .export(fileURL: self.$fileURL)
-                        self.cryptor.close(keep: false)
+
+                        let _ = DataManager.shared.export(cryptor: self.cryptor)
+                            .sink { completion in
+                                self.cryptor.close(keep: false)
+                                switch completion {
+                                case .finished:
+                                    break
+                                case .failure(let error):
+                                    J1Logger.shared.error("error = \(error)")
+                                    self.modal = .failure(error: error)
+                                }
+                            } receiveValue: { fileURL in
+                                self.fileURL = fileURL
+                                guard self.fileURL != nil else { return }
+                                self.sheet = .export(fileURL: self.$fileURL)
+                            }
                     }
                 }
                 Button("Import") {

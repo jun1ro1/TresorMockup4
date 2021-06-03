@@ -79,7 +79,7 @@ extension NSManagedObject {
             let name = attr.name
             let typ  = attr.attributeType
             let val  = self.value(forKey: name)
-            var str: String? = nil
+            var str: String = ""
             switch (typ, val) {
             case (.booleanAttributeType,   let v as Bool):
                 str = String(v)
@@ -94,9 +94,9 @@ extension NSManagedObject {
             case (.stringAttributeType,    let v as String):
                 str = v
             default:
-                str = nil
+                str = ""
             }
-            return str == nil ? nil : (name, str!)
+            return (name, str)
         }
         
         let rels: [(String, String)?] =  props.map { prop -> (String, String)? in
