@@ -28,16 +28,9 @@ class ExportEngine {
     private var error:   Error?     = nil
     public  var cryptor: Cryptor?   = nil
 
-    init(entity: PublishableManagedObject.Type, url: URL) {
+    init(entity: PublishableManagedObject.Type, fileURL: URL) {
         self.entity   = entity
-
-        let nameApp   = Bundle.main.object(forInfoDictionaryKey: kCFBundleNameKey as String) as! String
-        let nameTitle = String(describing: self.entity)
-        let timestr   = Self.timeString
-        self.fileURL = url
-            .appendingPathComponent("\(nameApp)-\(nameTitle)-\(timestr)", isDirectory: false)
-            .appendingPathExtension(for: .commaSeparatedText)
-
+        self.fileURL = fileURL
         self.stream = OutputStream(url: self.fileURL, append: false)!
         do {
             self.csv = try CSVWriter(stream: stream)
@@ -173,11 +166,13 @@ class DataManager {
         }
         J1Logger.shared.info("tempURL = \(tempURL)")
 
-        let engines = [
-            ExportEngine(entity: Category.self, url: tempURL),
-            ExportEngine(entity: Site.self,     url: tempURL),
-            ExportEngine(entity: Password.self, url: tempURL),
-        ]
+        let engines = [Category.self, Site.self, Password.self].map {
+            ExportEngine(entity: $0,
+                         fileURL: tempURL
+                            .appendingPathComponent(String(describing: $0), isDirectory: false)
+                            .appendingPathExtension(for: .commaSeparatedText))
+        }
+
         let publishers = engines.map {
             $0.csvPublisher(source: $0.backupPublisher())
         }
@@ -239,7 +234,14 @@ class DataManager {
         }
         J1Logger.shared.info("tempURL = \(tempURL)")
 
-        let engine     = ExportEngine(entity: Site.self, url: tempURL)
+        let nameApp   = Bundle.main.object(forInfoDictionaryKey: kCFBundleNameKey as String) as! String
+        let nameTitle = String(describing: Site.self)
+        let timestr   = ExportEngine.timeString
+        let fileURL = tempURL
+            .appendingPathComponent("\(nameApp)-\(nameTitle)-\(timestr)", isDirectory: false)
+            .appendingPathExtension(for: .commaSeparatedText)
+
+        let engine     = ExportEngine(entity: Site.self, fileURL: fileURL)
         engine.cryptor = cryptor
         let publisher  = engine.csvPublisher(source: engine.exportPublisher())
 
