@@ -75,7 +75,9 @@ extension NSManagedObject {
         let props = Self.entity().properties
         
         let attrs: [(String, String)?] = props.map { prop -> (String, String)? in
-            guard let attr = prop as? NSAttributeDescription else { return nil }
+            guard let attr = prop as? NSAttributeDescription else {
+                return nil
+            }
             let name = attr.name
             let typ  = attr.attributeType
             let val  = self.value(forKey: name)
@@ -100,19 +102,29 @@ extension NSManagedObject {
         }
         
         let rels: [(String, String)?] =  props.map { prop -> (String, String)? in
-            guard let rel = prop as? NSRelationshipDescription else { return nil }
+            guard let rel = prop as? NSRelationshipDescription else {
+                return nil
+            }
             let name  = rel.name
-            guard !rel.isToMany else { return nil }
+            guard !rel.isToMany else {
+                return nil
+            }
             
             let val   = self.value(forKey: name) as? NSManagedObject
             let uuid  = val?.value(forKey: "uuid") as? UUID
             
             let str = uuid?.uuidString
             return (name, str ?? "")
-            
         }
         
         return Dictionary(uniqueKeysWithValues: (attrs + rels).compactMap { $0 } )
+    }
+
+    func relationNames() -> [String] {
+        let props = Self.entity().properties
+        return props.compactMap { prop -> String? in
+            (prop as? NSRelationshipDescription)?.name
+        }
     }
 }
 

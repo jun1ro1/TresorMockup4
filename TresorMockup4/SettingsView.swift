@@ -151,7 +151,15 @@ struct SettingsView: View {
                 }
             Button("Restore") {
                 self.sheet = .restore { url in
-                    DataManager.shared.restore(url: url)
+                    let _ = DataManager.shared.restore(url: url).sink { completion in
+                        switch completion {
+                        case .finished:
+                            break
+                        case .failure(let error):
+                            J1Logger.shared.error("error = \(error)")
+                            self.modal = .failure(error: error)
+                        }
+                    } receiveValue: { _ in }
                 }
                 J1Logger.shared.debug("fileURL = \(String(describing: self.fileURL))")
             }

@@ -18,6 +18,12 @@
 		F954C09125CD8EE600F88AE8 /* NSManagedObject+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F954C09025CD8EE600F88AE8 /* NSManagedObject+Extensions.swift */; };
 		F954C09225CD8EE600F88AE8 /* NSManagedObject+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F954C09025CD8EE600F88AE8 /* NSManagedObject+Extensions.swift */; };
 		F954C09325CD8EE600F88AE8 /* NSManagedObject+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F954C09025CD8EE600F88AE8 /* NSManagedObject+Extensions.swift */; };
+		F95E9A372674F1CC00F7222F /* ExportEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = F95E9A362674F1CC00F7222F /* ExportEngine.swift */; };
+		F95E9A382674F1CC00F7222F /* ExportEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = F95E9A362674F1CC00F7222F /* ExportEngine.swift */; };
+		F95E9A392674F1CC00F7222F /* ExportEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = F95E9A362674F1CC00F7222F /* ExportEngine.swift */; };
+		F95E9A3B2674F29100F7222F /* ImportEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = F95E9A3A2674F29100F7222F /* ImportEngine.swift */; };
+		F95E9A3C2674F29100F7222F /* ImportEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = F95E9A3A2674F29100F7222F /* ImportEngine.swift */; };
+		F95E9A3D2674F29100F7222F /* ImportEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = F95E9A3A2674F29100F7222F /* ImportEngine.swift */; };
 		F965518B25AB5EB400FFD4E8 /* CryptorSeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = F965518A25AB5EB400FFD4E8 /* CryptorSeed.swift */; };
 		F965518C25AB5EB400FFD4E8 /* CryptorSeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = F965518A25AB5EB400FFD4E8 /* CryptorSeed.swift */; };
 		F965518D25AB5EB400FFD4E8 /* CryptorSeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = F965518A25AB5EB400FFD4E8 /* CryptorSeed.swift */; };
@@ -52,9 +58,9 @@
 		F9AE18B525B33336007373E0 /* CryptorError.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9AE18B425B33336007373E0 /* CryptorError.swift */; };
 		F9AE18B625B33336007373E0 /* CryptorError.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9AE18B425B33336007373E0 /* CryptorError.swift */; };
 		F9AE18B725B33336007373E0 /* CryptorError.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9AE18B425B33336007373E0 /* CryptorError.swift */; };
-		F9B9AEA525FC4FF800FA8D87 /* CSVPublisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B9AEA425FC4FF800FA8D87 /* CSVPublisher.swift */; };
-		F9B9AEA625FC4FF800FA8D87 /* CSVPublisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B9AEA425FC4FF800FA8D87 /* CSVPublisher.swift */; };
-		F9B9AEA725FC4FF800FA8D87 /* CSVPublisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B9AEA425FC4FF800FA8D87 /* CSVPublisher.swift */; };
+		F9B9AEA525FC4FF800FA8D87 /* CSVReaderPublisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B9AEA425FC4FF800FA8D87 /* CSVReaderPublisher.swift */; };
+		F9B9AEA625FC4FF800FA8D87 /* CSVReaderPublisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B9AEA425FC4FF800FA8D87 /* CSVReaderPublisher.swift */; };
+		F9B9AEA725FC4FF800FA8D87 /* CSVReaderPublisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B9AEA425FC4FF800FA8D87 /* CSVReaderPublisher.swift */; };
 		F9C8F6A8261CA550005920D3 /* DataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C8F6A7261CA550005920D3 /* DataManager.swift */; };
 		F9C8F6A9261CA550005920D3 /* DataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C8F6A7261CA550005920D3 /* DataManager.swift */; };
 		F9C8F6AA261CA550005920D3 /* DataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C8F6A7261CA550005920D3 /* DataManager.swift */; };
@@ -111,10 +117,14 @@
 		D4B70B24BCC867490BDD44CA /* Pods-TresorMockup4.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TresorMockup4.release.xcconfig"; path = "Target Support Files/Pods-TresorMockup4/Pods-TresorMockup4.release.xcconfig"; sourceTree = "<group>"; };
 		F916905725D78BE5003EBCCD /* TrashView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TrashView.swift; sourceTree = "<group>"; };
 		F91D3A102562D0BC0018238B /* FocusableTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FocusableTextField.swift; sourceTree = "<group>"; };
-		F94207AF256579CE008F4883 /* log.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = log.rtf; sourceTree = "<group>"; };
+		F94207AF256579CE008F4883 /* log1.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = log1.rtf; sourceTree = "<group>"; };
 		F94F676B2605BD22004DA90E /* TresorMockup4.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TresorMockup4.entitlements; sourceTree = "<group>"; };
 		F94F676F2605BD29004DA90E /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		F954C09025CD8EE600F88AE8 /* NSManagedObject+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSManagedObject+Extensions.swift"; sourceTree = "<group>"; };
+		F95666F0268E1C49008C21BE /* log2.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = log2.rtf; sourceTree = "<group>"; };
+		F95666F1268E1D87008C21BE /* log3.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = log3.rtf; sourceTree = "<group>"; };
+		F95E9A362674F1CC00F7222F /* ExportEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportEngine.swift; sourceTree = "<group>"; };
+		F95E9A3A2674F29100F7222F /* ImportEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportEngine.swift; sourceTree = "<group>"; };
 		F965518A25AB5EB400FFD4E8 /* CryptorSeed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptorSeed.swift; sourceTree = "<group>"; };
 		F965519125AB5F0E00FFD4E8 /* Validator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Validator.swift; sourceTree = "<group>"; };
 		F968B0C325BC59FA00B6296F /* CryptorUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptorUI.swift; sourceTree = "<group>"; };
@@ -145,7 +155,7 @@
 		F9851EC9256BEEA800784485 /* DetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailView.swift; sourceTree = "<group>"; };
 		F990F14B2628770F00E001C8 /* PasswordProxy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordProxy.swift; sourceTree = "<group>"; };
 		F9AE18B425B33336007373E0 /* CryptorError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptorError.swift; sourceTree = "<group>"; };
-		F9B9AEA425FC4FF800FA8D87 /* CSVPublisher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVPublisher.swift; sourceTree = "<group>"; };
+		F9B9AEA425FC4FF800FA8D87 /* CSVReaderPublisher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVReaderPublisher.swift; sourceTree = "<group>"; };
 		F9C8F6A7261CA550005920D3 /* DataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataManager.swift; sourceTree = "<group>"; };
 		F9C91A4225974D8300918D07 /* ViewUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewUtilities.swift; sourceTree = "<group>"; };
 		F9C91A4C2597676400918D07 /* Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
@@ -284,7 +294,9 @@
 		F9C91A602597815300918D07 /* Reference */ = {
 			isa = PBXGroup;
 			children = (
-				F94207AF256579CE008F4883 /* log.rtf */,
+				F94207AF256579CE008F4883 /* log1.rtf */,
+				F95666F0268E1C49008C21BE /* log2.rtf */,
+				F95666F1268E1D87008C21BE /* log3.rtf */,
 				F9ECF1DE2568C01400936DAF /* memo.rtf */,
 				F9C91A672597828A00918D07 /* Simulator Screen Shot - iPhone SE (2nd generation) - 2020-12-25 at 23.36.19.png */,
 				F9783F0425FBE38F00D63064 /* SettingsViewController.swift */,
@@ -301,7 +313,9 @@
 				F9CDBA1A25D19AC200780803 /* CategoryView.swift */,
 				F97309FC25600D05007109F7 /* ContentView.swift */,
 				F9C8F6A7261CA550005920D3 /* DataManager.swift */,
-				F9B9AEA425FC4FF800FA8D87 /* CSVPublisher.swift */,
+				F95E9A3A2674F29100F7222F /* ImportEngine.swift */,
+				F95E9A362674F1CC00F7222F /* ExportEngine.swift */,
+				F9B9AEA425FC4FF800FA8D87 /* CSVReaderPublisher.swift */,
 				F9851EC9256BEEA800784485 /* DetailView.swift */,
 				F9730A6325600E75007109F7 /* J1Logger.swift */,
 				F954C09025CD8EE600F88AE8 /* NSManagedObject+Extensions.swift */,
@@ -577,7 +591,7 @@
 				F9F6074A26038D1E00EB1E66 /* Restorer.swift in Sources */,
 				F9730A6425600E75007109F7 /* J1Logger.swift in Sources */,
 				F9730A5125600E18007109F7 /* RandomData.swift in Sources */,
-				F9B9AEA525FC4FF800FA8D87 /* CSVPublisher.swift in Sources */,
+				F9B9AEA525FC4FF800FA8D87 /* CSVReaderPublisher.swift in Sources */,
 				F9730A5425600E18007109F7 /* Cryptor.swift in Sources */,
 				F9CEC7DE25CE264600A14B61 /* Password+Extensions.swift.swift in Sources */,
 				F9CEC7F025CEBE3A00A14B61 /* PasswordsView.swift in Sources */,
@@ -585,6 +599,7 @@
 				F990F14C2628770F00E001C8 /* PasswordProxy.swift in Sources */,
 				F9730A4E25600E18007109F7 /* CryptorCore.swift in Sources */,
 				F973A7D925E1F5C9002EE692 /* SettingsView.swift in Sources */,
+				F95E9A372674F1CC00F7222F /* ExportEngine.swift in Sources */,
 				F965518B25AB5EB400FFD4E8 /* CryptorSeed.swift in Sources */,
 				F916905825D78BE5003EBCCD /* TrashView.swift in Sources */,
 				F968B0C425BC59FA00B6296F /* CryptorUI.swift in Sources */,
@@ -593,6 +608,7 @@
 				F91D3A112562D0BD0018238B /* FocusableTextField.swift in Sources */,
 				F9C91A4325974D8300918D07 /* ViewUtilities.swift in Sources */,
 				F9C91A4D2597676400918D07 /* Utilities.swift in Sources */,
+				F95E9A3B2674F29100F7222F /* ImportEngine.swift in Sources */,
 				F9730A4825600E18007109F7 /* LocalPassword.swift in Sources */,
 				F9CDBA1B25D19AC200780803 /* CategoryView.swift in Sources */,
 			);
@@ -604,13 +620,15 @@
 			files = (
 				F968B0C525BC59FA00B6296F /* CryptorUI.swift in Sources */,
 				F965518C25AB5EB400FFD4E8 /* CryptorSeed.swift in Sources */,
+				F95E9A3C2674F29100F7222F /* ImportEngine.swift in Sources */,
 				F9CEC7DF25CE264600A14B61 /* Password+Extensions.swift.swift in Sources */,
 				F965519325AB5F0E00FFD4E8 /* Validator.swift in Sources */,
 				F9CEC7E725CEB45700A14B61 /* TresorMockup4.xcdatamodeld in Sources */,
 				F9CDBA1C25D19AC200780803 /* CategoryView.swift in Sources */,
 				F990F14D2628770F00E001C8 /* PasswordProxy.swift in Sources */,
 				F9CDBA1525D1775200780803 /* Category+Extensions.swift in Sources */,
-				F9B9AEA625FC4FF800FA8D87 /* CSVPublisher.swift in Sources */,
+				F9B9AEA625FC4FF800FA8D87 /* CSVReaderPublisher.swift in Sources */,
+				F95E9A382674F1CC00F7222F /* ExportEngine.swift in Sources */,
 				F9C8F6A9261CA550005920D3 /* DataManager.swift in Sources */,
 				F916905925D78BE5003EBCCD /* TrashView.swift in Sources */,
 				F9AE18B625B33336007373E0 /* CryptorError.swift in Sources */,
@@ -628,13 +646,15 @@
 			files = (
 				F968B0C625BC59FA00B6296F /* CryptorUI.swift in Sources */,
 				F965518D25AB5EB400FFD4E8 /* CryptorSeed.swift in Sources */,
+				F95E9A3D2674F29100F7222F /* ImportEngine.swift in Sources */,
 				F9CEC7E025CE264600A14B61 /* Password+Extensions.swift.swift in Sources */,
 				F965519425AB5F0E00FFD4E8 /* Validator.swift in Sources */,
 				F9CEC7EB25CEB45800A14B61 /* TresorMockup4.xcdatamodeld in Sources */,
 				F9CDBA1D25D19AC200780803 /* CategoryView.swift in Sources */,
 				F990F14E2628770F00E001C8 /* PasswordProxy.swift in Sources */,
 				F9CDBA1625D1775200780803 /* Category+Extensions.swift in Sources */,
-				F9B9AEA725FC4FF800FA8D87 /* CSVPublisher.swift in Sources */,
+				F9B9AEA725FC4FF800FA8D87 /* CSVReaderPublisher.swift in Sources */,
+				F95E9A392674F1CC00F7222F /* ExportEngine.swift in Sources */,
 				F9C8F6AA261CA550005920D3 /* DataManager.swift in Sources */,
 				F916905A25D78BE5003EBCCD /* TrashView.swift in Sources */,
 				F9AE18B725B33336007373E0 /* CryptorError.swift in Sources */,
