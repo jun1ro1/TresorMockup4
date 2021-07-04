@@ -20,8 +20,19 @@ protocol PublishableManagedObject {
     -> AnyPublisher<[String: String]?, Error>
 }
 
+enum DataManagerError: Error {
+    case releasedError
+}
+
 class DataManager {
     static let shared = DataManager()
+
+    private var cancellable1: AnyCancellable? = nil
+    private var cancellable2: AnyCancellable? = nil
+
+    deinit {
+        J1Logger.shared.debug("deinit")
+    }
 
     func deleteAll() {
         Password.deleteAll()
@@ -140,104 +151,6 @@ class DataManager {
         }.eraseToAnyPublisher()
     }
 
-    func restore(url: URL) -> AnyPublisher<Bool, Error>  {
-        let tempURL = ImportEngine.temporaryURL
-        do {
-            try FileManager.default.createDirectory(at: tempURL, withIntermediateDirectories: true)
-        } catch let error {
-            J1Logger.shared.error("createDirectory error = \(error)")
-        }
-        J1Logger.shared.info("tempURL = \(tempURL)")
-
-        do {
-            try Zip.unzipFile(url, destination: tempURL, overwrite: true, password: nil)
-        } catch let error {
-            J1Logger.shared.error("Zip.unzipFile = \(error)")
-        }
-
-        let entities: [(NSManagedObject.Type, [String])] =
-            [(Category.self, ["uuid", "url", "title"]),
-             (Site.self    , ["uuid", "name"]),
-             (Password.self, ["uuid", "password"])]
-        let urls = entities.map { (cls, _) in
-            return tempURL.appendingPathComponent(
-                "\(cls)" + ".csv", isDirectory: false)
-        }
-        let csvs = urls.map { (url) in
-            return CSVReaderPublisher<[String: String]>(url: url)
-        }
-
-        let context = PersistenceController.shared.container.newBackgroundContext()
-        let engines = entities.map { (cls, keys) in
-                return ImportEngine(entity: cls, searchingKeys: keys, context: context)
-            }
-
-        let publisher = Deferred {
-            Future<Bool, Error> { promise in
-                 context.perform {
-                    let publishers: [AnyPublisher<([String: String], NSManagedObject), Error>]
-                        = zip(csvs, engines).map { (csv, engine) in
-                            let mopublisher = engine.managedObjectPublisher(publisher: csv.eraseToAnyPublisher())
-                            return engine.restorePublisher(publisher: mopublisher)
-                        }
-
-                    let loadPublishers = publishers.dropFirst().reduce(publishers[0]) {
-                        $0.append($1).eraseToAnyPublisher()
-                    }
-
-                    let loadCancellable = loadPublishers.sink { completion in
-                        (urls + [tempURL]).forEach { (url) in
-                            do {
-                                try FileManager.default.removeItem(at: url)
-                            } catch let error {
-                                J1Logger.shared.error("removeItem \(url.absoluteString) error = \(error)")
-                            }
-                        }
-                        switch completion {
-                        case .finished:
-                            J1Logger.shared.debug("completion = \(completion)")
-                            let links = engines.map { engine in
-                                engine.linkPublisher()
-                            }
-                            let linkPublishers = links.dropFirst().reduce(links[0]) {
-                                $0.append($1).eraseToAnyPublisher()
-                            }
-
-                            let linkCancellable = linkPublishers.sink { completion in
-                                switch completion {
-                                case .finished:
-                                    if context.hasChanges {
-                                        do {
-                                            try context.save()
-                                        } catch {
-                                            let nsError = error as NSError
-                                            J1Logger.shared.error("Unresolved error \(nsError), \(nsError.userInfo)")
-                                        }
-                                        J1Logger.shared.debug("save context")
-                                    }
-                                    context.reset()
-                                    J1Logger.shared.debug("finished")
-                                    promise(.success(true))
-                                case .failure(let error):
-                                    J1Logger.shared.error("error = \(error)")
-                                    promise(.failure(error))
-                                } // switch
-                            } receiveValue: { (val) in
-//                                print(val)
-                            }
-
-                        case .failure(let error):
-                            J1Logger.shared.error("error = \(error)")
-                        }
-                    } receiveValue: { (dict, _) in
-//                        print(dict)
-                    } // sink
-                } // conext.perform
-            } // Deferred
-        }.eraseToAnyPublisher()
-
-        return publisher
-    } // func restore
 
 
     func `import`(url: URL, cryptor: CryptorUI) {
@@ -274,66 +187,124 @@ class DataManager {
             }
         }
     }
+}
 
-//    func restore(url: URL) {
-//        let tempURL = ExportEngine.temporaryURL
-//        do {
-//            try FileManager.default.createDirectory(at: tempURL, withIntermediateDirectories: true)
-//        } catch let error {
-//            J1Logger.shared.error("createDirectory error = \(error)")
-//        }
-//        J1Logger.shared.info("tempURL = \(tempURL)")
-//
-//        do {
-//            try Zip.unzipFile(url, destination: tempURL, overwrite: true, password: nil)
-//        } catch let error {
-//            J1Logger.shared.error("Zip.unzipFile = \(error)")
-//        }
-//
-//        let context = PersistenceController.shared.container.newBackgroundContext()
-//        context.perform {
-//            var publisher: CSVPublisher
-//
-//            let csvSite = tempURL.appendingPathComponent("Site.csv", isDirectory: false)
-//            publisher = CSVPublisher(url: csvSite)
-//            let loaderSite = Restorer<Site>(searchingKeys: ["uuid", "url", "title"], context: context)
-//            loaderSite.load(from: publisher.subject)
-//            publisher.send()
-//
-//            let csvCategory = tempURL.appendingPathComponent("Category.csv", isDirectory: false)
-//            publisher = CSVPublisher(url: csvCategory)
-//            let loaderCategory = Restorer<Category>(searchingKeys: ["uuid", "name"], context: context)
-//            loaderCategory.load(from: publisher.subject)
-//            publisher.send()
-//
-//            let csvPassword = tempURL.appendingPathComponent("Password.csv", isDirectory: false)
-//            publisher = CSVPublisher(url: csvPassword)
-//            let loaderPassword = Restorer<Password>(searchingKeys: ["uuid", "password"], context: context)
-//            loaderPassword.load(from: publisher.subject)
-//            publisher.send()
-//
-//            loaderSite.link()
-//            loaderCategory.link()
-//            loaderPassword.link()
-//
-//            if context.hasChanges {
-//                do {
-//                    try context.save()
-//                } catch {
-//                    let nsError = error as NSError
-//                    J1Logger.shared.error("Unresolved error \(nsError), \(nsError.userInfo)")
-//                }
-//                J1Logger.shared.debug("save context")
-//            }
-//            context.reset()
-//
-//            [csvSite, csvCategory, csvPassword, tempURL].forEach { (url) in
-//                do {
-//                    try FileManager.default.removeItem(at: url)
-//                } catch let error {
-//                    J1Logger.shared.error("removeItem \(url.absoluteString) error = \(error)")
-//                }
-//            }
-//        }
-//    }
+class RestoreManager {
+    private var publisher:        AnyPublisher<Bool, Error>? = nil
+    private var cancellable:      AnyCancellable? = nil
+    private var cancellableLoad:  AnyCancellable? = nil
+    private var cancellableLink:  AnyCancellable? = nil
+
+    init(url: URL) {
+        let tempURL = ImportEngine.temporaryURL
+        do {
+            try FileManager.default.createDirectory(at: tempURL, withIntermediateDirectories: true)
+        } catch let error {
+            J1Logger.shared.error("createDirectory error = \(error)")
+        }
+        J1Logger.shared.info("tempURL = \(tempURL)")
+
+        do {
+            try Zip.unzipFile(url, destination: tempURL, overwrite: true, password: nil)
+        } catch let error {
+            J1Logger.shared.error("Zip.unzipFile = \(error)")
+        }
+
+        let entities: [(NSManagedObject.Type, [String])] =
+            [(Category.self, ["uuid", "name"]),
+             (Site.self    , ["uuid", "url", "title"]),
+             (Password.self, ["uuid", "password"])]
+        let urls = entities.map { (cls, _) in
+            return tempURL.appendingPathComponent(
+                "\(cls)" + ".csv", isDirectory: false)
+        }
+        let csvs = urls.map { (url) in
+            return CSVReaderPublisher<[String: String]>(url: url)
+        }
+
+        let context = PersistenceController.shared.container.newBackgroundContext()
+        let engines = entities.map { (cls, keys) in
+                return ImportEngine(entity: cls, searchingKeys: keys, context: context)
+            }
+
+        self.publisher = Deferred {
+            Future<Bool, Error> { [weak self] promise in
+                guard let self = self else {
+                    J1Logger.shared.error("released")
+                    promise(.failure(DataManagerError.releasedError))
+                    return
+                }
+
+                 context.perform {
+                    let publishers: [AnyPublisher<([String: String], NSManagedObject), Error>]
+                        = zip(csvs, engines).map { (csv, engine) in
+                            let mopublisher = engine.managedObjectPublisher(publisher: csv.eraseToAnyPublisher())
+                            return engine.restorePublisher(publisher: mopublisher)
+                        }
+
+                    let loadPublishers = publishers.dropFirst().reduce(publishers[0]) {
+                        $0.append($1).eraseToAnyPublisher()
+                    }
+
+                    self.cancellableLoad = loadPublishers.sink {completion in
+                        (urls + [tempURL]).forEach { (url) in
+                            do {
+                                try FileManager.default.removeItem(at: url)
+                            } catch let error {
+                                J1Logger.shared.error("removeItem \(url.absoluteString) error = \(error)")
+                            }
+                        }
+                        switch completion {
+                        case .finished:
+                            J1Logger.shared.debug("completion = \(completion)")
+                            let links = engines.map { engine in
+                                engine.linkPublisher()
+                            }
+                            let linkPublishers = links.dropFirst().reduce(links[0]) {
+                                $0.append($1).eraseToAnyPublisher()
+                            }
+
+                            self.cancellableLink = linkPublishers.sink { completion in
+                                switch completion {
+                                case .finished:
+                                    if context.hasChanges {
+                                        do {
+                                            try context.save()
+                                        } catch {
+                                            let nsError = error as NSError
+                                            J1Logger.shared.error("Unresolved error \(nsError), \(nsError.userInfo)")
+                                        }
+                                        J1Logger.shared.debug("save context")
+                                    }
+                                    context.reset()
+                                    J1Logger.shared.debug("finished")
+                                    promise(.success(true))
+                                case .failure(let error):
+                                    J1Logger.shared.error("error = \(error)")
+                                    promise(.failure(error))
+                                } // switch
+                            } receiveValue: { (val) in
+//                                print(val)
+                            }
+
+                        case .failure(let error):
+                            J1Logger.shared.error("error = \(error)")
+                        }
+                    } receiveValue: { (dict, _) in
+//                        print(dict)
+                    } // sink
+                } // conext.perform
+            } // Deferred
+        }.eraseToAnyPublisher()
+    } // init
+
+    deinit {
+        J1Logger.shared.debug("deinit")
+    }
+
+    func sink(receiveCompletion: @escaping ((Subscribers.Completion<Error>) -> Void),
+              receiveValue:      @escaping ((Bool) -> Void)) {
+        self.cancellable = self.publisher?.sink(receiveCompletion: receiveCompletion,
+                                                receiveValue: receiveValue)
+    }
 }

@@ -151,7 +151,8 @@ struct SettingsView: View {
                 }
             Button("Restore") {
                 self.sheet = .restore { url in
-                    let _ = DataManager.shared.restore(url: url).sink { completion in
+                    let restore = RestoreManager(url: url)
+                    restore.sink { completion in
                         switch completion {
                         case .finished:
                             break

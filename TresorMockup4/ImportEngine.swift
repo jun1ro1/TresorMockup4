@@ -14,12 +14,16 @@ import Combine
 import CSV
 import Zip
 
+
+enum ImportEngineError: Error {
+    case releasedError
+}
+
 class ImportEngine {
     var entity: NSManagedObject.Type
     var keys: [String]
     var context: NSManagedObjectContext
     var collection: [([String: String], NSManagedObject)] = []
-    var collectCancellable: AnyCancellable? = nil
 
     init(entity: NSManagedObject.Type, searchingKeys keys: [String], context: NSManagedObjectContext) {
         self.entity  = entity
@@ -36,12 +40,14 @@ class ImportEngine {
 
     func managedObjectPublisher(publisher: AnyPublisher<[String: String], Error>)
     -> AnyPublisher<([String: String], NSManagedObject), Error> {
-        var keys = self.keys
-        var obj: NSManagedObject?
         let entityName: String = self.entity.entity().name ?? "nil-name"
 
-        return publisher.tryMap {  dict in
-            obj = nil
+        return publisher.tryMap {  [weak self] dict in
+            guard let self = self else {
+                throw ImportEngineError.releasedError
+            }
+            var keys: [String]        = self.keys
+            var obj: NSManagedObject? = nil
             while obj == nil && keys.count > 0 {
                 let key = keys.removeFirst()
                 guard let valstr = dict[key] else {
