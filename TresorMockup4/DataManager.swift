@@ -228,12 +228,12 @@ class RestoreManager {
             }
 
         self.publisher = Deferred {
-            Future<Bool, Error> { [weak self] promise in
-                guard let self = self else {
-                    J1Logger.shared.error("released")
-                    promise(.failure(DataManagerError.releasedError))
-                    return
-                }
+            Future<Bool, Error> { [unowned self] promise in
+//                guard let self = self else {
+//                    J1Logger.shared.error("released")
+//                    promise(.failure(DataManagerError.releasedError))
+//                    return
+//                }
 
                  context.perform {
                     let publishers: [AnyPublisher<([String: String], NSManagedObject), Error>]
@@ -246,7 +246,13 @@ class RestoreManager {
                         $0.append($1).eraseToAnyPublisher()
                     }
 
-                    self.cancellableLoad = loadPublishers.sink {completion in
+                    self.cancellableLoad = loadPublishers.sink { [unowned self] completion in
+//                        guard let self = self else {
+//                            J1Logger.shared.error("released")
+//                            promise(.failure(DataManagerError.releasedError))
+//                            return
+//                        }
+
                         (urls + [tempURL]).forEach { (url) in
                             do {
                                 try FileManager.default.removeItem(at: url)
