@@ -291,6 +291,44 @@
 			path = Cryptor;
 			sourceTree = "<group>";
 		};
+		F98D38B42696060700288B50 /* AppData */ = {
+			isa = PBXGroup;
+			children = (
+				F9C8F6A7261CA550005920D3 /* DataManager.swift */,
+				F9CDBA1325D1775200780803 /* Category+Extensions.swift */,
+				F9CEC7DD25CE264600A14B61 /* Password+Extensions.swift.swift */,
+				F9ECF1D92568B7AA00936DAF /* Site+Extensions.swift */,
+			);
+			path = AppData;
+			sourceTree = "<group>";
+		};
+		F98D38B52696068E00288B50 /* CoreData */ = {
+			isa = PBXGroup;
+			children = (
+				F95E9A3A2674F29100F7222F /* ImportEngine.swift */,
+				F95E9A362674F1CC00F7222F /* ExportEngine.swift */,
+				F954C09025CD8EE600F88AE8 /* NSManagedObject+Extensions.swift */,
+			);
+			path = CoreData;
+			sourceTree = "<group>";
+		};
+		F98D38B6269606AA00288B50 /* CSV */ = {
+			isa = PBXGroup;
+			children = (
+				F9B9AEA425FC4FF800FA8D87 /* CSVReaderPublisher.swift */,
+			);
+			path = CSV;
+			sourceTree = "<group>";
+		};
+		F98D38B7269606D600288B50 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				F9730A6325600E75007109F7 /* J1Logger.swift */,
+				F9C91A4C2597676400918D07 /* Utilities.swift */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
 		F9C91A602597815300918D07 /* Reference */ = {
 			isa = PBXGroup;
 			children = (
@@ -309,28 +347,22 @@
 			children = (
 				F94F676B2605BD22004DA90E /* TresorMockup4.entitlements */,
 				F9730A0825600D05007109F7 /* Info.plist */,
-				F9CDBA1325D1775200780803 /* Category+Extensions.swift */,
+				F98D38B42696060700288B50 /* AppData */,
 				F9CDBA1A25D19AC200780803 /* CategoryView.swift */,
 				F97309FC25600D05007109F7 /* ContentView.swift */,
-				F9C8F6A7261CA550005920D3 /* DataManager.swift */,
-				F95E9A3A2674F29100F7222F /* ImportEngine.swift */,
-				F95E9A362674F1CC00F7222F /* ExportEngine.swift */,
-				F9B9AEA425FC4FF800FA8D87 /* CSVReaderPublisher.swift */,
+				F98D38B52696068E00288B50 /* CoreData */,
+				F98D38B6269606AA00288B50 /* CSV */,
 				F9851EC9256BEEA800784485 /* DetailView.swift */,
-				F9730A6325600E75007109F7 /* J1Logger.swift */,
-				F954C09025CD8EE600F88AE8 /* NSManagedObject+Extensions.swift */,
-				F9CEC7DD25CE264600A14B61 /* Password+Extensions.swift.swift */,
+				F98D38B7269606D600288B50 /* Utilities */,
 				F990F14B2628770F00E001C8 /* PasswordProxy.swift */,
 				F9CEC7EF25CEBE3A00A14B61 /* PasswordsView.swift */,
 				F9730A0325600D05007109F7 /* Persistence.swift */,
 				F9F6074926038D1E00EB1E66 /* Restorer.swift */,
 				F9ECF1F525695C7600936DAF /* SearchBar.swift */,
 				F973A7D825E1F5C9002EE692 /* SettingsView.swift */,
-				F9ECF1D92568B7AA00936DAF /* Site+Extensions.swift */,
 				F9851EC1256BEC0500784485 /* TestData.swift */,
 				F916905725D78BE5003EBCCD /* TrashView.swift */,
 				F97309FA25600D05007109F7 /* TresorMockup4App.swift */,
-				F9C91A4C2597676400918D07 /* Utilities.swift */,
 				F9C91A4225974D8300918D07 /* ViewUtilities.swift */,
 				F97309FE25600D05007109F7 /* Assets.xcassets */,
 				F9730A0025600D05007109F7 /* Preview Content */,
