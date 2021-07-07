@@ -122,6 +122,25 @@ class CategoryManager {
         case 2...:
             J1Logger.shared.error("kind=\(kind) count=\(count)")
             cat = result.first
+            let catfirst = result.first
+            let catrests = result.dropFirst()
+            catrests.forEach { rest in
+                rest.sites?.forEach {
+                    let site = $0 as! Site
+                    site.category = catfirst
+                    catfirst?.addToSites(site)
+                }
+            }
+            catrests.forEach {
+                self.viewContext.delete($0)
+            }
+            if self.viewContext.hasChanges {
+                do {
+                    try self.viewContext.save()
+                } catch let error {
+                    J1Logger.shared.error("save error = \(error)")
+                }
+            }
         default:
             J1Logger.shared.error("kind=\(kind) count=\(count)")
             cat = result.first
