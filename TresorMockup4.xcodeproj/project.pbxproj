@@ -52,6 +52,9 @@
 		F973A7DB25E1F5C9002EE692 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F973A7D825E1F5C9002EE692 /* SettingsView.swift */; };
 		F9851EC2256BEC0500784485 /* TestData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9851EC1256BEC0500784485 /* TestData.swift */; };
 		F9851ECA256BEEA800784485 /* DetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9851EC9256BEEA800784485 /* DetailView.swift */; };
+		F98D38B926960C8C00288B50 /* RestoreManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F98D38B826960C8C00288B50 /* RestoreManager.swift */; };
+		F98D38BA26960C8C00288B50 /* RestoreManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F98D38B826960C8C00288B50 /* RestoreManager.swift */; };
+		F98D38BB26960C8C00288B50 /* RestoreManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F98D38B826960C8C00288B50 /* RestoreManager.swift */; };
 		F990F14C2628770F00E001C8 /* PasswordProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = F990F14B2628770F00E001C8 /* PasswordProxy.swift */; };
 		F990F14D2628770F00E001C8 /* PasswordProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = F990F14B2628770F00E001C8 /* PasswordProxy.swift */; };
 		F990F14E2628770F00E001C8 /* PasswordProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = F990F14B2628770F00E001C8 /* PasswordProxy.swift */; };
@@ -153,6 +156,7 @@
 		F9783F0425FBE38F00D63064 /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
 		F9851EC1256BEC0500784485 /* TestData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestData.swift; sourceTree = "<group>"; };
 		F9851EC9256BEEA800784485 /* DetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailView.swift; sourceTree = "<group>"; };
+		F98D38B826960C8C00288B50 /* RestoreManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestoreManager.swift; sourceTree = "<group>"; };
 		F990F14B2628770F00E001C8 /* PasswordProxy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordProxy.swift; sourceTree = "<group>"; };
 		F9AE18B425B33336007373E0 /* CryptorError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptorError.swift; sourceTree = "<group>"; };
 		F9B9AEA425FC4FF800FA8D87 /* CSVReaderPublisher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVReaderPublisher.swift; sourceTree = "<group>"; };
@@ -294,6 +298,7 @@
 		F98D38B42696060700288B50 /* AppData */ = {
 			isa = PBXGroup;
 			children = (
+				F98D38B826960C8C00288B50 /* RestoreManager.swift */,
 				F9C8F6A7261CA550005920D3 /* DataManager.swift */,
 				F9CDBA1325D1775200780803 /* Category+Extensions.swift */,
 				F9CEC7DD25CE264600A14B61 /* Password+Extensions.swift.swift */,
@@ -305,6 +310,7 @@
 		F98D38B52696068E00288B50 /* CoreData */ = {
 			isa = PBXGroup;
 			children = (
+				F9730A0325600D05007109F7 /* Persistence.swift */,
 				F95E9A3A2674F29100F7222F /* ImportEngine.swift */,
 				F95E9A362674F1CC00F7222F /* ExportEngine.swift */,
 				F954C09025CD8EE600F88AE8 /* NSManagedObject+Extensions.swift */,
@@ -329,6 +335,30 @@
 			path = Utilities;
 			sourceTree = "<group>";
 		};
+		F9B5AF7626973EE200440A14 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				F9C91A4225974D8300918D07 /* ViewUtilities.swift */,
+				F9851EC9256BEEA800784485 /* DetailView.swift */,
+				F9CDBA1A25D19AC200780803 /* CategoryView.swift */,
+				F97309FC25600D05007109F7 /* ContentView.swift */,
+				F9CEC7EF25CEBE3A00A14B61 /* PasswordsView.swift */,
+				F9ECF1F525695C7600936DAF /* SearchBar.swift */,
+				F973A7D825E1F5C9002EE692 /* SettingsView.swift */,
+				F916905725D78BE5003EBCCD /* TrashView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		F9B5AF7726974D8500440A14 /* ToTrash */ = {
+			isa = PBXGroup;
+			children = (
+				F990F14B2628770F00E001C8 /* PasswordProxy.swift */,
+				F9F6074926038D1E00EB1E66 /* Restorer.swift */,
+			);
+			path = ToTrash;
+			sourceTree = "<group>";
+		};
 		F9C91A602597815300918D07 /* Reference */ = {
 			isa = PBXGroup;
 			children = (
@@ -345,28 +375,19 @@
 		F9ECF0F02568303800936DAF /* TresorMockup4 */ = {
 			isa = PBXGroup;
 			children = (
-				F94F676B2605BD22004DA90E /* TresorMockup4.entitlements */,
-				F9730A0825600D05007109F7 /* Info.plist */,
 				F98D38B42696060700288B50 /* AppData */,
-				F9CDBA1A25D19AC200780803 /* CategoryView.swift */,
-				F97309FC25600D05007109F7 /* ContentView.swift */,
+				F97309FE25600D05007109F7 /* Assets.xcassets */,
+				F9B5AF7626973EE200440A14 /* Views */,
 				F98D38B52696068E00288B50 /* CoreData */,
 				F98D38B6269606AA00288B50 /* CSV */,
-				F9851EC9256BEEA800784485 /* DetailView.swift */,
-				F98D38B7269606D600288B50 /* Utilities */,
-				F990F14B2628770F00E001C8 /* PasswordProxy.swift */,
-				F9CEC7EF25CEBE3A00A14B61 /* PasswordsView.swift */,
-				F9730A0325600D05007109F7 /* Persistence.swift */,
-				F9F6074926038D1E00EB1E66 /* Restorer.swift */,
-				F9ECF1F525695C7600936DAF /* SearchBar.swift */,
-				F973A7D825E1F5C9002EE692 /* SettingsView.swift */,
-				F9851EC1256BEC0500784485 /* TestData.swift */,
-				F916905725D78BE5003EBCCD /* TrashView.swift */,
-				F97309FA25600D05007109F7 /* TresorMockup4App.swift */,
-				F9C91A4225974D8300918D07 /* ViewUtilities.swift */,
-				F97309FE25600D05007109F7 /* Assets.xcassets */,
+				F9730A0825600D05007109F7 /* Info.plist */,
+				F9B5AF7726974D8500440A14 /* ToTrash */,
 				F9730A0025600D05007109F7 /* Preview Content */,
+				F9851EC1256BEC0500784485 /* TestData.swift */,
+				F94F676B2605BD22004DA90E /* TresorMockup4.entitlements */,
 				F9730A0525600D05007109F7 /* TresorMockup4.xcdatamodeld */,
+				F97309FA25600D05007109F7 /* TresorMockup4App.swift */,
+				F98D38B7269606D600288B50 /* Utilities */,
 			);
 			path = TresorMockup4;
 			sourceTree = "<group>";
@@ -614,6 +635,7 @@
 				F9AE18B525B33336007373E0 /* CryptorError.swift in Sources */,
 				F9ECF1F625695C7600936DAF /* SearchBar.swift in Sources */,
 				F9CDBA1425D1775200780803 /* Category+Extensions.swift in Sources */,
+				F98D38B926960C8C00288B50 /* RestoreManager.swift in Sources */,
 				F965519225AB5F0E00FFD4E8 /* Validator.swift in Sources */,
 				F9ECF1E52568CBF700936DAF /* TresorMockup4.xcdatamodeld in Sources */,
 				F9C8F6A8261CA550005920D3 /* DataManager.swift in Sources */,
@@ -668,6 +690,7 @@
 				F954C09225CD8EE600F88AE8 /* NSManagedObject+Extensions.swift in Sources */,
 				F9730A1225600D05007109F7 /* TresorMockup4Tests.swift in Sources */,
 				F9CEC7F125CEBE3A00A14B61 /* PasswordsView.swift in Sources */,
+				F98D38BA26960C8C00288B50 /* RestoreManager.swift in Sources */,
 				F973A7DA25E1F5C9002EE692 /* SettingsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -694,6 +717,7 @@
 				F954C09325CD8EE600F88AE8 /* NSManagedObject+Extensions.swift in Sources */,
 				F9730A1D25600D06007109F7 /* TresorMockup4UITests.swift in Sources */,
 				F9CEC7F225CEBE3A00A14B61 /* PasswordsView.swift in Sources */,
+				F98D38BB26960C8C00288B50 /* RestoreManager.swift in Sources */,
 				F973A7DB25E1F5C9002EE692 /* SettingsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
