@@ -20,19 +20,11 @@ protocol PublishableManagedObject {
     -> AnyPublisher<[String: String]?, Error>
 }
 
-enum DataManagerError: Error {
-    case releasedError
-}
-
-class DataManager {
+struct DataManager {
     static let shared = DataManager()
 
     private var cancellable1: AnyCancellable? = nil
     private var cancellable2: AnyCancellable? = nil
-
-    deinit {
-        J1Logger.shared.debug("deinit")
-    }
 
     func deleteAll() {
         Password.deleteAll()

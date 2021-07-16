@@ -51,13 +51,7 @@ class RestoreManager {
             }
 
         self.publisher = Deferred {
-            Future<Bool, Error> { [unowned self] promise in
-//                guard let self = self else {
-//                    J1Logger.shared.error("released")
-//                    promise(.failure(DataManagerError.releasedError))
-//                    return
-//                }
-
+            Future<Bool, Error> { [weak self] promise in
                  context.perform {
                     let publishers: [AnyPublisher<([String: String], NSManagedObject), Error>]
                         = zip(csvs, engines).map { (csv, engine) in
@@ -69,14 +63,8 @@ class RestoreManager {
                         $0.append($1).eraseToAnyPublisher()
                     }
 
-                    self.cancellableLoad = loadPublishers.sink { [unowned self] completion in
-//                        guard let self = self else {
-//                            J1Logger.shared.error("released")
-//                            promise(.failure(DataManagerError.releasedError))
-//                            return
-//                        }
-
-                        (urls + [tempURL]).forEach { (url) in
+                    self?.cancellableLoad = loadPublishers.sink { completion in
+                       (urls + [tempURL]).forEach { (url) in
                             do {
                                 try FileManager.default.removeItem(at: url)
                             } catch let error {
@@ -93,7 +81,7 @@ class RestoreManager {
                                 $0.append($1).eraseToAnyPublisher()
                             }
 
-                            self.cancellableLink = linkPublishers.sink { completion in
+                            self?.cancellableLink = linkPublishers.sink { completion in
                                 switch completion {
                                 case .finished:
                                     if context.hasChanges {
@@ -106,8 +94,13 @@ class RestoreManager {
                                         J1Logger.shared.debug("save context")
                                     }
                                     context.reset()
-                                    J1Logger.shared.debug("finished")
-                                    promise(.success(true))
+
+                                    // DEBUG!!
+                                    DispatchQueue.global(qos: .background).asyncAfter(deadline: .now() + 3) {
+                                        J1Logger.shared.debug("finished")
+                                        promise(.success(true))
+                                   }
+
                                 case .failure(let error):
                                     J1Logger.shared.error("error = \(error)")
                                     promise(.failure(error))
@@ -133,7 +126,9 @@ class RestoreManager {
 
     func sink(receiveCompletion: @escaping ((Subscribers.Completion<Error>) -> Void),
               receiveValue:      @escaping ((Bool) -> Void)) {
-        self.cancellable = self.publisher?.sink(receiveCompletion: receiveCompletion,
+        self.cancellable = self.publisher?
+            .receive(on: DispatchQueue.main)
+            .sink(receiveCompletion: receiveCompletion,
                                                 receiveValue: receiveValue)
     }
 }

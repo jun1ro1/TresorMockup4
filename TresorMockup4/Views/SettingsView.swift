@@ -62,11 +62,14 @@ struct SettingsView: View {
     }
     
     enum Modal: Identifiable {
+        case completed(title: String)
         case failure(error: Error)
         case deleteAll(block: () -> Void)
         
         var id: ObjectIdentifier {
             switch self {
+            case .completed(title: _):
+                return ObjectIdentifier(Self.self)
             case .failure(_):
                 return ObjectIdentifier(Self.self)
             case .deleteAll(block: _):
@@ -76,10 +79,11 @@ struct SettingsView: View {
         
         var body: Alert {
             switch self {
+            case .completed(let title):
+                return Alert(title: Text(title))
             case .failure(let error):
                 return Alert(title: Text("ERROR"),
                              message: Text(error.localizedDescription))
-
             case .deleteAll(let block):
                 return Alert(title: Text("Delete All Data"),
                              message: Text("Are you sure? Cannot undo."),
@@ -136,23 +140,6 @@ struct SettingsView: View {
             Section(header: Text("Backup / Restore")) {
                 Button("Backup") {
                     let _ = DataManager.shared.backup().sink { completion in
-                            switch completion {
-                            case .finished:
-                                break
-                            case .failure(let error):
-                                J1Logger.shared.error("error = \(error)")
-                                self.modal = .failure(error: error)
-                            }
-                        } receiveValue: { fileURL in
-                            self.fileURL = fileURL
-                            guard self.fileURL != nil else { return }
-                            self.sheet = .backup(fileURL: self.$fileURL)
-                        }
-                }
-            Button("Restore") {
-                self.sheet = .restore { url in
-                    let restore = RestoreManager(url: url)
-                    restore.sink { completion in
                         switch completion {
                         case .finished:
                             break
@@ -160,10 +147,27 @@ struct SettingsView: View {
                             J1Logger.shared.error("error = \(error)")
                             self.modal = .failure(error: error)
                         }
-                    } receiveValue: { _ in }
+                    } receiveValue: { fileURL in
+                        self.fileURL = fileURL
+                        guard self.fileURL != nil else { return }
+                        self.sheet = .backup(fileURL: self.$fileURL)
+                    }
                 }
-                J1Logger.shared.debug("fileURL = \(String(describing: self.fileURL))")
-            }
+                Button("Restore") {
+                    self.sheet = .restore { url in
+                        J1Logger.shared.info("restore url = \(url)")
+                        let restore = RestoreManager(url: url)
+                        restore.sink { completion in
+                            switch completion {
+                            case .finished:
+                                self.modal = .completed(title: "Resotre Completed")
+                            case .failure(let error):
+                                J1Logger.shared.error("error = \(error)")
+                                self.modal = .failure(error: error)
+                            }
+                        } receiveValue: { _ in }
+                    }
+                }
             } // Section
             Section(header: Text("Dangerous Operation").foregroundColor(.red)) {
                 Button("Delete All Data") {
@@ -174,6 +178,9 @@ struct SettingsView: View {
         .sheet(item: self.$sheet) { $0.body }
         .alert(item: self.$modal) { $0.body }
         .navigationTitle("Settings")
+        .onDisappear {
+            J1Logger.shared.debug("onDisappear")
+        }
     } // View
 }
 

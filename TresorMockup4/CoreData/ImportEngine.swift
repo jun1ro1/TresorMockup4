@@ -6,29 +6,26 @@
 //
 
 import Foundation
-
-import Foundation
 import CoreData
 import Combine
 
 import CSV
 import Zip
 
-
-enum ImportEngineError: Error {
-    case releasedError
-}
-
-class ImportEngine {
-    var entity: NSManagedObject.Type
-    var keys: [String]
-    var context: NSManagedObjectContext
-    var collection: [([String: String], NSManagedObject)] = []
+final class ImportEngine {
+    var entity:     NSManagedObject.Type
+    var keys:       [String]
+    var context:    NSManagedObjectContext
+    var collection: [([String : String], NSManagedObject)] = []
 
     init(entity: NSManagedObject.Type, searchingKeys keys: [String], context: NSManagedObjectContext) {
         self.entity  = entity
         self.keys    = keys
         self.context = context
+    }
+
+    deinit {
+        J1Logger.shared.debug("deinit")
     }
 
     static var temporaryURL: URL {
@@ -40,13 +37,12 @@ class ImportEngine {
 
     func managedObjectPublisher(publisher: AnyPublisher<[String: String], Error>)
     -> AnyPublisher<([String: String], NSManagedObject), Error> {
-        let entityName: String = self.entity.entity().name ?? "nil-name"
+        let entity     = self.entity
+        let entityName = entity.entity().name ?? "nil-name"
+        let context    = self.context
 
-        return publisher.tryMap {  [weak self] dict in
-            guard let self = self else {
-                throw ImportEngineError.releasedError
-            }
-            var keys: [String]        = self.keys
+        return publisher.tryMap { [weak self] dict in
+            var keys: [String]        = self?.keys ?? []
             var obj: NSManagedObject? = nil
             while obj == nil && keys.count > 0 {
                 let key = keys.removeFirst()
@@ -56,7 +52,7 @@ class ImportEngine {
                 }
                 let request: NSFetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: entityName)
                 var predicate: NSPredicate?
-                switch self.entity.entity().attributesByName[key]?.attributeType {
+                switch entity.entity().attributesByName[key]?.attributeType {
                 case .UUIDAttributeType:
                     predicate = NSPredicate(format: "%K == %@", "uuid", UUID(uuidString: valstr)! as CVarArg)
                 case .stringAttributeType:
@@ -73,7 +69,7 @@ class ImportEngine {
 
                 var items: [NSManagedObject]
                 do {
-                    items = try self.context.fetch(request) as! [NSManagedObject]
+                    items = try context.fetch(request) as! [NSManagedObject]
                 } catch let error {
                     J1Logger.shared.error("entity = \(entityName) fetch \(request) error = \(error)")
                     throw error
@@ -86,21 +82,18 @@ class ImportEngine {
             }
 
             if obj == nil {
-                obj = self.entity.init(context: self.context)
+                obj = entity.init(context: context)
             }
             return (dict, obj!)
         }.eraseToAnyPublisher()
     }
 
+    // https://qiita.com/toya108/items/5558c26817f6d2b67853
     func restorePublisher(publisher: AnyPublisher<([String: String], NSManagedObject), Error>)
     -> AnyPublisher<([String: String], NSManagedObject), Error> {
-        let pub = publisher.map { (dict, obj) -> ([String: String], NSManagedObject)in
+        let pub = publisher.map { [weak self] (dict, obj) -> ([String: String], NSManagedObject) in
             obj.setPrimitive(from: dict)
-            let relNames = obj.relationNames()
-            let relDict  = dict.filter {
-                relNames.firstIndex(of: $0.key) != nil
-            }
-            self.collection.append((relDict, obj))
+            self?.collection.append((dict, obj))
             return (dict, obj)
         }.eraseToAnyPublisher()
         return pub
@@ -109,16 +102,13 @@ class ImportEngine {
 
     func linkPublisher()
     -> AnyPublisher<([String: String], NSManagedObject), Error> {
-        let links = self.entity.entity().relationshipsByName
+        let links      = self.entity.entity().relationshipsByName
         let entityName = self.entity.entity().name ?? "nil-name"
         J1Logger.shared.debug("Entity = \(entityName)")
 
         let publisher = self.collection.publisher
-        return publisher.tryMap { [weak self] (dict, obj) in
-            guard let self = self else {
-                return (dict, obj)
-            }
-
+        let context   = self.context
+        return publisher.tryMap { (dict, obj) in
             links.forEach { link in
                 let name = link.key
                 guard !link.value.isToMany else { return }
@@ -140,7 +130,7 @@ class ImportEngine {
 
                 var items: [Any] = []
                 do {
-                    items = try self.context.fetch(request)
+                    items = try context.fetch(request)
                 } catch let error {
                     J1Logger.shared.error("name = \(name) fetch = \(error)")
                 }

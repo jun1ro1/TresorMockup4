@@ -18,6 +18,9 @@
 		F954C09125CD8EE600F88AE8 /* NSManagedObject+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F954C09025CD8EE600F88AE8 /* NSManagedObject+Extensions.swift */; };
 		F954C09225CD8EE600F88AE8 /* NSManagedObject+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F954C09025CD8EE600F88AE8 /* NSManagedObject+Extensions.swift */; };
 		F954C09325CD8EE600F88AE8 /* NSManagedObject+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F954C09025CD8EE600F88AE8 /* NSManagedObject+Extensions.swift */; };
+		F95CB05F269F42290093C9FF /* ActivityIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F95CB05E269F42290093C9FF /* ActivityIndicator.swift */; };
+		F95CB060269F42290093C9FF /* ActivityIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F95CB05E269F42290093C9FF /* ActivityIndicator.swift */; };
+		F95CB061269F42290093C9FF /* ActivityIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F95CB05E269F42290093C9FF /* ActivityIndicator.swift */; };
 		F95E9A372674F1CC00F7222F /* ExportEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = F95E9A362674F1CC00F7222F /* ExportEngine.swift */; };
 		F95E9A382674F1CC00F7222F /* ExportEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = F95E9A362674F1CC00F7222F /* ExportEngine.swift */; };
 		F95E9A392674F1CC00F7222F /* ExportEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = F95E9A362674F1CC00F7222F /* ExportEngine.swift */; };
@@ -126,6 +129,7 @@
 		F954C09025CD8EE600F88AE8 /* NSManagedObject+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSManagedObject+Extensions.swift"; sourceTree = "<group>"; };
 		F95666F0268E1C49008C21BE /* log2.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = log2.rtf; sourceTree = "<group>"; };
 		F95666F1268E1D87008C21BE /* log3.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = log3.rtf; sourceTree = "<group>"; };
+		F95CB05E269F42290093C9FF /* ActivityIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityIndicator.swift; sourceTree = "<group>"; };
 		F95E9A362674F1CC00F7222F /* ExportEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportEngine.swift; sourceTree = "<group>"; };
 		F95E9A3A2674F29100F7222F /* ImportEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportEngine.swift; sourceTree = "<group>"; };
 		F965518A25AB5EB400FFD4E8 /* CryptorSeed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptorSeed.swift; sourceTree = "<group>"; };
@@ -346,6 +350,7 @@
 				F9ECF1F525695C7600936DAF /* SearchBar.swift */,
 				F973A7D825E1F5C9002EE692 /* SettingsView.swift */,
 				F916905725D78BE5003EBCCD /* TrashView.swift */,
+				F95CB05E269F42290093C9FF /* ActivityIndicator.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -375,19 +380,19 @@
 		F9ECF0F02568303800936DAF /* TresorMockup4 */ = {
 			isa = PBXGroup;
 			children = (
-				F98D38B42696060700288B50 /* AppData */,
+				F94F676B2605BD22004DA90E /* TresorMockup4.entitlements */,
+				F9730A0825600D05007109F7 /* Info.plist */,
+				F9851EC1256BEC0500784485 /* TestData.swift */,
+				F97309FA25600D05007109F7 /* TresorMockup4App.swift */,
+				F9730A0525600D05007109F7 /* TresorMockup4.xcdatamodeld */,
 				F97309FE25600D05007109F7 /* Assets.xcassets */,
-				F9B5AF7626973EE200440A14 /* Views */,
+				F98D38B42696060700288B50 /* AppData */,
 				F98D38B52696068E00288B50 /* CoreData */,
 				F98D38B6269606AA00288B50 /* CSV */,
-				F9730A0825600D05007109F7 /* Info.plist */,
-				F9B5AF7726974D8500440A14 /* ToTrash */,
 				F9730A0025600D05007109F7 /* Preview Content */,
-				F9851EC1256BEC0500784485 /* TestData.swift */,
-				F94F676B2605BD22004DA90E /* TresorMockup4.entitlements */,
-				F9730A0525600D05007109F7 /* TresorMockup4.xcdatamodeld */,
-				F97309FA25600D05007109F7 /* TresorMockup4App.swift */,
+				F9B5AF7726974D8500440A14 /* ToTrash */,
 				F98D38B7269606D600288B50 /* Utilities */,
+				F9B5AF7626973EE200440A14 /* Views */,
 			);
 			path = TresorMockup4;
 			sourceTree = "<group>";
@@ -629,6 +634,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F95CB05F269F42290093C9FF /* ActivityIndicator.swift in Sources */,
 				F9730A0425600D05007109F7 /* Persistence.swift in Sources */,
 				F9730A4525600E18007109F7 /* SecureStore.swift in Sources */,
 				F9851ECA256BEEA800784485 /* DetailView.swift in Sources */,
@@ -676,6 +682,7 @@
 				F965518C25AB5EB400FFD4E8 /* CryptorSeed.swift in Sources */,
 				F95E9A3C2674F29100F7222F /* ImportEngine.swift in Sources */,
 				F9CEC7DF25CE264600A14B61 /* Password+Extensions.swift.swift in Sources */,
+				F95CB060269F42290093C9FF /* ActivityIndicator.swift in Sources */,
 				F965519325AB5F0E00FFD4E8 /* Validator.swift in Sources */,
 				F9CEC7E725CEB45700A14B61 /* TresorMockup4.xcdatamodeld in Sources */,
 				F9CDBA1C25D19AC200780803 /* CategoryView.swift in Sources */,
@@ -703,6 +710,7 @@
 				F965518D25AB5EB400FFD4E8 /* CryptorSeed.swift in Sources */,
 				F95E9A3D2674F29100F7222F /* ImportEngine.swift in Sources */,
 				F9CEC7E025CE264600A14B61 /* Password+Extensions.swift.swift in Sources */,
+				F95CB061269F42290093C9FF /* ActivityIndicator.swift in Sources */,
 				F965519425AB5F0E00FFD4E8 /* Validator.swift in Sources */,
 				F9CEC7EB25CEB45800A14B61 /* TresorMockup4.xcdatamodeld in Sources */,
 				F9CDBA1D25D19AC200780803 /* CategoryView.swift in Sources */,
