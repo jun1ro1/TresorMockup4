@@ -165,7 +165,9 @@ struct SettingsView: View {
                                 J1Logger.shared.error("error = \(error)")
                                 self.modal = .failure(error: error)
                             }
-                        } receiveValue: { _ in }
+                        } receiveValue: { val in
+                            print(val)
+                        }
                     }
                 }
             } // Section
