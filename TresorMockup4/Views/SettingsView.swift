@@ -15,6 +15,7 @@ struct SettingsView: View {
     @State var fileURL: URL?
     @State var sheet:   Sheet? = nil
     @State var modal:   Modal? = nil
+    @State var value:   Float  = 0.0
     
     @ObservedObject var cryptor: CryptorUI = CryptorUI(name: "export_import")
     
@@ -28,7 +29,7 @@ struct SettingsView: View {
         case export(fileURL: Binding<URL?>)
         case `import`(block: (URL) -> Void)
         case authenticate(cryptor: CryptorUI)
-        case progress(value: Float)
+        case progress(value: Binding<Float>)
         
         // ignore parameters to compare Sheet values
         var id: ObjectIdentifier {
@@ -61,7 +62,7 @@ struct SettingsView: View {
             case .authenticate(let cryptor):
                 return cryptor.view
             case .progress(let value):
-                return AnyView(ProgressView("progress", value: value))
+                return AnyView(ProgressView("progress", value: value.wrappedValue))
             }
         }
     }
@@ -172,7 +173,8 @@ struct SettingsView: View {
                                 self.modal = .failure(error: error)
                             }
                         } receiveValue: { val in
-                            self.sheet = .progress(value: val)
+                            self.value = val
+                            self.sheet = .progress(value: self.$value)
                         }
                     }
                 }
