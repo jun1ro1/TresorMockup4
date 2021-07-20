@@ -28,6 +28,7 @@ struct SettingsView: View {
         case export(fileURL: Binding<URL?>)
         case `import`(block: (URL) -> Void)
         case authenticate(cryptor: CryptorUI)
+        case progress(value: Float)
         
         // ignore parameters to compare Sheet values
         var id: ObjectIdentifier {
@@ -41,6 +42,8 @@ struct SettingsView: View {
             case .import(block: _):
                 return ObjectIdentifier(Self.self)
             case .authenticate(cryptor: _):
+                return ObjectIdentifier(Self.self)
+            case .progress(value: _):
                 return ObjectIdentifier(Self.self)
             }
         }
@@ -57,6 +60,8 @@ struct SettingsView: View {
                 return AnyView(DocumentPickerForOpening(block: block, fileType: [.commaSeparatedText]))
             case .authenticate(let cryptor):
                 return cryptor.view
+            case .progress(let value):
+                return AnyView(ProgressView("progress", value: value))
             }
         }
     }
@@ -158,6 +163,7 @@ struct SettingsView: View {
                         J1Logger.shared.info("restore url = \(url)")
                         let restore = RestoreManager(url: url)
                         restore.sink { completion in
+                            self.sheet = nil
                             switch completion {
                             case .finished:
                                 self.modal = .completed(title: "Resotre Completed")
@@ -166,7 +172,7 @@ struct SettingsView: View {
                                 self.modal = .failure(error: error)
                             }
                         } receiveValue: { val in
-                            print(val)
+                            self.sheet = .progress(value: val)
                         }
                     }
                 }

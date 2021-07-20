@@ -71,25 +71,33 @@ class RestoreManager {
 
         // file size check
 
-        let linesTotal = urls
-            .map { (url) -> Int in
-                let data: String
-                do {
-                    data = try String(contentsOf: url)
-                } catch let error {
-                    J1Logger.shared.error("file \(url.absoluteString) read error = \(error)")
-                    return 0
-                }
-                return data.split(separator: "\n").count
-            }
-            .reduce(0) { $0 + $1 }
-        var linesCurrent = 0
-
         let csvs = urls.map { (url) in
             return CSVReaderPublisher<[String: String]>(url: url)
         }
 
+        var linesTotal = 0
+        csvs.forEach { (csv) -> Void in
+            _ = csv.replaceError(with: [:])
+                .count()
+                .sink {
+                    linesTotal += $0
+                }
+        }
+        var linesCurrent = 0
+
         let context = PersistenceController.shared.container.newBackgroundContext()
+
+        if context.hasChanges {
+            do {
+                try context.save()
+            } catch {
+                let nsError = error as NSError
+                J1Logger.shared.error("Unresolved error \(nsError), \(nsError.userInfo)")
+            }
+            J1Logger.shared.debug("save context")
+        }
+        context.reset()
+
         let engines = entities.map { (cls, keys) in
             return ImportEngine(entity: cls, searchingKeys: keys, context: context)
         }
