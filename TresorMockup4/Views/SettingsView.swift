@@ -11,12 +11,37 @@ import SwiftUI
 
 import Zip
 
+struct CancellableView: View {
+    @State   var title: String
+    @State   var phase: String
+    @Binding var value: Double
+
+    var body: some View {
+        let val = min(max(self.value, 0.0), 1.0)
+        VStack(alignment: .center) {
+            Text(self.title)
+                .font(.title)
+                .multilineTextAlignment(.center)
+                .padding()
+            ProgressView(self.phase, value: self.value)
+                .padding([.leading, .trailing])
+            HStack {
+                Spacer()
+                Text(String(format: "%3.0f",val * 100) + "%")
+                    .font(.caption)
+                    .padding(.trailing)
+            }
+        }
+    }
+
+}
+
 struct SettingsView: View {
-    @State var fileURL: URL?
-    @State var sheet:   Sheet? = nil
-    @State var modal:   Modal? = nil
-    @State var value:   Float  = 0.0
-    
+    @State var fileURL:  URL?
+    @State var sheet:    Sheet? = nil
+    @State var modal:    Modal? = nil
+    @State var progress: Double = 0.0
+
     @ObservedObject var cryptor: CryptorUI = CryptorUI(name: "export_import")
     
     // https://qiita.com/1amageek/items/e90e1cfb0ad497e8b27a
@@ -29,7 +54,7 @@ struct SettingsView: View {
         case export(fileURL: Binding<URL?>)
         case `import`(block: (URL) -> Void)
         case authenticate(cryptor: CryptorUI)
-        case progress(value: Binding<Float>)
+        case cancellable(title: String, phase: String, value: Binding<Double>)
         
         // ignore parameters to compare Sheet values
         var id: ObjectIdentifier {
@@ -44,7 +69,7 @@ struct SettingsView: View {
                 return ObjectIdentifier(Self.self)
             case .authenticate(cryptor: _):
                 return ObjectIdentifier(Self.self)
-            case .progress(value: _):
+            case .cancellable(title: _, phase: _, value: _):
                 return ObjectIdentifier(Self.self)
             }
         }
@@ -61,8 +86,8 @@ struct SettingsView: View {
                 return AnyView(DocumentPickerForOpening(block: block, fileType: [.commaSeparatedText]))
             case .authenticate(let cryptor):
                 return cryptor.view
-            case .progress(let value):
-                return AnyView(ProgressView("progress", value: value.wrappedValue))
+            case .cancellable(let title, let phase, let value):
+                return AnyView(CancellableView(title: title, phase: phase, value: value))
             }
         }
     }
@@ -162,19 +187,20 @@ struct SettingsView: View {
                 Button("Restore") {
                     self.sheet = .restore { url in
                         J1Logger.shared.info("restore url = \(url)")
+                        self.sheet = .cancellable(title: "Restore", phase: "Loading...", value: self.$progress)
                         let restore = RestoreManager(url: url)
                         restore.sink { completion in
                             self.sheet = nil
                             switch completion {
                             case .finished:
-                                self.modal = .completed(title: "Resotre Completed")
+                                J1Logger.shared.debug("finished")
+//                                self.modal = .completed(title: "Resotre Completed")
                             case .failure(let error):
                                 J1Logger.shared.error("error = \(error)")
-                                self.modal = .failure(error: error)
+//                                self.modal = .failure(error: error)
                             }
                         } receiveValue: { val in
-                            self.value = val
-                            self.sheet = .progress(value: self.$value)
+                            self.progress = val
                         }
                     }
                 }
@@ -196,7 +222,10 @@ struct SettingsView: View {
 
 
 struct SettingsView_Previews: PreviewProvider {
+    @State var value: Double = 0.5
+
     static var previews: some View {
+        CancellableView(title: "Title", phase: "Loading...", value: .constant(0.5))
         SettingsView(fileURL: nil)
     }
 }

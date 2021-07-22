@@ -14,16 +14,18 @@ import Zip
 
 class RestoreManager {
     private var url:              URL
-    private var publisher:        PassthroughSubject<Float, Error>
+    private var publisher:        PassthroughSubject<Double, Error>
     private var cancellable:      AnyCancellable? = nil
     private var cancellableLoad:  AnyCancellable? = nil
     private var cancellableLink:  AnyCancellable? = nil
     private var progress:         Double          = 0.0
     private var phases:           Int             = 3
+    private var step:             Double          = 0.0
+
 
     init(url: URL) {
         self.url = url
-        self.publisher = PassthroughSubject<Float, Error>()
+        self.publisher = PassthroughSubject<Double, Error>()
     } // init
 
     deinit {
@@ -31,7 +33,7 @@ class RestoreManager {
     }
 
     func sink(receiveCompletion: @escaping ((Subscribers.Completion<Error>) -> Void),
-              receiveValue:      @escaping ((Float) -> Void)) {
+              receiveValue:      @escaping ((Double) -> Void)) {
         self.cancellable = self.publisher
             .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: receiveCompletion,
@@ -144,12 +146,8 @@ class RestoreManager {
                                 J1Logger.shared.debug("save context")
                             }
                             context.reset()
-
-                            // DEBUG!!
-                            DispatchQueue.global(qos: .background).asyncAfter(deadline: .now() + 3) {
-                                J1Logger.shared.debug("finished")
-                                self.publisher.send(completion: .finished)
-                            }
+                            J1Logger.shared.debug("finished")
+                            self.publisher.send(completion: .finished)
 
                         case .failure(let error):
                             J1Logger.shared.error("error = \(error)")
@@ -157,7 +155,7 @@ class RestoreManager {
                         } // switch
                     } receiveValue: { (val) in
                         //                        linesCurrent += 1
-                        //                    self.publisher.send(Float(linesCurrent) / Float(linesTotal))
+                        //                    self.publisher.send(Double(linesCurrent) / Double(linesTotal))
                     }
 
                 case .failure(let error):
@@ -165,7 +163,12 @@ class RestoreManager {
                 }
             } receiveValue: { _ in
                 linesCurrent += 1
-                self.publisher.send(Float(linesCurrent) / Float(linesTotal))
+                let progress = Double(linesCurrent) / Double(linesTotal)
+                self.publisher.send(progress)
+                if progress >= self.step {
+                    self.step += 1.0 / 16.0
+                    Thread.sleep(forTimeInterval: 0.1)
+                }
             } // sink
         } // conext.perform
     } // senf
