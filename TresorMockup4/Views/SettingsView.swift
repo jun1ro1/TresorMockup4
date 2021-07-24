@@ -13,8 +13,9 @@ import Zip
 
 struct CancellableView: View {
     @State   var title: String
-    @State   var phase: String
+    @Binding var phase: String
     @Binding var value: Double
+//    @Binding var completion: 
 
     var body: some View {
         let val = min(max(self.value, 0.0), 1.0)
@@ -40,6 +41,8 @@ struct SettingsView: View {
     @State var fileURL:  URL?
     @State var sheet:    Sheet? = nil
     @State var modal:    Modal? = nil
+
+    @State var phase:    String = ""
     @State var progress: Double = 0.0
 
     @ObservedObject var cryptor: CryptorUI = CryptorUI(name: "export_import")
@@ -54,7 +57,7 @@ struct SettingsView: View {
         case export(fileURL: Binding<URL?>)
         case `import`(block: (URL) -> Void)
         case authenticate(cryptor: CryptorUI)
-        case cancellable(title: String, phase: String, value: Binding<Double>)
+        case cancellable(title: String, phase: Binding<String>, value: Binding<Double>)
         
         // ignore parameters to compare Sheet values
         var id: ObjectIdentifier {
@@ -187,7 +190,9 @@ struct SettingsView: View {
                 Button("Restore") {
                     self.sheet = .restore { url in
                         J1Logger.shared.info("restore url = \(url)")
-                        self.sheet = .cancellable(title: "Restore", phase: "Loading...", value: self.$progress)
+                        self.sheet = .cancellable(title: "Restore",
+                                                  phase: self.$phase,
+                                                  value: self.$progress)
                         let restore = RestoreManager(url: url)
                         restore.sink { completion in
                             self.sheet = nil
@@ -199,7 +204,8 @@ struct SettingsView: View {
                                 J1Logger.shared.error("error = \(error)")
 //                                self.modal = .failure(error: error)
                             }
-                        } receiveValue: { val in
+                        } receiveValue: { (phase, val) in
+                            self.phase    = phase
                             self.progress = val
                         }
                     }
@@ -225,7 +231,9 @@ struct SettingsView_Previews: PreviewProvider {
     @State var value: Double = 0.5
 
     static var previews: some View {
-        CancellableView(title: "Title", phase: "Loading...", value: .constant(0.5))
+        CancellableView(title: "Title",
+                        phase: .constant("Loading..."),
+                        value: .constant(0.5))
         SettingsView(fileURL: nil)
     }
 }
