@@ -8,6 +8,7 @@
 import Foundation
 import CoreData
 import SwiftUI
+import Combine
 
 import Zip
 
@@ -15,7 +16,10 @@ struct CancellableView: View {
     @State   var title: String
     @Binding var phase: String
     @Binding var value: Double
-//    @Binding var completion: 
+    @Binding var completion: Subscribers.Completion<Error>?
+
+    // https://developer.apple.com/documentation/swiftui/presentationmode
+    @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
         let val = min(max(self.value, 0.0), 1.0)
@@ -32,18 +36,32 @@ struct CancellableView: View {
                     .font(.caption)
                     .padding(.trailing)
             }
+            Group {
+                switch self.completion {
+                case .finished:
+                    Button("OK") {
+                        self.presentationMode.wrappedValue.dismiss()
+                    }.padding()
+                default:
+                    Button("Cancel") {
+                        return
+                    }.padding()
+                } // switch
+            } // Group
         }
     }
-
 }
 
 struct SettingsView: View {
-    @State var fileURL:  URL?
-    @State var sheet:    Sheet? = nil
-    @State var modal:    Modal? = nil
+    @State var fileURL:    URL?
+    @State var sheet:      Sheet? = nil
+    @State var modal:      Modal? = nil
 
-    @State var phase:    String = ""
-    @State var progress: Double = 0.0
+    @State var phase:      String = ""
+    @State var progress:   Double = 0.0
+    @State var completion: Subscribers.Completion<Error>? = nil
+
+    @ObservedObject var restore: RestoreManager = RestoreManager()
 
     @ObservedObject var cryptor: CryptorUI = CryptorUI(name: "export_import")
     
@@ -57,7 +75,10 @@ struct SettingsView: View {
         case export(fileURL: Binding<URL?>)
         case `import`(block: (URL) -> Void)
         case authenticate(cryptor: CryptorUI)
-        case cancellable(title: String, phase: Binding<String>, value: Binding<Double>)
+        case cancellable(title: String,
+                         phase: Binding<String>,
+                         value: Binding<Double>,
+                         completion: Binding<Subscribers.Completion<Error>?>)
         
         // ignore parameters to compare Sheet values
         var id: ObjectIdentifier {
@@ -72,7 +93,7 @@ struct SettingsView: View {
                 return ObjectIdentifier(Self.self)
             case .authenticate(cryptor: _):
                 return ObjectIdentifier(Self.self)
-            case .cancellable(title: _, phase: _, value: _):
+            case .cancellable(title: _, phase: _, value: _, completion: _):
                 return ObjectIdentifier(Self.self)
             }
         }
@@ -89,8 +110,11 @@ struct SettingsView: View {
                 return AnyView(DocumentPickerForOpening(block: block, fileType: [.commaSeparatedText]))
             case .authenticate(let cryptor):
                 return cryptor.view
-            case .cancellable(let title, let phase, let value):
-                return AnyView(CancellableView(title: title, phase: phase, value: value))
+            case .cancellable(let title, let phase, let value, let completion):
+                return AnyView(CancellableView(title: title,
+                                               phase: phase,
+                                               value: value,
+                                               completion: completion))
             }
         }
     }
@@ -192,17 +216,18 @@ struct SettingsView: View {
                         J1Logger.shared.info("restore url = \(url)")
                         self.sheet = .cancellable(title: "Restore",
                                                   phase: self.$phase,
-                                                  value: self.$progress)
-                        let restore = RestoreManager(url: url)
-                        restore.sink { completion in
-                            self.sheet = nil
+                                                  value: self.$progress,
+                                                  completion: self.$completion)
+//                        let restore = RestoreManager()
+                        self.restore.url = url
+                        self.restore.sink { completion in
                             switch completion {
                             case .finished:
                                 J1Logger.shared.debug("finished")
-//                                self.modal = .completed(title: "Resotre Completed")
+                                self.completion = .finished
                             case .failure(let error):
                                 J1Logger.shared.error("error = \(error)")
-//                                self.modal = .failure(error: error)
+                                self.completion = .failure(error)
                             }
                         } receiveValue: { (phase, val) in
                             self.phase    = phase
@@ -233,7 +258,8 @@ struct SettingsView_Previews: PreviewProvider {
     static var previews: some View {
         CancellableView(title: "Title",
                         phase: .constant("Loading..."),
-                        value: .constant(0.5))
+                        value: .constant(0.5),
+                        completion: .constant(nil))
         SettingsView(fileURL: nil)
     }
 }

@@ -49,14 +49,14 @@ struct Progress {
         self.progress = (self.countTotal == 0) ?
             0.0 : Double(self.count) / Double(self.countTotal)
         if self.progress >= self.step {
-            self.step += 1.0 / 16.0
+            self.step += 1.0 / 32.0
             self.block?(self.progress)
         }
     }
 }
 
-class RestoreManager {
-    private var url:              URL
+class RestoreManager: ObservableObject {
+    var url:    URL? = nil
     private var phase:            String
 
     private var publisher:        PassthroughSubject<(String, Double), Error>
@@ -65,11 +65,11 @@ class RestoreManager {
     private var cancellableLink:  AnyCancellable? = nil
 
     private var progress = Progress {_ in
-        Thread.sleep(forTimeInterval: 0.1)
+        Thread.sleep(forTimeInterval: 0.05)
     }
 
-    init(url: URL) {
-        self.url   = url
+    init() {
+        self.url   = nil
         self.phase = ""
         self.publisher = PassthroughSubject<(String, Double), Error>()
     }
@@ -113,7 +113,7 @@ class RestoreManager {
 
         let attr: [FileAttributeKey: Any]
         do {
-            attr = try FileManager.default.attributesOfItem(atPath: self.url.path)
+            attr = try FileManager.default.attributesOfItem(atPath: self.url!.path)
         } catch let error {
             J1Logger.shared.error("attributeOfItem error  = \(error)")
             self.publisher.send(completion: .failure(error))
@@ -131,7 +131,7 @@ class RestoreManager {
         }
 
         do {
-            try Zip.unzipFile(self.url, destination: tempURL, overwrite:true, password: nil)
+            try Zip.unzipFile(self.url!, destination: tempURL, overwrite:true, password: nil)
         } catch let error {
             J1Logger.shared.error("Zip.unzipFile = \(error)")
             self.publisher.send(completion: .failure(error))
