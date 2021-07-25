@@ -16,6 +16,7 @@ struct CancellableView: View {
     @State   var title: String
     @Binding var phase: String
     @Binding var value: Double
+    @State   var restore: RestoreManager
     @Binding var completion: Subscribers.Completion<Error>?
 
     // https://developer.apple.com/documentation/swiftui/presentationmode
@@ -61,8 +62,6 @@ struct SettingsView: View {
     @State var progress:   Double = 0.0
     @State var completion: Subscribers.Completion<Error>? = nil
 
-    @ObservedObject var restore: RestoreManager = RestoreManager()
-
     @ObservedObject var cryptor: CryptorUI = CryptorUI(name: "export_import")
     
     // https://qiita.com/1amageek/items/e90e1cfb0ad497e8b27a
@@ -78,8 +77,9 @@ struct SettingsView: View {
         case cancellable(title: String,
                          phase: Binding<String>,
                          value: Binding<Double>,
+                         restore: RestoreManager,
                          completion: Binding<Subscribers.Completion<Error>?>)
-        
+
         // ignore parameters to compare Sheet values
         var id: ObjectIdentifier {
             switch self {
@@ -93,7 +93,7 @@ struct SettingsView: View {
                 return ObjectIdentifier(Self.self)
             case .authenticate(cryptor: _):
                 return ObjectIdentifier(Self.self)
-            case .cancellable(title: _, phase: _, value: _, completion: _):
+            case .cancellable(title: _, phase: _, value: _, restore: _, completion: _):
                 return ObjectIdentifier(Self.self)
             }
         }
@@ -110,10 +110,11 @@ struct SettingsView: View {
                 return AnyView(DocumentPickerForOpening(block: block, fileType: [.commaSeparatedText]))
             case .authenticate(let cryptor):
                 return cryptor.view
-            case .cancellable(let title, let phase, let value, let completion):
+            case .cancellable(let title, let phase, let value, let manager, let completion):
                 return AnyView(CancellableView(title: title,
                                                phase: phase,
                                                value: value,
+                                               restore: manager,
                                                completion: completion))
             }
         }
@@ -212,28 +213,29 @@ struct SettingsView: View {
                     }
                 }
                 Button("Restore") {
+                    self.completion = nil
                     self.sheet = .restore { url in
                         J1Logger.shared.info("restore url = \(url)")
+                        let restore = RestoreManager(url: url)
                         self.sheet = .cancellable(title: "Restore",
                                                   phase: self.$phase,
                                                   value: self.$progress,
+                                                  restore: restore,
                                                   completion: self.$completion)
-//                        let restore = RestoreManager()
-                        self.restore.url = url
-                        self.restore.sink { completion in
+                        restore.sink { completion in
+                            self.completion = completion
                             switch completion {
                             case .finished:
                                 J1Logger.shared.debug("finished")
-                                self.completion = .finished
                             case .failure(let error):
                                 J1Logger.shared.error("error = \(error)")
-                                self.completion = .failure(error)
                             }
                         } receiveValue: { (phase, val) in
                             self.phase    = phase
                             self.progress = val
                         }
                     }
+                    J1Logger.shared.debug("Restore")
                 }
             } // Section
             Section(header: Text("Dangerous Operation").foregroundColor(.red)) {
@@ -259,6 +261,7 @@ struct SettingsView_Previews: PreviewProvider {
         CancellableView(title: "Title",
                         phase: .constant("Loading..."),
                         value: .constant(0.5),
+                        restore: RestoreManager(),
                         completion: .constant(nil))
         SettingsView(fileURL: nil)
     }

@@ -55,7 +55,7 @@ struct Progress {
     }
 }
 
-class RestoreManager: ObservableObject {
+class RestoreManager {
     var url:    URL? = nil
     private var phase:            String
 
@@ -72,6 +72,11 @@ class RestoreManager: ObservableObject {
         self.url   = nil
         self.phase = ""
         self.publisher = PassthroughSubject<(String, Double), Error>()
+    }
+
+    convenience init(url: URL) {
+        self.init()
+        self.url = url
     }
 
     deinit {
