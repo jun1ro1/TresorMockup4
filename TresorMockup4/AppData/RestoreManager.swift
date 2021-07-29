@@ -64,6 +64,10 @@ class RestoreManager {
     private var cancellableLoad:  AnyCancellable? = nil
     private var cancellableLink:  AnyCancellable? = nil
 
+    private var context: NSManagedObjectContext? = nil
+
+    private var csvs: [CSVReaderPublisher<[String : String]>] = []
+
     private var progress = Progress {_ in
         Thread.sleep(forTimeInterval: 0.05)
     }
@@ -93,7 +97,15 @@ class RestoreManager {
     }
 
     func cancel() {
+//        self.cancellable?.cancel()
+        self.csvs.forEach { csv in
+            csv.cancel()
+        }
+//        self.cancellableLink?.cancel()
+//        self.cancellableLoad?.cancel()
 
+//        self.context?.reset()
+        J1Logger.shared.debug("cancelled")
     }
 
     private func send() {
@@ -143,9 +155,10 @@ class RestoreManager {
             return
         }
 
-        let csvs:  [CSVReaderPublisher<[String : String]>] = urls.map { (url) in
+        self.csvs = urls.map { (url) in
             return CSVReaderPublisher<[String: String]>(url: url)
         }
+        let csvs = self.csvs
 
         self.progress.countTotal = 0
         csvs.forEach { (csv) -> Void in
@@ -157,7 +170,8 @@ class RestoreManager {
         }
         self.progress.countTotal *= 2
 
-        let context = PersistenceController.shared.container.newBackgroundContext()
+        self.context = PersistenceController.shared.container.newBackgroundContext()
+        let context = self.context!
         if context.hasChanges {
             do {
                 J1Logger.shared.debug("save context")

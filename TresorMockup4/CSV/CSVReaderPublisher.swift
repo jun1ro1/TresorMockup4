@@ -20,24 +20,52 @@ enum CSVPublisherError: Error {
 }
 
 struct CSVReaderPublisher<Output>: Publisher {
-    typealias Output = [String: String]
+    typealias Input   = [String: String]
+    typealias Output  = [String: String]
     typealias Failure = Error
 
     private var url: URL
+    private var subscription: Subscription?
 
     init(url: URL) {
         self.url = url
     }
 
     func receive<S>(subscriber: S)
-    where S : Subscriber, Error == S.Failure, [String : String] == S.Input {
+    where S: Subscriber, S.Failure == Failure, S.Input == Input {
         let subscription = CSVReaderSubscription<Output, S>(url: url, subscriber: subscriber)
         subscriber.receive(subscription: subscription)
     }
+
+//    func cancel() {
+//        self.subscription?.cancel()
+//    }
 }
 
 extension CSVReaderPublisher {
-    class CSVReaderSubscription<Output, S: Subscriber>: Subscription
+    class CSVReaderSubscriber<Input, Failure>: Subscriber, Cancellable {
+        var subscription: Subscription?
+
+        func receive(subscription: Subscription) {
+            self.subscription = subscription
+            subscription.request(.unlimited)
+        }
+
+        func receive(_ input: [String : String]) -> Subscribers.Demand {
+            return .none
+        }
+
+        func receive(completion: Subscribers.Completion<Error>) {
+            self.cancel()
+        }
+
+        func cancel() {
+            self.subscription?.cancel()
+            self.subscription = nil
+        }
+    }
+
+    class CSVReaderSubscription<Output, S: Subscriber>: Subscription, Cancellable
     where S.Input == [String: String], S.Failure == Error {
 
         private var url:        URL

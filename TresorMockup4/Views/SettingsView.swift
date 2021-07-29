@@ -18,6 +18,7 @@ struct CancellableView: View {
     @Binding var value: Double
     @State   var restore: RestoreManager
     @Binding var completion: Subscribers.Completion<Error>?
+    @Binding var cancel: (() -> Void)?
 
     // https://developer.apple.com/documentation/swiftui/presentationmode
     @Environment(\.presentationMode) var presentationMode
@@ -45,7 +46,10 @@ struct CancellableView: View {
                     }.padding()
                 default:
                     Button("Cancel") {
-                        return
+                        guard let block = self.cancel else {
+                            return
+                        }
+                        block()
                     }.padding()
                 } // switch
             } // Group
@@ -78,7 +82,8 @@ struct SettingsView: View {
                          phase: Binding<String>,
                          value: Binding<Double>,
                          restore: RestoreManager,
-                         completion: Binding<Subscribers.Completion<Error>?>)
+                         completion: Binding<Subscribers.Completion<Error>?>,
+                         cancel: Binding<(() -> Void)?>)
 
         // ignore parameters to compare Sheet values
         var id: ObjectIdentifier {
@@ -93,7 +98,7 @@ struct SettingsView: View {
                 return ObjectIdentifier(Self.self)
             case .authenticate(cryptor: _):
                 return ObjectIdentifier(Self.self)
-            case .cancellable(title: _, phase: _, value: _, restore: _, completion: _):
+            case .cancellable(title: _, phase: _, value: _, restore: _, completion: _, cancel: _):
                 return ObjectIdentifier(Self.self)
             }
         }
@@ -110,12 +115,13 @@ struct SettingsView: View {
                 return AnyView(DocumentPickerForOpening(block: block, fileType: [.commaSeparatedText]))
             case .authenticate(let cryptor):
                 return cryptor.view
-            case .cancellable(let title, let phase, let value, let manager, let completion):
+            case .cancellable(let title, let phase, let value, let manager, let completion, let cancel):
                 return AnyView(CancellableView(title: title,
                                                phase: phase,
                                                value: value,
                                                restore: manager,
-                                               completion: completion))
+                                               completion: completion,
+                                               cancel: cancel))
             }
         }
     }
@@ -221,7 +227,10 @@ struct SettingsView: View {
                                                   phase: self.$phase,
                                                   value: self.$progress,
                                                   restore: restore,
-                                                  completion: self.$completion)
+                                                  completion: self.$completion,
+                                                  cancel: .constant( {
+                                                                        restore.cancel()
+                                                  }))
                         restore.sink { completion in
                             self.completion = completion
                             switch completion {
@@ -262,7 +271,8 @@ struct SettingsView_Previews: PreviewProvider {
                         phase: .constant("Loading..."),
                         value: .constant(0.5),
                         restore: RestoreManager(),
-                        completion: .constant(nil))
+                        completion: .constant(nil),
+                        cancel: .constant(nil))
         SettingsView(fileURL: nil)
     }
 }
