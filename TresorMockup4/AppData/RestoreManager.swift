@@ -4,6 +4,7 @@
 //
 //  Created by OKU Junichirou on 2021/07/08.
 //
+// https://www.advancedswift.com/read-file-combine-swift/
 
 import Foundation
 import CoreData
@@ -16,6 +17,7 @@ public enum RestoreError: Error {
     case cannotCreateTempDir(error: Error)
     case cannotGetFileSize
     case tooLargeFile
+    case cancelled
 }
 
 extension RestoreError: LocalizedError {
@@ -28,6 +30,8 @@ extension RestoreError: LocalizedError {
             return "Cannot get file size"
         case .tooLargeFile:
             return "Too Large file"
+        case .cancelled:
+            return "Cancelled"
         }
     }
 }
@@ -66,10 +70,10 @@ class RestoreManager {
 
     private var context: NSManagedObjectContext? = nil
 
-    private var csvs: [CSVReaderPublisher<[String : String]>] = []
+    //    private var csvs: [CSVReaderPublisher<[String : String]>] = []
 
     private var progress = Progress {_ in
-        Thread.sleep(forTimeInterval: 0.05)
+        Thread.sleep(forTimeInterval: 0.1)
     }
 
     init() {
@@ -97,14 +101,10 @@ class RestoreManager {
     }
 
     func cancel() {
-//        self.cancellable?.cancel()
-        self.csvs.forEach { csv in
-            csv.cancel()
-        }
-//        self.cancellableLink?.cancel()
-//        self.cancellableLoad?.cancel()
-
-//        self.context?.reset()
+        self.cancellableLink?.cancel()
+        self.cancellableLoad?.cancel()
+        self.context?.reset()
+        self.publisher.send(completion: .failure(RestoreError.cancelled))
         J1Logger.shared.debug("cancelled")
     }
 
@@ -155,20 +155,46 @@ class RestoreManager {
             return
         }
 
-        self.csvs = urls.map { (url) in
+        let csvs = urls.map { (url) in
             return CSVReaderPublisher<[String: String]>(url: url)
         }
-        let csvs = self.csvs
 
         self.progress.countTotal = 0
         csvs.forEach { (csv) -> Void in
-            _ = csv.replaceError(with: [:])
+            let countCancellable = csv.replaceError(with: [:])
                 .count()
                 .sink {
                     self.progress.countTotal += $0
                 }
+            J1Logger.shared.debug("countCancellabe = \(countCancellable)")
         }
         self.progress.countTotal *= 2
+
+
+
+        // DEBUG!!
+//        let csvs2 = csvs.map { $0.eraseToAnyPublisher() }
+//        let debugPublishers = csvs2.dropFirst().reduce(csvs2[0]) {
+//            $0.append($1).eraseToAnyPublisher()
+//        }
+//        var debugCount = 0
+//        let debugCancellable = debugPublishers
+//            .subscribe(on: DispatchQueue.global(qos: .background))
+//            .sink { completion in
+//                J1Logger.shared.debug("completion = \(completion)")
+//            } receiveValue: { val in
+//                debugCount += 1
+//                Thread.sleep(forTimeInterval: 0.1)
+//                J1Logger.shared.debug("debugCount = \(debugCount)")
+//
+//            }
+//        J1Logger.shared.debug("debugCancellable = \(debugCancellable)")
+//        DispatchQueue.global().asyncAfter(deadline: .now() + 0.7) {
+//            debugCancellable.cancel()
+//            J1Logger.shared.debug("debugCancellable = \(debugCancellable)")
+//        }
+
+
 
         self.context = PersistenceController.shared.container.newBackgroundContext()
         let context = self.context!
@@ -200,57 +226,62 @@ class RestoreManager {
             }
 
             self.phase = "Loading..."
-            self.cancellableLoad = loadPublishers.sink { completion in
-                (urls + [tempURL]).forEach { (url) in
-                    do {
-                        try FileManager.default.removeItem(at: url)
-                    } catch let error {
-                        J1Logger.shared.error("removeItem \(url.absoluteString) error = \(error)")
+            self.cancellableLoad = loadPublishers
+                .subscribe(on: DispatchQueue.global(qos: .background))
+                .sink { completion in
+                    (urls + [tempURL]).forEach { (url) in
+                        do {
+                            try FileManager.default.removeItem(at: url)
+                        } catch let error {
+                            J1Logger.shared.error("removeItem \(url.absoluteString) error = \(error)")
+                        }
                     }
-                }
-                switch completion {
-                case .finished:
-                    J1Logger.shared.debug("completion = \(completion)")
-                    let links = engines.map { engine in
-                        engine.linkPublisher()
-                    }
-                    let linkPublishers = links.dropFirst().reduce(links[0]) {
-                        $0.append($1).eraseToAnyPublisher()
-                    }
+                    switch completion {
+                    case .finished:
+                        J1Logger.shared.debug("completion = \(completion)")
+                        let links = engines.map { engine in
+                            engine.linkPublisher()
+                        }
+                        let linkPublishers = links.dropFirst().reduce(links[0]) {
+                            $0.append($1).eraseToAnyPublisher()
+                        }
 
-                    self.phase = "Linking..."
-                    self.cancellableLink = linkPublishers.sink { completion in
-                        switch completion {
-                        case .finished:
-                            if context.hasChanges {
-                                do {
-                                    try context.save()
-                                } catch {
-                                    let nsError = error as NSError
-                                    J1Logger.shared.error("Unresolved error \(nsError), \(nsError.userInfo)")
-                                }
-                                J1Logger.shared.debug("save context")
+                        self.phase = "Linking..."
+                        self.cancellableLink = linkPublishers
+                            .subscribe(on: DispatchQueue.global(qos: .background))
+                            .sink { completion in
+                                switch completion {
+                                case .finished:
+                                    if context.hasChanges {
+                                        do {
+                                            try context.save()
+                                        } catch {
+                                            let nsError = error as NSError
+                                            J1Logger.shared.error("Unresolved error \(nsError), \(nsError.userInfo)")
+                                        }
+                                        J1Logger.shared.debug("save context")
+                                    }
+                                    context.reset()
+                                    J1Logger.shared.debug("finished")
+                                    self.publisher.send(completion: .finished)
+
+                                case .failure(let error):
+                                    J1Logger.shared.error("error = \(error)")
+                                    self.publisher.send(completion: .failure(error))
+                                } // switch
+                            } receiveValue: { (val) in
+                                self.progress.countUp()
+                                self.publisher.send((self.phase, self.progress.progress))
                             }
-                            context.reset()
-                            J1Logger.shared.debug("finished")
-                            self.publisher.send(completion: .finished)
 
-                        case .failure(let error):
-                            J1Logger.shared.error("error = \(error)")
-                            self.publisher.send(completion: .failure(error))
-                        } // switch
-                    } receiveValue: { (val) in
-                        self.progress.countUp()
-                        self.publisher.send((self.phase, self.progress.progress))
+                    case .failure(let error):
+                        J1Logger.shared.error("error = \(error)")
                     }
-
-                case .failure(let error):
-                    J1Logger.shared.error("error = \(error)")
-                }
-            } receiveValue: { _ in
-                self.progress.countUp()
-                self.publisher.send((self.phase, self.progress.progress))
-            } // sink
+                } receiveValue: { _ in
+                    self.progress.countUp()
+                    self.publisher.send((self.phase, self.progress.progress))
+                } // sink
         } // conext.perform
+        J1Logger.shared.debug("end of send")
     } // senf
 }

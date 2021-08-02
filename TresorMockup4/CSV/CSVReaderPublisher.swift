@@ -25,7 +25,6 @@ struct CSVReaderPublisher<Output>: Publisher {
     typealias Failure = Error
 
     private var url: URL
-    private var subscription: Subscription?
 
     init(url: URL) {
         self.url = url
@@ -43,31 +42,30 @@ struct CSVReaderPublisher<Output>: Publisher {
 }
 
 extension CSVReaderPublisher {
-    class CSVReaderSubscriber<Input, Failure>: Subscriber, Cancellable {
-        var subscription: Subscription?
-
-        func receive(subscription: Subscription) {
-            self.subscription = subscription
-            subscription.request(.unlimited)
-        }
-
-        func receive(_ input: [String : String]) -> Subscribers.Demand {
-            return .none
-        }
-
-        func receive(completion: Subscribers.Completion<Error>) {
-            self.cancel()
-        }
-
-        func cancel() {
-            self.subscription?.cancel()
-            self.subscription = nil
-        }
-    }
+//    class CSVReaderSubscriber<Input, Failure>: Subscriber, Cancellable {
+//        var subscription: Subscription?
+//
+//        func receive(subscription: Subscription) {
+//            self.subscription = subscription
+//            subscription.request(.unlimited)
+//        }
+//
+//        func receive(_ input: [String : String]) -> Subscribers.Demand {
+//            return .none
+//        }
+//
+//        func receive(completion: Subscribers.Completion<Error>) {
+//            self.cancel()
+//        }
+//
+//        func cancel() {
+//            self.subscription?.cancel()
+//            self.subscription = nil
+//        }
+//    }
 
     class CSVReaderSubscription<Output, S: Subscriber>: Subscription, Cancellable
     where S.Input == [String: String], S.Failure == Error {
-
         private var url:        URL
         private var subscriber: S?         = nil
         private var error:      Error?     = nil

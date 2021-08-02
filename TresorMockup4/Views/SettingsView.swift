@@ -13,9 +13,10 @@ import Combine
 import Zip
 
 struct CancellableView: View {
-    @State   var title: String
-    @Binding var phase: String
-    @Binding var value: Double
+    @State   var title:   String
+    @State   var message: String?
+    @Binding var phase:   String
+    @Binding var value:   Double
     @State   var restore: RestoreManager
     @Binding var completion: Subscribers.Completion<Error>?
     @Binding var cancel: (() -> Void)?
@@ -30,6 +31,10 @@ struct CancellableView: View {
                 .font(.title)
                 .multilineTextAlignment(.center)
                 .padding()
+            Text(self.message ?? "")
+                .font(.title3)
+                .multilineTextAlignment(.center)
+                .padding()
             ProgressView(self.phase, value: self.value)
                 .padding([.leading, .trailing])
             HStack {
@@ -40,17 +45,24 @@ struct CancellableView: View {
             }
             Group {
                 switch self.completion {
-                case .finished:
-                    Button("OK") {
-                        self.presentationMode.wrappedValue.dismiss()
-                    }.padding()
-                default:
+                case nil:
                     Button("Cancel") {
                         guard let block = self.cancel else {
                             return
                         }
                         block()
                     }.padding()
+                case .finished:
+                    Button("OK") {
+                        self.presentationMode.wrappedValue.dismiss()
+                    }.padding()
+                case .failure(let error):
+                    Button("OK") {
+                        self.presentationMode.wrappedValue.dismiss()
+                    }.padding()
+                    .onAppear {
+                        self.message = (error as? LocalizedError)?.errorDescription
+                    }
                 } // switch
             } // Group
         }
