@@ -91,6 +91,10 @@ extension CSVReaderPublisher {
             }
         }
 
+        deinit {
+            J1Logger.shared.debug("deinit")
+        }
+
         func request(_ demand: Subscribers.Demand) {
             guard let subscriber = self.subscriber else {
                 return

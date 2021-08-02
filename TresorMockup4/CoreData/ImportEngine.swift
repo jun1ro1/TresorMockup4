@@ -17,6 +17,7 @@ final class ImportEngine {
     var keys:       [String]
     var context:    NSManagedObjectContext
     var collection: [([String : String], NSManagedObject)] = []
+    var cancelled:  Bool? = false
 
     init(entity: NSManagedObject.Type, searchingKeys keys: [String], context: NSManagedObjectContext) {
         self.entity  = entity
@@ -92,8 +93,10 @@ final class ImportEngine {
     func restorePublisher(publisher: AnyPublisher<([String: String], NSManagedObject), Error>)
     -> AnyPublisher<([String: String], NSManagedObject), Error> {
         let pub = publisher.map { [weak self] (dict, obj) -> ([String: String], NSManagedObject) in
-            obj.setPrimitive(from: dict)
-            self?.collection.append((dict, obj))
+            if self?.cancelled != true {
+                obj.setPrimitive(from: dict)
+                self?.collection.append((dict, obj))
+            }
             return (dict, obj)
         }.eraseToAnyPublisher()
         return pub
@@ -108,7 +111,7 @@ final class ImportEngine {
 
         let publisher = self.collection.publisher
         let context   = self.context
-        return publisher.tryMap { (dict, obj) in
+        return publisher.tryMap { [weak self] (dict, obj) in
             links.forEach { link in
                 let name = link.key
                 guard !link.value.isToMany else { return }
@@ -147,7 +150,9 @@ final class ImportEngine {
                 if let oldval = obj.primitiveValue(forKey: name) {
                     J1Logger.shared.debug("\(entityName) : \(name) is \(String(describing: oldval))")
                 } else {
-                    obj.setPrimitiveValue(item, forKey: name)
+                    if self?.cancelled != true {
+                        obj.setPrimitiveValue(item, forKey: name)
+                    }
                 }
             }
             return (dict, obj)

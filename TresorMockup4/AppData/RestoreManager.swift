@@ -63,6 +63,7 @@ class RestoreManager {
     var url:    URL? = nil
     private var phase:            String
 
+    private var engines:          [ImportEngine]  = []
     private var publisher:        PassthroughSubject<(String, Double), Error>
     private var cancellable:      AnyCancellable? = nil
     private var cancellableLoad:  AnyCancellable? = nil
@@ -102,6 +103,9 @@ class RestoreManager {
 
     func cancel() {
         self.cancellableLink?.cancel()
+        self.engines.forEach {
+            $0.cancelled = true
+        }
         self.cancellableLoad?.cancel()
         self.context?.reset()
         self.publisher.send(completion: .failure(RestoreError.cancelled))
@@ -210,9 +214,10 @@ class RestoreManager {
         }
         context.reset()
 
-        let engines = entities.map { (cls, keys) in
+        self.engines = entities.map { (cls, keys) in
             return ImportEngine(entity: cls, searchingKeys: keys, context: context)
         }
+        let engines = self.engines
 
         context.perform {
             let publishers: [AnyPublisher<([String: String], NSManagedObject), Error>]
@@ -246,7 +251,7 @@ class RestoreManager {
                             $0.append($1).eraseToAnyPublisher()
                         }
 
-                        self.phase = "Linking..."
+                        self.phase = "Linking relations..."
                         self.cancellableLink = linkPublishers
                             .subscribe(on: DispatchQueue.global(qos: .background))
                             .sink { completion in
