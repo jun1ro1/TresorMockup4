@@ -59,7 +59,11 @@ struct Progress {
     }
 }
 
-class RestoreManager {
+protocol LoaderManager {
+
+}
+
+class RestoreManager: LoaderManager {
     var url:    URL? = nil
     private var phase:            String
 
@@ -74,7 +78,7 @@ class RestoreManager {
     //    private var csvs: [CSVReaderPublisher<[String : String]>] = []
 
     private var progress = Progress {_ in
-        Thread.sleep(forTimeInterval: 0.1)
+        Thread.sleep(forTimeInterval: 0.05)
     }
 
     init() {
@@ -174,32 +178,6 @@ class RestoreManager {
         }
         self.progress.countTotal *= 2
 
-
-
-        // DEBUG!!
-//        let csvs2 = csvs.map { $0.eraseToAnyPublisher() }
-//        let debugPublishers = csvs2.dropFirst().reduce(csvs2[0]) {
-//            $0.append($1).eraseToAnyPublisher()
-//        }
-//        var debugCount = 0
-//        let debugCancellable = debugPublishers
-//            .subscribe(on: DispatchQueue.global(qos: .background))
-//            .sink { completion in
-//                J1Logger.shared.debug("completion = \(completion)")
-//            } receiveValue: { val in
-//                debugCount += 1
-//                Thread.sleep(forTimeInterval: 0.1)
-//                J1Logger.shared.debug("debugCount = \(debugCount)")
-//
-//            }
-//        J1Logger.shared.debug("debugCancellable = \(debugCancellable)")
-//        DispatchQueue.global().asyncAfter(deadline: .now() + 0.7) {
-//            debugCancellable.cancel()
-//            J1Logger.shared.debug("debugCancellable = \(debugCancellable)")
-//        }
-
-
-
         self.context = PersistenceController.shared.container.newBackgroundContext()
         let context = self.context!
         if context.hasChanges {
@@ -222,7 +200,8 @@ class RestoreManager {
         context.perform {
             let publishers: [AnyPublisher<([String: String], NSManagedObject), Error>]
                 = zip(csvs, engines).map { (csv, engine) in
-                    let mopublisher = engine.managedObjectPublisher(publisher: csv.eraseToAnyPublisher())
+                    let mopublisher = engine.managedObjectPublisher(
+                        publisher: csv.eraseToAnyPublisher())
                     return engine.restorePublisher(publisher: mopublisher)
                 }
 
@@ -272,6 +251,7 @@ class RestoreManager {
 
                                 case .failure(let error):
                                     J1Logger.shared.error("error = \(error)")
+                                    context.reset()
                                     self.publisher.send(completion: .failure(error))
                                 } // switch
                             } receiveValue: { (val) in

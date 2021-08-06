@@ -17,7 +17,7 @@ struct CancellableView: View {
     @State   var message: String?
     @Binding var phase:   String
     @Binding var value:   Double
-    @State   var restore: RestoreManager
+    @State   var manager: LoaderManager
     @Binding var completion: Subscribers.Completion<Error>?
     @Binding var cancel: (() -> Void)?
 
@@ -55,13 +55,22 @@ struct CancellableView: View {
                 case .finished:
                     Button("OK") {
                         self.presentationMode.wrappedValue.dismiss()
-                    }.padding()
+                    }
+                    .padding()
+                    .onAppear {
+                        withAnimation {
+                            self.message = "Completed"
+                        }
+                    }
                 case .failure(let error):
                     Button("OK") {
                         self.presentationMode.wrappedValue.dismiss()
-                    }.padding()
+                    }
+                    .padding()
                     .onAppear {
-                        self.message = (error as? LocalizedError)?.errorDescription
+                        withAnimation {
+                            self.message = (error as? LocalizedError)?.errorDescription
+                        }
                     }
                 } // switch
             } // Group
@@ -93,7 +102,7 @@ struct SettingsView: View {
         case cancellable(title: String,
                          phase: Binding<String>,
                          value: Binding<Double>,
-                         restore: RestoreManager,
+                         manager: LoaderManager,
                          completion: Binding<Subscribers.Completion<Error>?>,
                          cancel: Binding<(() -> Void)?>)
 
@@ -110,7 +119,7 @@ struct SettingsView: View {
                 return ObjectIdentifier(Self.self)
             case .authenticate(cryptor: _):
                 return ObjectIdentifier(Self.self)
-            case .cancellable(title: _, phase: _, value: _, restore: _, completion: _, cancel: _):
+            case .cancellable(title: _, phase: _, value: _, manager: _, completion: _, cancel: _):
                 return ObjectIdentifier(Self.self)
             }
         }
@@ -131,7 +140,7 @@ struct SettingsView: View {
                 return AnyView(CancellableView(title: title,
                                                phase: phase,
                                                value: value,
-                                               restore: manager,
+                                               manager: manager,
                                                completion: completion,
                                                cancel: cancel))
             }
@@ -207,12 +216,34 @@ struct SettingsView: View {
                             self.cryptor.close(keep: false)
                             return
                         }
+                        self.completion = nil
                         self.sheet = .import { url in
-                            DataManager.shared.import(url: url, cryptor: self.cryptor)
-                            J1Logger.shared.debug("fileURL = \(String(describing: url))")
+                            J1Logger.shared.info("restore url = \(url)")
+                            let importMan = ImportManager(url: url, cryptor: self.cryptor)
+                            self.sheet = .cancellable(title: "Import",
+                                                      phase: self.$phase,
+                                                      value: self.$progress,
+                                                      manager: importMan,
+                                                      completion: self.$completion,
+                                                      cancel: .constant( {
+                                                        importMan.cancel()
+                                                      }))
+                            importMan.sink { completion in
+                                self.completion = completion
+                                switch completion {
+                                case .finished:
+                                    J1Logger.shared.debug("finished")
+                                case .failure(let error):
+                                    J1Logger.shared.error("error = \(error)")
+                                }
+                            } receiveValue: { (phase, val) in
+                                self.phase    = phase
+                                self.progress = val
+                            }
                         }
-                    }
-                }
+                        J1Logger.shared.debug("Import")
+                    } // cryptor.open
+                } // Import
             } // Section
             Section(header: Text("Backup / Restore")) {
                 Button("Backup") {
@@ -234,16 +265,16 @@ struct SettingsView: View {
                     self.completion = nil
                     self.sheet = .restore { url in
                         J1Logger.shared.info("restore url = \(url)")
-                        let restore = RestoreManager(url: url)
+                        let restoreMan = RestoreManager(url: url)
                         self.sheet = .cancellable(title: "Restore",
                                                   phase: self.$phase,
                                                   value: self.$progress,
-                                                  restore: restore,
+                                                  manager: restoreMan,
                                                   completion: self.$completion,
                                                   cancel: .constant( {
-                                                                        restore.cancel()
+                                                    restoreMan.cancel()
                                                   }))
-                        restore.sink { completion in
+                        restoreMan.sink { completion in
                             self.completion = completion
                             switch completion {
                             case .finished:
@@ -257,7 +288,7 @@ struct SettingsView: View {
                         }
                     }
                     J1Logger.shared.debug("Restore")
-                }
+                } // Restore
             } // Section
             Section(header: Text("Dangerous Operation").foregroundColor(.red)) {
                 Button("Delete All Data") {
@@ -282,7 +313,7 @@ struct SettingsView_Previews: PreviewProvider {
         CancellableView(title: "Title",
                         phase: .constant("Loading..."),
                         value: .constant(0.5),
-                        restore: RestoreManager(),
+                        manager: RestoreManager(),
                         completion: .constant(nil),
                         cancel: .constant(nil))
         SettingsView(fileURL: nil)

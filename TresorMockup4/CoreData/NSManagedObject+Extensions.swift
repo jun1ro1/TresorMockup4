@@ -70,7 +70,33 @@ extension NSManagedObject {
             }
         }
     }
-    
+
+    func setValues(from properties: [String: String]) {
+        let names = Self.entity().properties.map { $0.name }
+        names.forEach { name in
+            if let val = properties[name] {
+                switch Self.entity().attributesByName[name]?.attributeType {
+                case .booleanAttributeType:
+                    self.setValue(Bool(val), forKey: name)
+                case .integer16AttributeType, .integer32AttributeType, .integer64AttributeType:
+                    self.setValue(Int(val), forKey: name)
+                case .dateAttributeType:
+                    self.setValue(Self.dateFormatter.date(from: val), forKey: name)
+                case .UUIDAttributeType:
+                    if let v = UUID(uuidString: val) {
+                        self.setValue(v, forKey: name)
+                    } else {
+                        J1Logger.shared.error("can not convert to UUID \(val)")
+                    }
+                case .stringAttributeType:
+                    self.setValue(String(val), forKey: name)
+                default:
+                    self.setValue(nil, forKey: name)
+                }
+            }
+        }
+    }
+
     func propertyDictionary() -> [String: String] {
         let props = Self.entity().properties
         

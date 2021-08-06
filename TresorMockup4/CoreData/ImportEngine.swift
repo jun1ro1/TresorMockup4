@@ -16,8 +16,13 @@ final class ImportEngine {
     var entity:     NSManagedObject.Type
     var keys:       [String]
     var context:    NSManagedObjectContext
-    var collection: [([String : String], NSManagedObject)] = []
     var cancelled:  Bool? = false
+
+    var collection: [([String : String], NSManagedObject)] = []
+    var previousObject: NSManagedObject?
+
+    var header:        [String]?        = nil
+    var headerMapping: [String: String] = [:]
 
     init(entity: NSManagedObject.Type, searchingKeys keys: [String], context: NSManagedObjectContext) {
         self.entity  = entity
@@ -36,7 +41,8 @@ final class ImportEngine {
         return tempURL
     }
 
-    func managedObjectPublisher(publisher: AnyPublisher<[String: String], Error>)
+    func managedObjectPublisher(publisher: AnyPublisher<[String: String], Error>,
+                                compoundPredicate: NSPredicate? = nil)
     -> AnyPublisher<([String: String], NSManagedObject), Error> {
         let entity     = self.entity
         let entityName = entity.entity().name ?? "nil-name"
@@ -52,10 +58,12 @@ final class ImportEngine {
                     continue
                 }
                 let request: NSFetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: entityName)
+
                 var predicate: NSPredicate?
                 switch entity.entity().attributesByName[key]?.attributeType {
                 case .UUIDAttributeType:
-                    predicate = NSPredicate(format: "%K == %@", "uuid", UUID(uuidString: valstr)! as CVarArg)
+                    predicate = NSPredicate(format: "%K == %@",
+                                            "uuid", UUID(uuidString: valstr)! as CVarArg)
                 case .stringAttributeType:
                     predicate = NSPredicate(format: "%K == %@", key, valstr)
                 default:
@@ -65,6 +73,11 @@ final class ImportEngine {
                     J1Logger.shared.error("entity = \(entityName) Unknown attribute type")
                     continue
                 }
+                if compoundPredicate != nil {
+                    predicate = NSCompoundPredicate(
+                        andPredicateWithSubpredicates: [predicate!, compoundPredicate!])
+                }
+                
                 request.predicate = predicate
                 request.sortDescriptors = nil
 
@@ -95,6 +108,7 @@ final class ImportEngine {
         let pub = publisher.map { [weak self] (dict, obj) -> ([String: String], NSManagedObject) in
             if self?.cancelled != true {
                 obj.setPrimitive(from: dict)
+                self?.previousObject = obj
                 self?.collection.append((dict, obj))
             }
             return (dict, obj)
@@ -102,6 +116,44 @@ final class ImportEngine {
         return pub
     }
 
+    func setValuePublisher(publisher: AnyPublisher<([String: String], NSManagedObject), Error>,
+                           cryptor: Cryptor?)
+    -> AnyPublisher<([String: String], NSManagedObject), Error> {
+        let pub = publisher.map { [weak self]
+            (dictParam, obj) -> ([String: String], NSManagedObject) in
+            if self?.header == nil {
+                self?.header = Array(dictParam.keys).map { $0.lowercased() }
+            }
+            var dict: [String: String] = dictParam
+            if self?.cancelled != true {
+                let plain = dict["password"]
+                if plain != nil {
+                    dict.removeValue(forKey: "password")
+                }
+                obj.setValues(from: dict)
+                if plain != nil {
+                    try? (obj as! Site).setPassword(cryptor: cryptor!, plain: plain!)
+                }
+                self?.previousObject = obj
+                self?.collection.append((dict, obj))
+            }
+            return (dict, obj)
+        }.eraseToAnyPublisher()
+        return pub
+    }
+
+    func importPublisher(publisher: AnyPublisher<([String: String], NSManagedObject), Error>)
+    -> AnyPublisher<([String: String], NSManagedObject), Error> {
+        let pub = publisher.map { [weak self]
+            (dict, obj) -> ([String: String], NSManagedObject) in
+            if self?.cancelled != true {
+                obj.setPrimitive(from: dict)
+                self?.collection.append((dict, obj))
+            }
+            return (dict, obj)
+        }.eraseToAnyPublisher()
+        return pub
+    }
 
     func linkPublisher()
     -> AnyPublisher<([String: String], NSManagedObject), Error> {

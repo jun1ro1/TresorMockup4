@@ -14,6 +14,9 @@
 		F916905925D78BE5003EBCCD /* TrashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F916905725D78BE5003EBCCD /* TrashView.swift */; };
 		F916905A25D78BE5003EBCCD /* TrashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F916905725D78BE5003EBCCD /* TrashView.swift */; };
 		F91D3A112562D0BD0018238B /* FocusableTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = F91D3A102562D0BC0018238B /* FocusableTextField.swift */; };
+		F94B287C26B8536E0044E9E8 /* ImportManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F94B287B26B8536E0044E9E8 /* ImportManager.swift */; };
+		F94B287D26B8536E0044E9E8 /* ImportManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F94B287B26B8536E0044E9E8 /* ImportManager.swift */; };
+		F94B287E26B8536E0044E9E8 /* ImportManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F94B287B26B8536E0044E9E8 /* ImportManager.swift */; };
 		F94F67702605BD29004DA90E /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F94F676F2605BD29004DA90E /* CloudKit.framework */; };
 		F954C09125CD8EE600F88AE8 /* NSManagedObject+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F954C09025CD8EE600F88AE8 /* NSManagedObject+Extensions.swift */; };
 		F954C09225CD8EE600F88AE8 /* NSManagedObject+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F954C09025CD8EE600F88AE8 /* NSManagedObject+Extensions.swift */; };
@@ -124,6 +127,7 @@
 		F916905725D78BE5003EBCCD /* TrashView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TrashView.swift; sourceTree = "<group>"; };
 		F91D3A102562D0BC0018238B /* FocusableTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FocusableTextField.swift; sourceTree = "<group>"; };
 		F94207AF256579CE008F4883 /* log1.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = log1.rtf; sourceTree = "<group>"; };
+		F94B287B26B8536E0044E9E8 /* ImportManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportManager.swift; sourceTree = "<group>"; };
 		F94F676B2605BD22004DA90E /* TresorMockup4.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TresorMockup4.entitlements; sourceTree = "<group>"; };
 		F94F676F2605BD29004DA90E /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		F954C09025CD8EE600F88AE8 /* NSManagedObject+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSManagedObject+Extensions.swift"; sourceTree = "<group>"; };
@@ -302,11 +306,12 @@
 		F98D38B42696060700288B50 /* AppData */ = {
 			isa = PBXGroup;
 			children = (
-				F98D38B826960C8C00288B50 /* RestoreManager.swift */,
 				F9C8F6A7261CA550005920D3 /* DataManager.swift */,
 				F9CDBA1325D1775200780803 /* Category+Extensions.swift */,
 				F9CEC7DD25CE264600A14B61 /* Password+Extensions.swift.swift */,
 				F9ECF1D92568B7AA00936DAF /* Site+Extensions.swift */,
+				F98D38B826960C8C00288B50 /* RestoreManager.swift */,
+				F94B287B26B8536E0044E9E8 /* ImportManager.swift */,
 			);
 			path = AppData;
 			sourceTree = "<group>";
@@ -644,6 +649,7 @@
 				F98D38B926960C8C00288B50 /* RestoreManager.swift in Sources */,
 				F965519225AB5F0E00FFD4E8 /* Validator.swift in Sources */,
 				F9ECF1E52568CBF700936DAF /* TresorMockup4.xcdatamodeld in Sources */,
+				F94B287C26B8536E0044E9E8 /* ImportManager.swift in Sources */,
 				F9C8F6A8261CA550005920D3 /* DataManager.swift in Sources */,
 				F954C09125CD8EE600F88AE8 /* NSManagedObject+Extensions.swift in Sources */,
 				F97309FD25600D05007109F7 /* ContentView.swift in Sources */,
@@ -690,6 +696,7 @@
 				F9CDBA1525D1775200780803 /* Category+Extensions.swift in Sources */,
 				F9B9AEA625FC4FF800FA8D87 /* CSVReaderPublisher.swift in Sources */,
 				F95E9A382674F1CC00F7222F /* ExportEngine.swift in Sources */,
+				F94B287D26B8536E0044E9E8 /* ImportManager.swift in Sources */,
 				F9C8F6A9261CA550005920D3 /* DataManager.swift in Sources */,
 				F916905925D78BE5003EBCCD /* TrashView.swift in Sources */,
 				F9AE18B625B33336007373E0 /* CryptorError.swift in Sources */,
@@ -718,6 +725,7 @@
 				F9CDBA1625D1775200780803 /* Category+Extensions.swift in Sources */,
 				F9B9AEA725FC4FF800FA8D87 /* CSVReaderPublisher.swift in Sources */,
 				F95E9A392674F1CC00F7222F /* ExportEngine.swift in Sources */,
+				F94B287E26B8536E0044E9E8 /* ImportManager.swift in Sources */,
 				F9C8F6AA261CA550005920D3 /* DataManager.swift in Sources */,
 				F916905A25D78BE5003EBCCD /* TrashView.swift in Sources */,
 				F9AE18B725B33336007373E0 /* CryptorError.swift in Sources */,
