@@ -49,7 +49,7 @@ extension Site {
 
 // MARK: -
 extension Site {
-    public func setPassword(cryptor: Cryptor, plain newPassPlain: String) throws {
+    public func setPassword(cryptor: Cryptor, plain newPassPlain: String, append: Bool = false) throws {
         guard let viewContext = self.managedObjectContext else { return }
         guard !newPassPlain.isEmpty else { return }
         
@@ -63,7 +63,17 @@ extension Site {
         let newPassCipher = try cryptor.encrypt(plain: newPassPlain)
         let newPassHash   = try newPassPlain.hash()
         let newPassLength = Int16(newPassPlain.count)
-        
+
+        if append {
+            let p = Password(context: viewContext)
+            p.password     = newPassCipher
+            p.passwordHash = newPassHash
+            p.length       = newPassLength
+            p.site         = self
+            self.addToPasswords(p)
+            return
+        }
+
         // save old password
         if let oldPassStr  = self.password, let oldPassHash = self.passwordHash {
             if passwords.first(where: { $0.passwordHash == oldPassHash }) == nil {
@@ -76,7 +86,7 @@ extension Site {
             }
         }
         
-        // set new password
+        // set new password to the Site
         self.password     = newPassCipher
         self.passwordHash = newPassHash
         self.length       = newPassLength

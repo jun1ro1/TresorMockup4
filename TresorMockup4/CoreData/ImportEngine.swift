@@ -41,6 +41,15 @@ final class ImportEngine {
         return tempURL
     }
 
+    func isRepeatingRecord(dict: [String: String]) -> Bool {
+        return self.keys.map { (key) -> Bool in
+            let val = dict[key]
+            return (val == nil) || val!.isEmpty
+        }.reduce(true) {
+            $0 && $1
+        }
+    }
+
     func managedObjectPublisher(publisher: AnyPublisher<[String: String], Error>,
                                 compoundPredicate: NSPredicate? = nil)
     -> AnyPublisher<([String: String], NSManagedObject), Error> {
@@ -51,10 +60,16 @@ final class ImportEngine {
         return publisher.tryMap { [weak self] dict in
             var keys: [String]        = self?.keys ?? []
             var obj: NSManagedObject? = nil
+
+            if (self?.isRepeatingRecord(dict: dict) ?? false) && self?.previousObject != nil {
+                let dict2 = dict.filter { (_, val) in !val.isEmpty }
+                return (dict2, self!.previousObject!)
+            }
+
             while obj == nil && keys.count > 0 {
                 let key = keys.removeFirst()
-                guard let valstr = dict[key] else {
-                    J1Logger.shared.debug("entity = \(entityName) \(key) value is nil in \(dict)")
+                guard let valstr = dict[key], !valstr.isEmpty else {
+                    J1Logger.shared.debug("entity = \(entityName) \(key) value is nil or empty in \(dict)")
                     continue
                 }
                 let request: NSFetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: entityName)
@@ -77,7 +92,7 @@ final class ImportEngine {
                     predicate = NSCompoundPredicate(
                         andPredicateWithSubpredicates: [predicate!, compoundPredicate!])
                 }
-                
+
                 request.predicate = predicate
                 request.sortDescriptors = nil
 
@@ -132,8 +147,11 @@ final class ImportEngine {
                 }
                 obj.setValues(from: dict)
                 if plain != nil {
-                    try? (obj as! Site).setPassword(cryptor: cryptor!, plain: plain!)
+                    try? (obj as? Site)?
+                        .setPassword(cryptor: cryptor!, plain: plain!,
+                                     append: (self?.isRepeatingRecord(dict: dict) ?? false))
                 }
+
                 self?.previousObject = obj
                 self?.collection.append((dict, obj))
             }
